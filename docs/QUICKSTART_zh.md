@@ -1,62 +1,62 @@
-# reverse-skill 快速開始與社群問題說明
+# reverse-skill quick start and community problem explanation
 
-## 專案定位
+## Project positioning
 
-`reverse-skill` 是 AI 客戶端可讀取的逆向工程、安全研究技能、規則與工具文件集合，不是一個單一的可執行應用程式。使用前，請先確認你對分析目標擁有明確授權，或正在使用合法的 CTF、教學或測試環境。
+`reverse-skill` is a collection of reverse engineering, security research skills, rules and tool files that can be read by the AI ​​client. It is not a single executable application. Before use, please confirm that you have explicit authorization for the analysis target or are using a legal CTF, teaching or testing environment.
 
-## 基本使用方式
+## Basic usage
 
-先下載專案：
+Download the project first:
 
     git clone https://github.com/zhaoxuya520/reverse-skill.git
     cd reverse-skill
 
-接著將專案目錄交給你使用的 AI 客戶端作為工作區或文件來源。核心文件包括：
+Then give the project directory to the AI ​​client you are using as a workspace or file source. Core files include:
 
-- `RULES.md`：一般規則與安全邊界。
-- `skills/MASTER-ROUTING.md`：技能路由與任務分流。
-- `skills/*/SKILL.md`：各專業領域的技能說明。
-- `docs/platforms/`：不同作業系統的工具安裝說明。
+- `RULES.md`: General rules and safety boundaries.
+- `skills/MASTER-ROUTING.md`: Skill routing and task offloading.
+- `skills/*/SKILL.md`: Description of skills in each professional field.
+- `docs/platforms/`: Tool installation instructions for different operating systems.
 
-本專案保持客戶端中立，因此 OpenCode、Codex、Cursor、Claude Code 與其他客戶端的實際載入方式，仍以各客戶端官方文件為準；不要假設某一個客戶端的 plugin 或同步格式能套用到其他客戶端。
+This project remains client-neutral, so the actual loading methods of OpenCode, Codex, Cursor, Claude Code and other clients are still subject to the official documents of each client; do not assume that the plugin or synchronization format of a certain client can be applied to other clients.
 
-最可靠的通用方式是把完整 repository 根目錄作為工作區開啟，而不是只把 `skills/` 子目錄複製進客戶端。確認客戶端能讀取根目錄的 `AGENTS.md` / `RULES.md`，再執行平台原生 `master-route`；若客戶端不會自動載入專案規則，就在對話中明確引用 `RULES.md` 和目標 `SKILL.md`。
+The most reliable general approach is to open the entire repository root directory as a workspace, rather than just copying the `skills/` subdirectory into the client. Confirm that the client can read `AGENTS.md` / `RULES.md` in the root directory, and then execute the platform's native `master-route`; if the client does not automatically load the project rules, explicitly reference `RULES.md` and the target `SKILL.md` in the conversation.
 
-## OpenCode、Codex 與同步問題
+## OpenCode, Codex and synchronization issues
 
-若客戶端顯示 `Not Synchronizable` 或無法同步，先確認工作區是否指向完整的 repository 根目錄、檔案權限是否允許讀取，以及客戶端是否支援該目錄格式。最可靠的替代方式是直接在本地工作區開啟 repository，並在對話中明確引用所需的規則或技能文件。若問題仍可重現，回報時請附上客戶端版本、作業系統、完整錯誤訊息與最小重現步驟。
+If the client displays `Not Synchronizable` or cannot be synchronized, first confirm whether the workspace points to the complete repository root directory, whether the file permissions allow reading, and whether the client supports the directory format. The most reliable alternative is to open the repository directly in the local workspace and explicitly reference the required rules or skill files in the conversation. If the problem can still be reproduced, please include the client version, operating system, complete error message, and minimum reproduction steps when reporting.
 
-## AI 拒絕處理分析請求
+## AI refuses to process analysis request
 
-AI 的安全策略不會因為提示中加入「我已授權」就必然允許所有操作。請只處理合法授權的目標，避免要求未授權入侵、憑證竊取、持久化或破壞性操作；可將請求限定為程式碼理解、樣本分析、漏洞修補、CTF 或防禦性驗證。對於特定 APK、網站或帳戶，請先準備可驗證的授權範圍與測試環境。
+AI's security policy will not necessarily allow all operations just because "I have authorized" is added to the prompt. Please process only legitimately authorized targets and avoid requests for unauthorized intrusion, credential theft, persistence, or destructive operations; you can limit requests to code understanding, sample analysis, vulnerability patching, CTF, or defensive verification. For a specific APK, website, or account, please first prepare verifiable authorization scope and test environment.
 
-## Python 工具與 uv
+## Python tools and uv
 
-獨立命令列工具可使用：
+Standalone command line tools are available:
 
     uv tool install PACKAGE_NAME
 
-專案依賴則使用隔離環境：
+Project dependencies use isolation environments:
 
     uv venv
     uv pip install -r requirements.txt
 
-不要機械式把所有 `pip` 字串替換為 `uv pip`；`python -m pip`、`pipx` bootstrap 與已存在的虛擬環境各有不同用途。若尚未安裝 `uv`，請使用作業系統套件管理器或明確建立的虛擬環境，不要把安全工具直接安裝到系統全域 Python。
+Don't mechanically replace all `pip` strings with `uv pip`; `python -m pip`, `pipx` bootstrap and existing virtual environments each have different uses. If `uv` is not installed yet, please use the operating system package manager or an explicitly created virtual environment. Do not install security tools directly into system-wide Python.
 
-更完整的安裝與壓縮檔安全說明見 [安裝與下載安全指引](UV-AND-DOWNLOAD-SECURITY_zh.md)。
+For more complete installation and compressed file security instructions, see [Installation and Download Security Guidelines] (UV-AND-DOWNLOAD-SECURITY_zh.md).
 
-## ZIP 報毒與下載安全
+## ZIP virus reporting and download security
 
-逆向工程工具可能包含二進位檔、除錯器、封裝檔或測試資料，容易觸發防毒軟體的啟發式偵測。防毒警告不代表已證明安全，也不代表已證明惡意。請勿停用防毒軟體或盲目略過警告。
+Reverse engineering tools may contain binaries, debuggers, packaging files or test data, which can easily trigger heuristic detection by anti-virus software. Antivirus warnings do not mean that security has been proven, nor that malicious intent has been proven. Don't disable your anti-virus software or blindly ignore warnings.
 
-開啟壓縮檔前，請從預期的 HTTPS repository 或 release 頁面下載，核對 checksum 或 release digest（若有提供），檢查壓縮檔內容，並使用最新的安全軟體掃描。不要因為檔案成功下載，就直接執行其中未知的二進位檔、腳本或安裝程式。
+Before opening the archive, please download it from the expected HTTPS repository or release page, check the checksum or release digest (if provided), check the archive contents, and scan with the latest security software. Do not directly execute unknown binaries, scripts or installers just because the file downloaded successfully.
 
-## 帳戶、貢獻與未具體化回報
+## Accounts, Contributions and Unspecified Returns
 
-請遵守 AI 客戶端、GitHub、工具供應商及目標環境的服務條款。repository 本身無法保證第三方平台不會限制帳戶，也不能替平台決定帳戶政策。若要貢獻 radare2 或其他技能，請先閱讀 `skills/CONTRIBUTING.md`，並以小型、可驗證的 Pull Request 提交。
+Please comply with the terms of service of the AI ​​client, GitHub, tool vendor, and target environment. The repository itself cannot guarantee that third-party platforms will not restrict accounts, nor can it determine account policies for the platform. To contribute radare2 or other skills, please first read `skills/CONTRIBUTING.md` and submit as a small, verifiable Pull Request.
 
-只有包含完整錯誤訊息、環境資訊與重現步驟的問題，才適合進一步修復。像是只有「病毒」、「gaha」或「test」的回報，請補充檔名、下載 URL、掃描產品、版本與重現方式。
+Only issues that contain a complete error message, environment information, and reproduction steps are suitable for further repair. For reports with only "virus", "gaha" or "test", please add the file name, download URL, scan product, version and reproduction method.
 
-## 外部模型與 API
+## External models and APIs
 
-本 repository 不內建、不代理、也不轉售 Grok/xAI API，不會收集或分發 Grok API key。模型與 API endpoint 由使用者在所選 AI 客戶端或供應商中自行配置；使用第三方轉發服務時，請自行核對供應商、資料處理條款與金鑰風險。
+This repository does not build, proxy, or resell the Grok/xAI API, and does not collect or distribute Grok API keys. Models and API endpoints are configured by users in the selected AI client or provider; when using third-party forwarding services, please check the provider, data processing terms, and key risks yourself.

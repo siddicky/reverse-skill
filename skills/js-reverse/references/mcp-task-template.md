@@ -1,30 +1,30 @@
-# MCP 任务编排模板
+# MCP task arrangement template
 
 ```md
 ## Observe
-- 页面：
-- 目标请求：
+- Page:
+- Target request:
 - initiator：
-- 可疑脚本：
+- Suspicious script:
 
 ## Capture
-- 采样方式：
-- 命中位置：
-- 关键入参：
-- 关键返回：
+- Sampling method:
+- Hit location:
+- Key input parameters:
+- Key return:
 
 ## Rebuild
-- 入口函数：
-- 依赖脚本：
-- 环境缺口：
+- Entry function:
+- Dependency script:
+- Environmental gaps:
 
 ## Patch
 - first divergence：
-- 本次补丁：
-- 复测结果：
+- This patch:
+- Retest results:
 
 ## Output
-- 是否拿到参数：
-- 是否可稳定复现：
-- 剩余风险：
+- Whether to get the parameters:
+- Whether it can be reproduced stably:
+- Residual risk:
 ```

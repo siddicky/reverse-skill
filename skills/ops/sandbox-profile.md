@@ -1,54 +1,54 @@
-# 可选沙箱工具 Profile（对照 bootstrap-manifest）
+# Optional sandbox tool Profile (compare bootstrap-manifest)
 
-> Z3r0 默认镜像工具很全；reverse-skill **不捆绑镜像**，用本表做「覆盖率对照」与可选 Docker 建议。
+> Z3r0 has a complete set of default image tools; reverse-skill**does not bundle the image**. Use this table for "coverage comparison" and optional Docker recommendations.
 
-## reverse-skill 可自动 bootstrap 的能力
+## reverse-skill The ability to automatically bootstrap
 
-来源：`skills/scripts/bootstrap-manifest.json`（以文件为准）：
+ Source: `skills/scripts/bootstrap-manifest.json` (subject to file):
 
-| 能力 | 典型场景 |
+| Capabilities | Typical scenarios |
 |------|----------|
 | jadx / apktool / adb / frida / frida-ps | Android |
-| r2 / rabin2 | 二进制 CLI |
+| r2 / rabin2 | Binary CLI |
 | idalib-mcp / idapro | IDA MCP |
-| jeb-pro | 商业 Android / ARM 反编译器（手动许可安装） |
-| jshookmcp / reqable-mcp / anything-analyzer / agent-browser | Web/JS/抓包/浏览器 |
+| jeb-pro | Commercial Android/ARM decompiler (manual license installation) |
+| jshookmcp / reqable-mcp / anything-analyzer / agent-browser | Web/JS/capture/browser |
 | ghidra-mcp | Ghidra |
-| nmap / seclists / proxycat / burpsuite-mcp / pentestswarm | 渗透 |
-| binwalk / pwntools / yara | 固件/pwn/恶意 |
+| nmap / seclists / proxycat / burpsuite-mcp / pentestswarm | Penetration |
+| binwalk/pwntools/yara | firmware/pwn/malicious |
 
 ```powershell
 powershell -File skills\scripts\bootstrap-reverse.ps1 -Capability @('jadx','nmap','yara') -StartServices
 powershell -File skills\scripts\refresh-tool-index.ps1
 ```
 
-## Z3r0 沙箱常见但本包 manifest 未自动装的
+## Z3r0 is common in sandboxes but  is not automatically installed in this package manifest
 
-| 工具 | reverse-skill 策略 |
+| tool | reverse-skill strategy |
 |------|-------------------|
-| subfinder / amass / httpx / ffuf / nuclei / sqlmap | 文档安装 / Kali 脚本 / 外部 MCP；**勿假装 bootstrap 已有** |
-| Ghidra GUI 全量 | ghidra-mcp 能力 + 手动插件步骤 |
-| gdb / pwndbg | 平台文档手动；pwntools 可 bootstrap |
-| hydra / hashcat | 手动或 Kali |
-| JEB Pro | 用户持有许可证后手动安装；第三方 MCP bridge 必须先完成供应链审查 |
-| Reqable 桌面客户端 | 用户手动安装；`reqable-mcp` 仅登记官方固定版本的 MCP 运行时 |
-| SecLists | seclists 能力 |
+| subfinder / amass / httpx / ffuf / nuclei / sqlmap | document installation / Kali script / external MCP;**do not pretend to bootstrap already have**|
+| Ghidra GUI full | ghidra-mcp capabilities + manual plug-in steps |
+| gdb / pwndbg | platform documentation manually; pwntools can bootstrap |
+| hydra / hashcat | manual or Kali |
+| JEB Pro | Users install manually after holding a license; third-party MCP bridge must first complete the supply chain review |
+| Reqable desktop client | User manual installation; `reqable-mcp` only registers the official fixed version of the MCP runtime |
+| SecLists | seclists Capabilities |
 
-## 推荐「轻量 Docker 作战」profile（可选，非依赖）
+## recommends the "Lightweight Docker Combat" profile (optional, non-dependent)
 
-仅当用户 **自己** 有 Docker 且授权 lab 时：
+ only when user**himself**has Docker and authorizes lab:
 
 ```text
-最小：nmap + nuclei + sqlmap 容器或 pentestMCP 类镜像
-移动：jadx + apktool + frida 宿主机
-逆向：宿主机 IDA/r2 + tool-index
+Minimum:nmap + nuclei + sqlmap container or pentestMCP -style image
+Mobile: jadx + apktool + frida host
+Reverse: host IDA/r2 + tool-index
 ```
 
-**MUST NOT** 要求用户安装 Z3r0 才能使用 reverse-skill。
+**MUST NOT**requires users to install Z3r0 to use reverse-skill.
 
-## network_profile 联动
+## network_profile linkage
 
-沙箱内扫描仍受 case `scope.md` 的 `network_profile` 约束：
+Scanning within the  sandbox is still subject to `network_profile` in case `scope.md`:
 
-- `offline` → 不建议起对外扫描容器  
-- `authorized_target_only` → 容器也只能打 in_scope  
+- `offline` → It is not recommended to scan the container    externally.  
+- `authorized_target_only` → The container can only be opened in_scope  

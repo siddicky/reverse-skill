@@ -1,135 +1,135 @@
-# 逆向工程参考资源汇总
+# Summary of reverse engineering reference resources
 
-> 精选自多个 awesome 列表，按实用性排序。AI 在逆向分析时可参考这些资源获取方法论和工具指导。
+> Curated from multiple awesome lists, sorted by usefulness. AI can refer to these resources for methodological and tool guidance during reverse analysis.
 
 ---
 
-## 综合资源库
+## Comprehensive resource library
 
-| 项目 | Stars | 覆盖 | 链接 |
+| Project | Stars | Coverage | Link |
 |------|-------|------|------|
-| **awesome-reversing** (tylerha97) | 3k+ | 逆向工具/书籍/课程/练习 | https://github.com/tylerha97/awesome-reversing |
-| **awesome-reverse-engineering** (alphaSeclab) | 4k+ | 3500+ 工具 + 2300 文章，全平台 | https://github.com/alphaSeclab/awesome-reverse-engineering |
-| **Reverse-Engineering** (mytechnotalent) | 10k+ | 免费教程：x86/x64/ARM/AVR/RISC-V | https://github.com/mytechnotalent/Reverse-Engineering |
-| **awesome-malware-analysis** (rshipp) | 12k+ | 恶意软件分析工具/资源 | https://github.com/rshipp/awesome-malware-analysis |
-| **reversingBits** | — | 逆向/二进制分析速查表合集 | https://github.com/mohitmishra786/reversingBits |
-| **awesome-arm-exploitation** | — | ARM 利用资源（视频/文章/书籍） | https://github.com/HenryHoggard/awesome-arm-exploitation |
-| **Binary-Analysis-Automation** | — | 自动化二进制分析（ML/脚本/静态/动态） | https://github.com/user1342/Awesome-Binary-Analysis-Automation |
+| **awesome-reversing** (tylerha97) | 3k+ | Reverse tools/books/courses/exercises |https://github.com/tylerha97/awesome-reversing|
+| **awesome-reverse-engineering** (alphaSeclab) | 4k+ | 3500+ tools + 2300 articles, all platforms |https://github.com/alphaSeclab/awesome-reverse-engineering|
+| **Reverse-Engineering** (mytechnotalent) | 10k+ | Free Tutorial: x86/x64/ARM/AVR/RISC-V |https://github.com/mytechnotalent/Reverse-Engineering|
+| **awesome-malware-analysis** (rshipp) | 12k+ | Malware analysis tools/resources |https://github.com/rshipp/awesome-malware-analysis|
+| **reversingBits** | — | Reverse/binary analysis cheat sheet collection |https://github.com/mohitmishra786/reversingBits|
+| **awesome-arm-exploitation** | — | ARM exploit resources (video/article/book) |https://github.com/HenryHoggard/awesome-arm-exploitation|
+| **Binary-Analysis-Automation** | — | Automated binary analysis (ML/script/static/dynamic) |https://github.com/user1342/Awesome-Binary-Analysis-Automation|
 
 ---
 
-## ELF / Linux 逆向专项
+## ELF/Linux reverse engineering project
 
-| 资源 | 说明 | 链接 |
+| Resource | Description | Link |
 |------|------|------|
-| **libelfmaster** | 安全 ELF 解析库（取证/恶意软件重建） | https://github.com/elfmaster/libelfmaster |
-| **ELF 规范** | 官方 ELF 格式文档 | https://refspecs.linuxfoundation.org/elf/elf.pdf |
-| **Linux Internals** | /proc 文件系统、内存布局、syscall | https://0xax.gitbooks.io/linux-insides/ |
-| **Compiler Explorer** | 在线看 C/C++/Rust/Go 编译成什么汇编 | https://godbolt.org/ |
+| **libelfmaster** | Secure ELF parsing library (forensics/malware reconstruction) |https://github.com/elfmaster/libelfmaster|
+| **ELF specification** | official ELF format document |https://refspecs.linuxfoundation.org/elf/elf.pdf|
+| **Linux Internals** | /proc file system, memory layout, syscall |https://0xax.gitbooks.io/linux-insides/|
+| **Compiler Explorer** | Online look at what assembly C/C++/Rust/Go compiles into |https://godbolt.org/|
 
 ---
 
-## ARM / AArch64 专项
+## ARM/AArch64 specialization
 
-| 资源 | 说明 | 链接 |
+| Resource | Description | Link |
 |------|------|------|
-| **ARM 官方架构手册** | 完整指令集参考 | https://developer.arm.com/documentation |
-| **Azeria Labs** | ARM 汇编/利用教程（最佳入门） | https://azeria-labs.com/writing-arm-assembly-part-1/ |
-| **ARM64 syscall 表** | Linux AArch64 系统调用号 | https://arm64.syscall.sh/ |
-| **QEMU 用户态模拟** | 不需要真实设备分析 ARM 二进制 | `qemu-aarch64 -strace ./binary` |
+| **ARM Official Architecture Manual** | Complete Instruction Set Reference |https://developer.arm.com/documentation|
+| **Azeria Labs** | ARM assembly/utilization tutorial (best entry) |https://azeria-labs.com/writing-arm-assembly-part-1/|
+| **ARM64 syscall table** | Linux AArch64 system call number |https://arm64.syscall.sh/|
+| **QEMU user mode simulation** | does not require real device analysis ARM binary |`qemu-aarch64 -strace ./binary`|
 
 ---
 
-## 恶意软件分析
+## Malware analysis
 
-| 资源 | 说明 | 链接 |
+| Resource | Description | Link |
 |------|------|------|
-| **YARA** | 恶意软件特征匹配规则 | https://github.com/VirusTotal/yara |
-| **Volatility 3** | 内存取证框架 | https://github.com/volatilityfoundation/volatility3 |
-| **FLOSS** | 自动提取混淆字符串 | https://github.com/mandiant/flare-floss |
-| **Detect It Easy (DiE)** | 文件类型/壳/编译器识别 | https://github.com/horsicq/Detect-It-Easy |
-| **PE-bear** | PE 文件分析器 | https://github.com/hasherezade/pe-bear |
-| **Capa** | 自动识别二进制能力（网络/文件/加密等） | https://github.com/mandiant/capa |
-| **Unpacker** | 通用脱壳框架 | https://github.com/malwaretech/UnpackerFramework |
+| **YARA** | Malware signature matching rules |https://github.com/VirusTotal/yara|
+| **Volatility 3** | Memory Forensics Framework |https://github.com/volatilityfoundation/volatility3|
+| **FLOSS** | Automatically extract obfuscated strings |https://github.com/mandiant/flare-floss|
+| **Detect It Easy (DiE)** | File type/shell/compiler identification |https://github.com/horsicq/Detect-It-Easy|
+| **PE-bear** | PE file analyzer |https://github.com/hasherezade/pe-bear|
+| **Capa** | Automatic recognition of binary capabilities (network/file/encryption, etc.) |https://github.com/mandiant/capa|
+| **Unpacker** | Universal unpacking framework |https://github.com/malwaretech/UnpackerFramework|
 
 ---
 
-## 动态分析 / 沙箱
+## Dynamic Analysis/Sandbox
 
-| 资源 | 说明 | 链接 |
+| Resource | Description | Link |
 |------|------|------|
-| **Frida** | 跨平台动态插桩 | https://frida.re/ |
-| **strace** | Linux 系统调用跟踪 | 系统自带 |
-| **ltrace** | 库函数调用跟踪 | 系统自带 |
-| **QEMU** | 用户态/系统态模拟 | https://www.qemu.org/ |
-| **Unicorn** | CPU 模拟框架（可编程） | https://www.unicorn-engine.org/ |
-| **Qiling** | 高级二进制模拟框架 | https://qiling.io/ |
-| **angr** | 符号执行 + 二进制分析 | https://angr.io/ |
-| **Triton** | 动态二进制分析框架 | https://triton-library.github.io/ |
+| **Frida** | cross-platform dynamic instrumentation |https://frida.re/|
+| **strace** | Linux system call tracing | comes with the system |
+| **ltrace** | library function call tracing | comes with the system |
+| **QEMU** | User mode/system mode simulation |https://www.qemu.org/|
+| **Unicorn** | CPU simulation framework (programmable) |https://www.unicorn-engine.org/|
+| **Qiling** | Advanced binary simulation framework |https://qiling.io/|
+| **angr** | symbolic execution + binary analysis |https://angr.io/|
+| **Triton** | Dynamic binary analysis framework |https://triton-library.github.io/|
 
 ---
 
-## 反混淆 / 脱壳
+## Anti-obfuscation/unpacking
 
-| 资源 | 说明 | 链接 |
+| Resource | Description | Link |
 |------|------|------|
-| **UPX** | 最常见的壳，`upx -d` 脱壳 | https://upx.github.io/ |
-| **unipacker** | 通用 PE 脱壳器 | https://github.com/unipacker/unipacker |
-| **de4dot** | .NET 反混淆 | https://github.com/de4dot/de4dot |
-| **JADX** | Android DEX 反混淆 | https://github.com/skylot/jadx |
-| **JEB** | 商业 Android/ARM 反编译器 | https://www.pnfsoftware.com/ |
-| **Miasm** | 逆向工程框架（IR/符号执行/反混淆） | https://github.com/cea-sec/miasm |
-| **OLLVM 反混淆** | 控制流平坦化/虚假控制流对抗 | 用 angr/Triton 符号执行恢复 |
+| **UPX** | The most common shell,`upx -d`shelled |https://upx.github.io/|
+| **unipacker** | Universal PE packer |https://github.com/unipacker/unipacker|
+| **de4dot** | .NET Anti-obfuscation |https://github.com/de4dot/de4dot|
+| **JADX** | Android DEX Anti-obfuscation |https://github.com/skylot/jadx|
+| **JEB** | Commercial Android/ARM decompiler |https://www.pnfsoftware.com/|
+| **Miasm** | Reverse Engineering Framework (IR/Symbolic Execution/Deobfuscation) |https://github.com/cea-sec/miasm|
+| **OLLVM deobfuscation** | Control flow flattening/fake control flow countermeasures | Perform recovery with angr/Triton symbols |
 
 ---
 
-## 在线分析平台
+## Online analysis platform
 
-| 平台 | 说明 | 链接 |
+| Platform | Description | Link |
 |------|------|------|
-| **VirusTotal** | 多引擎扫描 + 行为分析 | https://www.virustotal.com/ |
-| **Joe Sandbox** | 自动化恶意软件分析 | https://www.joesandbox.com/ |
-| **ANY.RUN** | 交互式在线沙箱 | https://any.run/ |
-| **Hybrid Analysis** | 免费恶意软件分析 | https://www.hybrid-analysis.com/ |
-| **Compiler Explorer** | 看编译器输出 | https://godbolt.org/ |
-| **Dogbolt** | 多反编译器对比（IDA/Ghidra/Binary Ninja） | https://dogbolt.org/ |
+| **VirusTotal** | Multi-engine scan + behavioral analysis |https://www.virustotal.com/|
+| **Joe Sandbox** | Automated malware analysis |https://www.joesandbox.com/|
+| **ANY.RUN** | Interactive online sandbox |https://any.run/|
+| **Hybrid Analysis** | Free malware analysis |https://www.hybrid-analysis.com/|
+| **Compiler Explorer** | View compiler output |https://godbolt.org/|
+| **Dogbolt** | Multiple decompiler comparison (IDA/Ghidra/Binary Ninja) |https://dogbolt.org/|
 
 ---
 
-## 学习路径
+## learning path
 
-### 入门（0-3 个月）
+### Getting started (0-3 months)
 
-1. [Reverse Engineering for Beginners](https://beginners.re/) — 免费电子书
-2. [Azeria Labs ARM 教程](https://azeria-labs.com/) — ARM 汇编基础
-3. [Nightmare](https://guyinatuxedo.github.io/) — CTF 逆向/Pwn 教程
-4. [crackmes.one](https://crackmes.one/) — 逆向练习题
+1. [Reverse Engineering for Beginners](https://beginners.re/)— Free e-book
+2. [Azeria Labs ARM Tutorial](https://azeria-labs.com/)— ARM Assembly Basics
+3. [Nightmare](https://guyinatuxedo.github.io/)— CTF Reverse/Pwn Tutorial
+4. [crackmes.one](https://crackmes.one/)— Reverse exercises
 
-### 进阶（3-12 个月）
+### Advanced (3-12 months)
 
-1. [Practical Binary Analysis](https://practicalbinaryanalysis.com/) — 实战二进制分析
-2. [The IDA Pro Book](https://nostarch.com/idapro2.htm) — IDA 深度使用
-3. [Malware Unicorn RE101](https://malwareunicorn.org/workshops/re101.html) — 恶意软件逆向
-4. [pwnable.kr](http://pwnable.kr/) / [pwnable.tw](https://pwnable.tw/) — Pwn 练习
+1. [Practical Binary Analysis](https://practicalbinaryanalysis.com/)— Practical Binary Analysis
+2. [The IDA Pro Book](https://nostarch.com/idapro2.htm)— In-depth use of IDA
+3. [Malware Unicorn RE101](https://malwareunicorn.org/workshops/re101.html)— Malware Reverse Engineering
+4. [pwnable.kr](http://pwnable.kr/)/ [pwnable.tw](https://pwnable.tw/)— Pwn Exercise
 
-### 高级
+### advanced
 
-1. [Modern Binary Exploitation](https://github.com/RPISEC/MBE) — RPI 课程
-2. [How to Hack Like a Ghost](https://nostarch.com/how-hack-ghost) — 高级渗透
-3. [Windows Internals](https://docs.microsoft.com/en-us/sysinternals/) — Windows 内核
-4. 实战：分析真实恶意软件样本（MalwareBazaar）
+1. [Modern Binary Exploitation](https://github.com/RPISEC/MBE)— RPI Course
+2. [How to Hack Like a Ghost](https://nostarch.com/how-hack-ghost)— Advanced Penetration
+3. [Windows Internals](https://docs.microsoft.com/en-us/sysinternals/)— Windows Kernel
+4. Practical combat: analyzing real malware samples (MalwareBazaar)
 
 ---
 
-## 速查表
+## cheat sheet
 
-| 速查表 | 链接 |
+| Cheat Sheet | Link |
 |--------|------|
-| x86/x64 指令速查 | https://www.felixcloutier.com/x86/ |
-| ARM64 指令速查 | https://developer.arm.com/documentation/ddi0602/latest |
-| Linux syscall 表 (x64) | https://blog.rchapman.org/posts/Linux_System_Call_Table_for_x86_64/ |
-| Linux syscall 表 (ARM64) | https://arm64.syscall.sh/ |
-| GDB 速查 | https://darkdust.net/files/GDB%20Cheat%20Sheet.pdf |
-| radare2 速查 | 本包 `radare2/references/cheatsheet.md` |
-| IDA 快捷键 | https://hex-rays.com/products/ida/support/freefiles/IDA_Pro_Shortcuts.pdf |
-| Ghidra 快捷键 | Ghidra 内置 Help → Keyboard Shortcuts |
+| x86/x64 command quick check |https://www.felixcloutier.com/x86/|
+| ARM64 instruction quick check |https://developer.arm.com/documentation/ddi0602/latest|
+| Linux syscall table (x64) |https://blog.rchapman.org/posts/Linux_System_Call_Table_for_x86_64/|
+| Linux syscall table (ARM64) |https://arm64.syscall.sh/|
+| GDB Quick Search |https://darkdust.net/files/GDB%20Cheat%20Sheet.pdf|
+| radare2 quick check | this package`radare2/references/cheatsheet.md`|
+| IDA shortcut key |https://hex-rays.com/products/ida/support/freefiles/IDA_Pro_Shortcuts.pdf|
+| Ghidra shortcuts | Ghidra built-in Help → Keyboard Shortcuts |

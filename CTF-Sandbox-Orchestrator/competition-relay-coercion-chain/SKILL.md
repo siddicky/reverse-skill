@@ -9,7 +9,7 @@ Use this skill only as a downstream specialization after `$ctf-sandbox-orchestra
 
 Use this skill when the hard part is proving the full chain from forced authentication to a service that actually accepts the relayed identity.
 
-Reply in Simplified Chinese unless the user explicitly requests English.
+Reply in English unless the user explicitly requests another language.
 
 ## Quick Start
 

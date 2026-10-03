@@ -1,82 +1,82 @@
-# .NET 混淆器脱混淆详解
+# Detailed explanation of .NET obfuscator deobfuscation
 
-主流 .NET 混淆器的识别、脱壳、anti-tamper 绕过。核心工具：**de4dot**（自动识别大多数壳）+ **dnSpyEx**（手动 patch）+ **dnlib**（脚本化）。
+ identifies, unpacks, and anti-tamper bypasses mainstream .NET obfuscators. Core tools:**de4dot**(automatically recognizes most shells) +**dnSpyEx**(manual patch) +**dnlib**(scripted).
 
-## 总决策表
+## general decision table
 
-| 混淆器 | de4dot type | 典型特征 | 自动脱壳 | 手动要点 |
+| mixer | de4dot type | Typical features | Automatic unpacking | Manual points |
 |--------|-------------|---------|---------|---------|
-| ConfuserEx 1.x/2.x | `cfze` | anti-tamper、控制流变形、字符串加密、反调试 | ✅ 多数自动 | 新版需先 patch anti-tamper |
-| ConfuserEx 3.x / 私改 | `cfze` | 同上 + 自定义 protector | ⚠️ 部分 | dump 运行时 / dnlib |
-| SmartAssembly | `sa` | 字符串编码、资源压缩、方法调用隐藏 | ✅ 自动 | 资源解压 |
-| Babel.NET | `babel` | 方法体加密、控制流、字符串 | ✅ 自动 | — |
-| Eazfuscator.NET | `eaz` | 字符串/资源加密、表达式混淆 | ⚠️ 部分 | 字符串解密器 |
-| .NET Reactor | `reactor` | necrobit (代码段加密) + anti-tamper | ⚠️ 新版难 | dump + 重建 metadata |
-| Themida .NET | — | 外壳 + 虚拟化 | ❌ de4dot 不行 | dump 内存，走 native 思路 |
-| Agile.NET / CliSecure | `agile` | 方法体加密 | ✅ 自动 | — |
+| ConfuserEx 1.x/2.x | `cfze` | anti-tamper, control flow transformation, string encryption, anti-debugging | ✅ Most automatic | new versions need to patch anti-tamper first |
+| ConfuserEx 3.x / private modification | `cfze` | Same as above + custom protector | ⚠️ Part of | dump runtime / dnlib |
+| SmartAssembly | `sa` | String encoding, resource compression, method call hiding | ✅ Automatic | resource decompression |
+| Babel.NET | `babel` | Method body encryption, control flow, string | ✅ Automatic | — |
+| Eazfuscator.NET | `eaz` | String/resource encryption, expression obfuscation | ⚠️ Part of | String decryptor |
+| .NET Reactor | `reactor` | necrobit (code segment encryption) + anti-tamper | ⚠️ New version is difficult | dump + rebuild metadata |
+| Themida .NET | — | shell + virtualization | ❌ de4dot does not work | dump memory, take the native idea |
+| Agile.NET / CliSecure | `agile` | Method body encryption | ✅ Automatic | — |
 
-## de4dot 标准用法
+## de4dot standard usage
 
 ```powershell
-# 自动识别（多数情况够用）
+# automatically recognizes (sufficient in most cases)
 de4dot target.exe -o target-clean.exe
 
-# 显式指定 type（自动识别失败）
+# Explicitly specify type (automatic recognition failed)
 de4dot --type cfze target.exe -o target-clean.exe
 
-# 先探测壳类型
+# first detects the shell type
 de4dot --detect target.exe
 
-# 批量
+# Batch
 de4dot *.exe
 
-# 只解字符串，不动控制流（最小干预）
+# only decodes strings and does not control the flow (minimal intervention)
 de4dot --strtyp delegate --strtok METHOD_TOKEN target.exe
 ```
 
-de4dot 的 `--strtyp` / `strtok` 模式：只解字符串解密器（指定解密方法 token），保留原控制流。适合"只想看明文字符串但不想碰 anti-tamper"的场景。
+`--strtyp` / `strtok` mode of de4dot: only decodes the string decryptor (specifies the decryption method token), retaining the original control flow. Suitable for scenarios where "you only want to see plain text strings but don't want to touch anti-tamper".
 
 ---
 
-## ConfuserEx（最常见）
+## ConfuserEx (most common)
 
-### 特征识别
+### Feature Recognition
 
-- 入口模块 `<module>` 类带 `[MethodImpl(NoInlining)]` 的 anti-tamper 检查
-- 大量 `Dictionary<string, T>` 的字符串解密器调用
-- 控制流平坦化（switch dispatch + state 变量）
-- 资源里嵌 `.cmp` 压缩资源
-- dnSpyEx C# 视图：类名/方法名乱码（`\uXXXX` 或无意义字符），方法体里满屏 `int num = ...; switch(num)`
+- entry module `<module>` class anti-tamper with `[MethodImpl(NoInlining)]` check
+- A large number of `Dictionary<string, T>`'s string decryptors call
+- control flow flattening (switch dispatch + state variable)
+- resource is embedded in `.cmp` compressed resource
+- dnSpyEx C# view: The class name/method name is garbled (`\uXXXX` or meaningless characters), and the method body fills the screen `int num = ...; switch(num)`
 
-### 脱壳流程
+### unpacking process
 
 ```powershell
-# 1. 标准脱壳
+# 1. Standard shelling
 de4dot target.exe -o target-clean.exe
 
-# 2. 如果 de4dot 报 "unknown" 或脱壳后打不开 → 新版/私改 ConfuserEx
-#    先确认 anti-tamper：
-dnSpyEx 打开 → 找 Module .cctor 或 Main 里的完整性校验
+# 2. If de4dot reports "unknown" or cannot be opened after unpacking → New version/privately modified ConfuserEx
+#    first confirm anti-tamper:
+Open dnSpyEx → Find the integrity check in Module .cctor or Main
 ```
 
-### anti-tamper 绕过（新版 ConfuserEx 常见）
+### anti-tamper bypass (common in newer versions of ConfuserEx)
 
-ConfuserEx 的 `anti tamper` 会在运行时校验方法体哈希，被改就崩。de4dot 通常能处理旧版，新版需手动：
+ConfuserEx's `anti tamper` will verify the method body hash at runtime and will crash if it is changed. de4dot can usually handle older versions, newer versions need to be done manually:
 
 ```text
-方法 A — dnSpyEx 直接 patch 校验函数：
-  1. 找 anti-tamper 校验方法（通常在 <module> 的静态构造里调用）
-  2. IL 编辑：把校验方法体改成 ret（直接返回）
-  3. 保存 → 再喂给 de4dot
+Method A — dnSpyEx directly patches the verification function:
+  1. Find the anti-tamper verification method (usually called in the static construction of <module>)
+  2. IL editor: Change the verification method body to ret (return directly)
+  3. Save → then feed to de4dot
 
-方法 B — 运行时 dump：
-  1. 用 MegaDumper / ExtremeDumper 跑起来 dump 内存中的 assembly
-  2. dump 出来的已经解密，再用 de4dot 清理残留
+Method B — runtime dump:
+  1. Run MegaDumper / ExtremeDumper to dump the assembly in memory
+  2. The dump has been decrypted, and then use de4dot to clean up the residue.
 ```
 
-### 控制流还原后
+### control flow restored
 
-de4dot 会把平坦化的 switch dispatch 还原成正常 if/while。如果没完全还原（看到残留 state 机），可再跑一次 de4dot 或手动跟 IL。
+de4dot will restore the flattened switch dispatch to normal if/while. If it is not completely restored (you see residual state machines), you can run de4dot again or follow IL manually.
 
 ---
 
@@ -86,60 +86,60 @@ de4dot 会把平坦化的 switch dispatch 还原成正常 if/while。如果没�
 de4dot --type sa target.exe -o target-clean.exe
 ```
 
-特征：
-- 字符串用 `SmartAssembly.Runtime.Strong` 系列编码
-- 资源压缩（`{assembly}.Resources`）
-- 方法调用隐藏（`ProcessCaller` / 间接 call）
+ Features:
+- string uses `SmartAssembly.Runtime.Strong` series encoding
+- resource compression (`{assembly}.Resources`)
+- method call hidden (`ProcessCaller` / indirect call)
 
-de4dot 对 SmartAssembly 兼容性最好，基本一键搞定。
+de4dot has the best compatibility with SmartAssembly and can basically be done with one click.
 
 ---
 
-## .NET Reactor（necrobit）
+## .NET Reactor（necrobit)
 
-`.NET Reactor` 的 **necrobit** 把真实方法体加密存到资源，运行时解密注入，原方法体是空壳。de4dot 对老版本有效，新版本（4.x+）常失败。
+`.NET Reactor`'s**necrobit**encrypts the real method body and saves it to the resource, and then decrypts and injects it at runtime. The original method body is an empty shell. de4dot works with older versions, but often fails with newer versions (4.x+).
 
 ```text
-当 de4dot 失败时：
-1. 让程序跑起来（dotnet target.exe 或直接双击）
-2. MegaDumper / ExtremeDumper dump 进程内存 → 导出解密后的 assembly
-3. 用 de4dot 清理 dump 产物的残留混淆
-4. 如果 metadata 损坏，用 dnlib 重建（见 common-workflow.md）
+When de4dot fails:
+1. Let the program run (dotnet target.exe or double-click directly)
+2. MegaDumper / ExtremeDumper dump process memory → export decrypted assembly
+3. Use de4dot to clean up the residual obfuscation of the dump product
+4. If metadata is damaged, use dnlib to rebuild it (see common-workflow.md)
 ```
 
 ---
 
-## 字符串解密器手动提取
+## string decryptor manually extracts
 
-混淆器把字符串加密，运行时调用解密方法还原。de4dot 多数能自动识别解密器，识别失败时手动：
+The  obfuscator encrypts the string and calls the decryption method to restore it at runtime. Most of de4dot can automatically identify the decryptor, if the identification fails, manually:
 
 ```text
-1. dnSpyEx 找到解密方法（通常签名固定：static string Decrypt(int) 或 Decrypt(string, int)）
-   - 特征：被大量调用、参数是数字常量、返回 string
-2. 记下方法 token（如 0x06000012）
-3. de4dot 指定解密器：
+1. Find the decryption method in dnSpyEx (the signature is usually fixed:static string Decrypt(int) or Decrypt(string, int))
+   - Characteristics: Called in large numbers, parameters are numeric constants, and return strings
+2. Write down the method token (such as 0x06000012)
+3. de4dot specifies the decryptor:
    de4dot --strtyp delegate --strtok 0x06000012 target.exe -o target-clean.exe
 ```
 
-如果连解密方法本身也被混淆（控制流平坦化），需要先脱控制流再定位解密器。
+ If even the decryption method itself is obfuscated (control flow flattening), you need to remove the control flow first and then locate the decryptor.
 
-## anti-debug 常见手法
+## anti-debug common techniques
 
-| 手法 | 位置 | 绕过 |
+| Technique | Location | Bypass |
 |------|------|------|
-| `Debugger.IsAttached` 检查 | 任意方法 | IL 改 `ldc.i4.0; ret` 或 patch getter |
-| `Debugger.IsLogging` | — | 同上 |
-| 时间检测 (`DateTime.Now` 差值) | 方法入口 | patch 掉差值比较 |
-| `CheckRemoteDebuggerPresent` P/Invoke | — | nop 掉调用 |
-| 异常驱动控制流（try/catch 路径选择）| 主逻辑 | 不能简单 nop，要分析 catch 块真实路径 |
+| `Debugger.IsAttached` check | any method | IL change `ldc.i4.0; ret` or patch getter |
+| `Debugger.IsLogging` | — | Same as above |
+| time detection (`DateTime.Now` difference) | method entry | patch difference comparison |
+| `CheckRemoteDebuggerPresent` P/Invoke | — | nop call |
+| Exception driven control flow (try/catch path selection) | main logic | cannot be simple nop, the real path of the catch block must be analyzed |
 
-> .NET anti-debug 比 native 简单 —— 多数是托管 API 调用，dnSpyEx IL 改一行即可。
+> .NET anti-debug is simpler than native - most of them are managed API calls, and dnSpyEx IL only needs to change one line.
 
-## de4dot 失败时的退路
+## de4dot Fallback in case of failure
 
-1. **de4dot --detect** 看识别结果，对照上表
-2. **运行时 dump**（MegaDumper / ExtremeDumper / Process Hacker 导出模块）
-3. **dnlib 脚本** 手动解（见 common-workflow.md 的 dnlib 段）
-4. **动态优先**：跑起来在解密点下断，直接看明文，不脱壳也能拿情报
+1. **de4dot --detect**To see the recognition results, compare  in the above table
+2. **runtime dump**(MegaDumper / ExtremeDumper / Process Hacker export module)
+3. **dnlib script**manual solution (see the dnlib section of common-workflow.md)
+4. **dynamic priority**: when running, it will break at the decryption point, read the plain text directly, and get the information without unpacking
 
-社区参考：Washi 博客《misconceptions-about-dotnet》（IL 分析的常见误区）、看雪 .NET 逆向版块、Guided Hacking《Top 5 .NET RE Tools》。
+ community reference: Washi blog "misconceptions-about-dotnet" (common misconceptions in IL analysis), Kanxue .NET reverse section, Guided Hacking "Top 5 .NET RE Tools".

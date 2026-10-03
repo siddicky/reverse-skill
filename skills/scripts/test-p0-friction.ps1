@@ -148,9 +148,9 @@ if ($LASTEXITCODE -eq 0) { Ok 'verify-routing-coherence exit 0' } else { Bad "ve
 # 8) Chinese route samples (P1)
 $mr = Join-Path $scriptDir 'master-route.ps1'
 $zhCases = @(
-    @{ Hint = '安卓 APK 加固 反编译'; Expect = 'apk-reverse' },
-    @{ Hint = '渗透测试 端口扫描 SQL注入'; Expect = 'pentest-tools' },
-    @{ Hint = '前端签名 JS逆向'; Expect = 'js-reverse' }
+ @{ Hint = 'Android APK reinforcement decompilation'; Expect = 'apk-reverse' },
+ @{ Hint = 'Penetration Testing Port Scanning SQL Injection'; Expect = 'pentest-tools' },
+ @{ Hint = 'Front-end signature JS reverse'; Expect = 'js-reverse' }
 )
 foreach ($zc in $zhCases) {
     $raw = & $HostExe -NoProfile -ExecutionPolicy Bypass -File $mr -Hint $zc.Hint 2>&1 | Out-String

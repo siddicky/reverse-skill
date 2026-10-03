@@ -2,7 +2,7 @@
   <img src="reverse-skill.png" alt="reverse-skill" width="140" />
 </p>
 <h1 align="center">reverse-skill</h1>
-<h3 align="center">Cybersecurity Skills Router · 逆向技能路由包</h3>
+<h3 align="center">Cybersecurity Skills Router · Reverse skills routing package</h3>
 
 <p align="center"><em style="font-family: Georgia, serif; font-size: 1.2em; color: #777;">Navigate the dark waters, sail against the stream.</em></p>
 
@@ -35,7 +35,7 @@
 </p>
 
 <p align="center">
-  🌐 <a href="README_zh.md">中文</a> ·
+ 🌐 <a href="README_zh.md">English translation</a> ·
   <a href="https://reverse.apivix.com/">Project website</a> ·
   <a href="https://reverse.apivix.com/docs/">Online tutorial</a>
 </p>
@@ -146,10 +146,10 @@ PRIMARY ladder: [skills/MASTER-ROUTING.md](skills/MASTER-ROUTING.md) · Full mat
 
 ### Prerequisites
 
-- **Java / JDK** — for jadx and apktool
-- **Node.js 22.12+** — for JS toolchain and MCP servers
-- **Python 3.x** — for Frida and helper scripts
-- **A code AI client** — Claude Code, Codex, Cursor, OpenCode, or another compatible client
+- **Java / JDK**— for jadx and apktool
+- **Node.js 22.12+**— for JS toolchain and MCP servers
+- **Python 3.x**— for Frida and helper scripts
+- **A code AI client**— Claude Code, Codex, Cursor, OpenCode, or another compatible client
 
 ### Installation
 
@@ -168,9 +168,9 @@ Then refresh the tool index per platform:
 Check [skills/tool-index.md](skills/tool-index.md) to see detected tools.
 
 Platform-specific docs:
-- **Kali Linux** → [kali/README-kali.md](kali/README-kali.md)
-- **Ubuntu/Debian** → [docs/platforms/linux.md](docs/platforms/linux.md)
-- **macOS** → [docs/platforms/macos.md](docs/platforms/macos.md)
+- **Kali Linux**→ [kali/README-kali.md](kali/README-kali.md)
+- **Ubuntu/Debian**→ [docs/platforms/linux.md](docs/platforms/linux.md)
+- **macOS**→ [docs/platforms/macos.md](docs/platforms/macos.md)
 
 <p align="right">(<a href="#getting-started">back to top</a>)</p>
 
@@ -215,7 +215,7 @@ Platform-specific docs:
 | [skills/routing.md](skills/routing.md) | Task → skill routing matrix |
 | [skills/SKILL.md](skills/SKILL.md) | Master entry point |
 | [skills/INDEX.md](skills/INDEX.md) | Auto-generated, client-neutral skill navigation index |
-| [skills/config/routing.json](skills/config/routing.json) | **Routing single source of truth** (43 rules, R0–R44) |
+| [skills/config/routing.json](skills/config/routing.json) |**Routing single source of truth**(43 rules, R0–R44) |
 | [skills/tool-index.md](skills/tool-index.md) | Local tool status (auto-generated) |
 | [skills/scripts/master-route.ps1](skills/scripts/master-route.ps1) | One-shot PRIMARY triage (reads routing.json) |
 | [skills/scripts/case-init.ps1](skills/scripts/case-init.ps1) | Case dir: scope / timeline / workitems |
@@ -239,7 +239,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File skills/scripts/smoke.ps1
 powershell -NoProfile -ExecutionPolicy Bypass -File skills/scripts/extract-summaries.ps1 -Check
 ```
 
-GitHub Actions CI runs all of the above on **Windows + Ubuntu** for every push/PR.
+GitHub Actions CI runs all of the above on**Windows + Ubuntu**for every push/PR.
 
 ### Client-neutral integration
 
@@ -295,11 +295,11 @@ Contributions are welcome! Fork the repo, create a feature branch, and open a PR
 
 ## License
 
-This project (`reverse-skill`) is primarily licensed under the **MIT License** (see [LICENSE](LICENSE)).
+This project (`reverse-skill`) is primarily licensed under the**MIT License**(see [LICENSE](LICENSE)).
 
 **Submodule and third-party dependencies:**
-- **CTF-Sandbox-Orchestrator/**: **GNU GPLv3**
-- **Pentest Swarm AI**: Original project is **AGPL-3.0**. This repo only invokes it via CLI or MCP and does not include its source code
+- **CTF-Sandbox-Orchestrator/**:**GNU GPLv3**
+- **Pentest Swarm AI**: Original project is**AGPL-3.0**. This repo only invokes it via CLI or MCP and does not include its source code
 - Other tools (jadx, frida, nmap, burpsuite-mcp, etc.) are subject to their respective official licenses
 
 <p align="right">(<a href="#license">back to top</a>)</p>
@@ -316,14 +316,14 @@ Special thanks to the OLLVM deobfuscation ecosystem contributors and everyone wh
 
 ## Contact
 
-- **Email:** [ww7517437@gmail.com](mailto:ww7517437@gmail.com)
-- **Issues:** [GitHub Issues](https://github.com/zhaoxuya520/reverse-skill/issues)
+- **Email:**[ww7517437@gmail.com](mailto:ww7517437@gmail.com)
+- **Issues:**[GitHub Issues](https://github.com/zhaoxuya520/reverse-skill/issues)
 
 ## Disclaimer
 
 This project is intended solely for lawful security research, education, CTF competitions, and testing of systems that you own or have explicit authorization to assess.
 
-**Unauthorized access, scanning, exploitation, disruption, data acquisition, or any other use against systems without prior permission is strictly prohibited.** Users are solely responsible for complying with applicable laws, regulations, and the authorized scope of testing. The maintainers accept no liability for misuse of this project or for any resulting damage or legal consequences
+**Unauthorized access, scanning, exploitation, disruption, data acquisition, or any other use against systems without prior permission is strictly prohibited.**Users are solely responsible for complying with applicable laws, regulations, and the authorized scope of testing. The maintainers accept no liability for misuse of this project or for any resulting damage or legal consequences
 
 ## Installation and download security
 

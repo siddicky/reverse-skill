@@ -24,7 +24,7 @@ $fail = New-Object System.Collections.Generic.List[string]
 function Ok($m) { Write-Host "[OK] $m" -ForegroundColor Green }
 function Bad($m) { Write-Host "[FAIL] $m" -ForegroundColor Red; [void]$fail.Add($m) }
 
-# --- 新事实源/产物检查（routing.json / benchmark / INDEX） ---
+# --- New fact source/product check (routing.json/benchmark/INDEX) ---
 $routingJson = Join-Path $skillsRoot 'config/routing.json'
 if (Test-Path -LiteralPath $routingJson) {
     $rj = Get-Content -LiteralPath $routingJson -Raw -Encoding UTF8 | ConvertFrom-Json
@@ -71,12 +71,12 @@ if (Test-Path -LiteralPath $benchJson) {
     if ($bjCases.Count -ge 100) { Ok "benchmark cases=$($bjCases.Count)" } else { Bad "benchmark cases < 100 ($($bjCases.Count))" }
     $badExpect = @($bjCases | Where-Object { $_.expect -notmatch '^R\d+$' })
     if ($badExpect.Count -eq 0) { Ok 'benchmark expect ids well-formed' } else { Bad "benchmark bad expect: $($badExpect.Count)" }
-    # benchmark expect 必须存在于 routing.json（防 benchmark 引用已删除的路由）
+    # benchmark expect must exist in routing.json (to prevent benchmark from referencing deleted routes)
     if (Test-Path -LiteralPath $routingJson) {
         $rjIds = @($rjRoutes | ForEach-Object { $_.Name })
         $ghostExpect = @($bjCases | Where-Object { $_.expect -notin $rjIds })
         if ($ghostExpect.Count -eq 0) { Ok 'benchmark expects all exist in routing.json' } else { Bad "benchmark ghost expects: $(($ghostExpect | Select-Object -First 5).expect -join ',')" }
-        # 反向：每个 routing.json 路由至少要有一条 benchmark 用例（meta 要求新增路由同步加用例）
+        # Reverse: Each routing.json route must have at least one benchmark use case (meta requires new routes to be added simultaneously with use cases)
         $expectIds = @($bjCases | ForEach-Object { $_.expect } | Select-Object -Unique)
         $uncoveredRoutes = @($rjIds | Where-Object { $_ -notin $expectIds })
         if ($uncoveredRoutes.Count -eq 0) { Ok 'benchmark covers every routing.json route' } else { Bad "routes with no benchmark case: $($uncoveredRoutes -join ',')" }
@@ -87,7 +87,7 @@ if (Test-Path -LiteralPath $benchJson) {
 
 if (Test-Path -LiteralPath (Join-Path $skillsRoot 'INDEX.md')) { Ok 'INDEX.md present (generated)' } else { Bad 'INDEX.md missing (run extract-summaries.ps1)' }
 
-# master-route.ps1 不得回退到硬编码路由表（防绕过 routing.json）
+# master-route.ps1 must not fall back to the hard-coded routing table (to prevent bypassing routing.json)
 $mrText = Get-Content -LiteralPath (Join-Path $scriptDir 'master-route.ps1') -Raw -Encoding UTF8
 if ($mrText -match '\$map\s*=\s*\[ordered\]' -or $mrText -match "R1'\s*=\s*'apk-reverse") {
     Bad 'master-route.ps1 contains hardcoded routing table (must read routing.json)'
@@ -166,12 +166,12 @@ foreach ($rp in @($rulesEn, $rulesZh)) {
         Bad "$name missing case-init/scope/network_profile gate"
     }
     # Compact or CRITICAL must not jump routing→ACT without scope
-    if ($rt -match 'auth\.status\s*=\s*granted|auth.status=granted|未就绪禁止|MUST NOT ACT against targets|禁止对目标 ACT') {
+    if ($rt -match 'auth\.status\s*=\s*granted|auth.status=granted|ACT on the target is prohibited if it is not ready|Force must not bypass hard doors') {
         Ok "$name has auth hard gate language"
     } else {
         Bad "$name missing auth hard-gate language"
     }
-    # Post-trigger / 行为链: case-init before ACT pattern
+    # Post-trigger / behavior chain: case-init before ACT pattern
     if ($rt -match '(?s)case-init.{0,400}ACT|scope\.md.{0,400}ACT|scope-contract.{0,400}ACT') {
         Ok "$name orders scope before ACT (nearby)"
     } else {
@@ -199,42 +199,42 @@ Assert-Fields (Join-Path $skillsRoot 'ops/timeline-workitem.md') @('timeline.md'
 Assert-Fields (Join-Path $skillsRoot 'ops/role-map.md') @('lead', 'cie', 'cpe', 'cre', 'Handoff')
 Assert-Fields (Join-Path $skillsRoot 'ops/skill-supply-chain.md') @('AST10', 'MCP', 'bootstrap', 'MUST')
 Assert-Fields (Join-Path $skillsRoot 'references/community-security-skills.md') @('trailofbits', 'agentskills.io', 'MUST', '2026-07')
-Assert-Fields (Join-Path $skillsRoot 'reverse-engineering/references/re-agent-workflow.md') @('Triage', 'Static', 'Dynamic', 'Synthesis', 'IAT 修复铁律', 'E-iat-repair-fail', 'E-exports', 'dnSpy', '可行性门闩', 'E-self-check-crash', 'ExitProcess', '时间盒', 'E-api-hash', 'E-anti-debug-peb', 'E-wide-strings', 'A–T', 'U–AV', 'nonpe-format-cookbook')
+Assert-Fields (Join-Path $skillsRoot 'reverse-engineering/references/re-agent-workflow.md') @('Triage', 'Static', 'Dynamic', 'Synthesis', 'IAT repair iron law', 'E-iat-repair-fail', 'E-exports', 'dnSpy', 'feasibility latch', 'E-self-check-crash', 'ExitProcess', 'time box', 'E-api-hash', 'E-anti-debug-peb', 'E-wide-strings', 'A–T', 'U–AV', 'nonpe-format-cookbook')
 Assert-Fields (Join-Path $skillsRoot 'pentest-tools/references/recon-pipeline.md') @('auth.status', 'network_profile', 'Evidence', 'nuclei')
 Assert-Fields (Join-Path $skillsRoot 'docs-generator/references/security-report-templates.md') @('Evidence Chain', 'Findings', 'Path')
 Assert-Fields (Join-Path $skillsRoot 'field-journal/_template.md') @('Scope', 'Evidence', 'Finding')
 Assert-Fields (Join-Path $skillsRoot 'case-review/SKILL.md') @('ACTION REQUIRED', 'review_case.py', 'Evidence Graph Review')
 $vendorRulesPath = Join-Path $skillsRoot 'docs-generator/references/vendor-report-rules.md'
 $vendorRulesText = Get-Content $vendorRulesPath -Raw -Encoding UTF8
-Assert-Fields (Join-Path $skillsRoot 'docs-generator/SKILL.md') @('vendor-report-rules.md', 'flavor = null', '不强制 IOC/ATT&CK')
+Assert-Fields (Join-Path $skillsRoot 'docs-generator/SKILL.md') @('vendor-report-rules.md', 'flavor = null', 'IOC/ATT&CK is not forced')
 Assert-Fields $vendorRulesPath @('flavor = null', 'explicit_malware')
-if ($vendorRulesText -match '(?m)逆向工程报告\s*\|\s*默认\s*`malware`') {
+if ($vendorRulesText -match '(?m)\|\s*1\. Reverse engineering report\s*\|[^\r\n]*default\s+`malware`') {
     Bad 'vendor rules default generic reverse engineering to malware flavor'
 } else {
     Ok 'vendor rules keep generic reverse engineering flavor-neutral'
 }
-if ($vendorRulesText -match '先确认 scope 并保全' -and $vendorRulesText -match '不得在证据保全前直接删除文件') {
+if ($vendorRulesText -match 'first confirm the scope and preserve evidence' -and $vendorRulesText -match 'Files must not be deleted directly before evidence preservation') {
     Ok 'malware remediation preserves evidence before destructive actions'
 } else {
     Bad 'malware remediation does not require evidence preservation before destructive actions'
 }
-if ($vendorRulesText -match '(?m)JS/Web 签名逆向报告\s*\|[^\r\n]*malware') {
+if ($vendorRulesText -match '(?m)\|\s*4\. JS/Web signature reverse engineering\s*\|[^\r\n]*malware') {
     Bad 'vendor rules route JS signature reports through malware flavor'
 } else {
     Ok 'vendor rules keep JS signature reports flavor-neutral'
 }
-Assert-Fields $vendorRulesPath @('skills/ops/evidence-finding-path.md', '来源证据', 'securelist.com/updated-mata', 'www.huorong.cn', 'thin overlay', 'vuln')
-Assert-Fields (Join-Path $skillsRoot 'malware-analysis/SKILL.md') @('IAT 修复铁律', 'E-iat-repair-fail', 'E-exports', 'E-self-check-crash', 'ExitProcess', '时间盒', '可行性', 'E-api-hash', 'E-sig-forge', 'A–T', 'U–AV', 'E-batch-deobf', 'E-vba-pcode')
-Assert-Fields (Join-Path $skillsRoot 'reverse-engineering/anti-analysis.md') @('Agent 响应菜谱 A–T', 'E-anti-debug-cpuid', 'E-api-hash', 'SigCheck', 'ollvm-deobfuscation')
+Assert-Fields $vendorRulesPath @('skills/ops/evidence-finding-path.md', 'source_ref', 'source_type', 'securelist.com/updated-mata', 'www.huorong.cn', 'thin overlay', 'vuln')
+Assert-Fields (Join-Path $skillsRoot 'malware-analysis/SKILL.md') @('IAT repair iron rule', 'E-iat-repair-fail', 'E-exports', 'E-self-check-crash', 'ExitProcess', 'Timebox', 'feasibility', 'E-api-hash', 'E-sig-forge', 'A–T', 'U–AV', 'E-batch-deobf', 'E-vba-pcode')
+Assert-Fields (Join-Path $skillsRoot 'reverse-engineering/anti-analysis.md') @('Agent response recipes A–T', 'E-anti-debug-cpuid', 'E-api-hash', 'SigCheck', 'ollvm-deobfuscation')
 Assert-Fields (Join-Path $skillsRoot 'reverse-engineering/references/nonpe-format-cookbook.md') @('U–AV', 'E-batch-deobf', 'E-ps-decode-layer-N', 'E-vba-pcode', 'E-js-vmp', 'E-driver-irp-handlers', 'E-dll-tls-dllmain', 'E-android-hidden-icon-manifest', 'E-delay-import')
 Assert-Fields (Join-Path $skillsRoot 'js-reverse/SKILL.md') @('E-js-vmp', 'E-js-deobf', 'nonpe-format-cookbook')
 Assert-Fields (Join-Path $skillsRoot 'apk-reverse/SKILL.md') @('E-android-hidden-icon-manifest', 'nonpe-format-cookbook')
 Assert-Fields (Join-Path $skillsRoot 'reverse-engineering/kernel-driver-reverse.md') @('E-driver-irp-handlers', 'E-driver-ioctl', 'E-driver-byovd')
-Assert-Fields (Join-Path $skillsRoot 'docs-generator/references/security-report-templates.md') @('thin `vuln`', '1c. 漏洞技术分析')
-if ($vendorRulesText -match '(?m)vuln.*默认全文' -or $vendorRulesText -match '第 3 个默认全文 flavor') {
+Assert-Fields (Join-Path $skillsRoot 'docs-generator/references/security-report-templates.md') @('thin `vuln`', '1c. Vulnerability technical analysis report')
+if ($vendorRulesText -match '(?i)vuln.*default full-text flavor' -and $vendorRulesText -notmatch '(?i)vuln is \*\*not\*\* the 3rd default full-text flavor') {
     # presence of explicit "not third default" language is OK; flag only if it claims vuln IS a third default full flavor
 }
-if ($vendorRulesText -match '仅 2 个厂商全文 flavor' -or $vendorRulesText -match '不是.*第 3 个默认全文 flavor') {
+if ($vendorRulesText -match 'only 2 full-text flavors from manufacturers' -and $vendorRulesText -match 'vuln is \*\*not\*\* the 3rd default full-text flavor') {
     Ok 'vendor rules keep vuln as thin overlay not third default flavor'
 } else {
     Bad 'vendor rules missing vuln thin-overlay constraint'
@@ -409,9 +409,9 @@ if (Test-Path -LiteralPath $kaliManifest) {
 }
 
 # --- supply-chain pin gate: auto-install download sources MUST be pinned ---
-# 统一判定：pinnedVersion / pinnedCommit / pinPolicy 三选一；
-# github-release-* 额外接受 assetSha256 / preferApiDigest（GitHub 官方发布资产哈希）。
-# local-http-mcp 只有在不获取外部源码时才可免 pin。
+# Unified judgment: choose one of three pinnedVersion / pinnedCommit / pinPolicy;
+# github-release-* additionally accepts assetSha256/preferApiDigest (the official GitHub release asset hash).
+# local-http-mcp is pin-free only when no external source code is obtained.
 $pinKinds = @('pip-package', 'npm-mcp', 'npm-global', 'go-install', 'git-clone')
 foreach ($mf in @($skillsManifest, $kaliManifest)) {
     if (-not (Test-Path -LiteralPath $mf)) { continue }
@@ -444,10 +444,10 @@ foreach ($mf in @($skillsManifest, $kaliManifest)) {
             'remote-http-mcp' {
                 $hasPin = (-not $capMap['repoUrl']) -and (-not $capMap['repo']) -and $capMap['pinPolicy']
             }
-            'winget-package' { $hasPin = $hasPin } # winget-latest 属于 pinPolicy
-            'apt-package' { $hasPin = $true }      # 发行版仓库自带（Kali 侧）
-            'docker-image' { $hasPin = $true }     # fallback 通道
-            'manual' { $hasPin = $true }           # 手工安装
+            'winget-package' { $hasPin = $hasPin } # winget-latest is part of pinPolicy
+            'apt-package' { $hasPin = $true }      # provided by the distribution repository (Kali side)
+            'docker-image' { $hasPin = $true }     # fallback channel
+            'manual' { $hasPin = $true }           # manual installation
             default { $hasPin = $hasPin }
         }
         if (-not $hasPin) {
@@ -460,8 +460,8 @@ foreach ($mf in @($skillsManifest, $kaliManifest)) {
 
 # identity: no FastAPI/React requirement in ops IDENTITY
 $id = Get-Content (Join-Path $skillsRoot 'ops/IDENTITY.md') -Raw -Encoding UTF8
-if ($id -match '不是|不做|NOT|not a Z3r0|FastAPI|React') { Ok 'identity distinguishes platform' } else { Bad 'identity weak' }
-if ($id -match 'tool-index|bootstrap|field-journal|路由') { Ok 'identity keeps reverse-skill DNA' } else { Bad 'identity missing DNA' }
+if ($id -match 'We are not|not done on purpose|not a Z3r0|FastAPI|React') { Ok 'identity distinguishes platform' } else { Bad 'identity weak' }
+if ($id -match 'tool-index|bootstrap|field-journal|routing') { Ok 'identity keeps reverse-skill DNA' } else { Bad 'identity missing DNA' }
 
 $idCheck = @()
 $idCheck += "HEAD packageRoot=$packageRoot"
@@ -481,9 +481,9 @@ if ($masterSkillText -like "*genuine decision boundary*" -and $masterSkillText -
 $routingText = Get-Content -LiteralPath (Join-Path $PackageRoot "skills/routing.md") -Raw -Encoding UTF8
 if ($routingText -like "*genuine decision boundary*" -and $routingText -notlike "*Always provide a next-step menu*") { Ok "routing ambiguity path no longer forces unconditional menu" } else { Bad "routing still forces unconditional next-step menu" }
 $contribText = Get-Content -LiteralPath (Join-Path $PackageRoot "skills/CONTRIBUTING.md") -Raw -Encoding UTF8
-if ($contribText -like "*genuine decision boundary*" -and $contribText -notlike "*每个阶段结束时提供 3-6 个编号*") { Ok "new-skill contract uses genuine decision boundaries" } else { Bad "new-skill contract still requires per-stage menus" }
+if ($contribText -like "*genuine decision boundary*" -and $contribText -match 'only provides 3-6 numbered options in the \*\*genuine decision boundary\*\*') { Ok "new-skill contract uses genuine decision boundaries" } else { Bad "new-skill contract still requires per-stage menus" }
 $reWorkflowText = Get-Content -LiteralPath (Join-Path $PackageRoot "skills/reverse-engineering/references/re-agent-workflow.md") -Raw -Encoding UTF8
-if ($reWorkflowText -like "*decision_delta*" -and $reWorkflowText -like "*carry_forward_refs*" -and $reWorkflowText -like "*consumer 必须先继承 refs*") { Ok "representative RE workflow consumes delta by reference" } else { Bad "representative RE workflow missing delta consumer contract" }
+if ($reWorkflowText -like "*decision_delta*" -and $reWorkflowText -like "*carry_forward_refs*" -and $reWorkflowText -like "*consumer must first inherit refs*") { Ok "representative RE workflow consumes delta by reference" } else { Bad "representative RE workflow missing delta consumer contract" }
 
 # Issue #77 — analysis decision framework anchors (MUST run before fail gate)
 $adf = Join-Path $PackageRoot "skills/ops/analysis-decision-framework.md"

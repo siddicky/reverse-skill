@@ -123,7 +123,7 @@ if len(source_pwntools_fields) != 5:
 expected_pwntools_fields = [
     "pwntools",
     "reverse-engineering",
-    "CTF pwn 利用开发框架",
+    "CTF pwn exploit development framework",
     "version",
     "pwn",
 ]
@@ -292,7 +292,7 @@ def parse_markdown_row(line):
     return [cell.strip() for cell in stripped[1:-1].split("|")]
 
 
-tool_header = ["工具", "归属 skill", "作用", "可用", "路径", "版本", "来源", "脚本引用"]
+tool_header = ["Tool", "Skill", "Purpose", "Available", "Path", "Version", "Source", "Script reference"]
 tool_headers = [
     index for index, line in enumerate(lines) if parse_markdown_row(line) == tool_header
 ]
@@ -323,9 +323,9 @@ else:
                 "pwntools Markdown skill must be 'reverse-engineering', "
                 f"got {tool_row[1]!r}"
             )
-        if tool_row[2] != "CTF pwn 利用开发框架":
+        if tool_row[2] != "CTF pwn exploit development framework":
             errors.append(
-                "pwntools Markdown purpose must be 'CTF pwn 利用开发框架', "
+                "pwntools Markdown purpose must be 'CTF pwn exploit development framework', "
                 f"got {tool_row[2]!r}"
             )
         if tool_row[3] != "yes":
@@ -349,7 +349,7 @@ else:
 capability_headings = [
     index
     for index, line in enumerate(lines)
-    if line.startswith("## ") and line[3:].startswith("能力状态视图")
+    if line.startswith("## ") and line[3:].startswith("Capability Status View")
 ]
 capability_matches = []
 if len(capability_headings) != 1:
@@ -420,9 +420,9 @@ elif have_jq:
                     "pwntools JSON skill must be 'reverse-engineering', "
                     f"got {pwntools.get('skill')!r}"
                 )
-            if pwntools.get("purpose") != "CTF pwn 利用开发框架":
+            if pwntools.get("purpose") != "CTF pwn exploit development framework":
                 errors.append(
-                    "pwntools JSON purpose must be 'CTF pwn 利用开发框架', "
+                    "pwntools JSON purpose must be 'CTF pwn exploit development framework', "
                     f"got {pwntools.get('purpose')!r}"
                 )
             if pwntools.get("available") is not True:
@@ -493,11 +493,11 @@ for section_number, (section_start, title) in enumerate(section_starts):
     if any("pwntools" in line.split() for line in section_lines):
         matching_section_titles.append(title)
 
-expected_section_titles = ["逆向分析"]
+expected_section_titles = ["Reverse Engineering"]
 if matching_section_titles != expected_section_titles:
     raise SystemExit(
         "bootstrap human help must classify the complete token 'pwntools' "
-        "once and only once under [逆向分析]; "
+        "once and only once under [Reverse Engineering]; "
         f"matching section titles: {matching_section_titles!r}"
     )
 PY
@@ -518,23 +518,23 @@ fi
 # Mutation checks lock the classification rule itself: the token is accepted
 # only under reverse analysis, while a duplicate in any other section fails.
 cat > "$SCRATCH/help-only-reverse.txt" <<'EOF'
-可用能力:
+Available capabilities:
 
-  [逆向分析]
+  [Reverse Engineering]
     jadx pwntools gef
 
-  [其他]
+  [Other]
     not-pwntools ghidra-mcp
 EOF
 "$REAL_PYTHON" "$HELP_VALIDATOR" "$SCRATCH/help-only-reverse.txt"
 
 cat > "$SCRATCH/help-duplicate-section.txt" <<'EOF'
-可用能力:
+Available capabilities:
 
-  [逆向分析]
+  [Reverse Engineering]
     jadx pwntools gef
 
-  [其他]
+  [Other]
     pwntools ghidra-mcp
 EOF
 if "$REAL_PYTHON" "$HELP_VALIDATOR" "$SCRATCH/help-duplicate-section.txt" \
@@ -615,7 +615,7 @@ import sys
 
 ansi_escape = re.compile(r"\x1b\[[0-?]*[ -/]*[@-~]")
 lines = [ansi_escape.sub("", line).rstrip("\r") for line in sys.argv[1].splitlines()]
-expected = f"[OK] pwntools 已可用: {sys.argv[2]}"
+expected = f"[OK] pwntools is available: {sys.argv[2]}"
 if expected not in lines:
     raise SystemExit(
         "bootstrap preflight did not report the resolved pwn stub path on the "

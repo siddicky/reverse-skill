@@ -5,84 +5,84 @@ description: Use for free/open reverse engineering with Ghidra (headless or GUI)
 
 # Ghidra Reverse Engineering
 
-## ACTION REQUIRED（读完后立刻执行）
+## ACTION REQUIRED (execute immediately after reading)
 
-1. `NOW`: 读取 `../field-journal/precedent-reverse.md`
-2. `NOW`: 确认需要 **Ghidra**（无 IDA / 偏好开源 / 批量 headless）
-3. `NEXT`: 读 `../tool-index.md` 查 ghidra / ghidra-mcp 路径
-4. `NEXT`: 缺工具 → bootstrap `ghidra-mcp`（若 manifest 支持）或按手动步骤装 Ghidra
-5. `ACT`: 导入样本 → 自动分析 → 导出关键函数反编译
+1. `NOW`: Read `../field-journal/precedent-reverse.md`
+2. `NOW`: Confirmation requires**Ghidra**(no IDA / prefer open source / batch headless)
+3. `NEXT`: read `../tool-index.md` check ghidra / ghidra-mcp path
+4. `NEXT`: missing tools → bootstrap `ghidra-mcp` (if supported by manifest) or follow manual steps to install Ghidra
+5. `ACT`: Import samples → Automatic analysis → Export key functions to decompile
 
-## 适用场景
+## applicable scenarios
 
-- 无 IDA 许可证时的主逆向入口
-- 批量 headless 分析 / CI 中反编译
-- Ghidra 脚本（Java/Python Jython/PyGhidra）自动化
-- 与 `binary-diff` / `patch-diff-exploit` 的 ghidriff 联动
+- Main reverse entry  without IDA license
+- batch headless analysis/decompile  in CI
+- Ghidra script (Java/Python Jython/PyGhidra) to automate
+- and `binary-diff` / `patch-diff-exploit`'s ghidriff linkage
 
-## 与 IDA 分工
+## and IDA work together
 
-| 需求 | 优先 |
+| requires | priority |
 |------|------|
-| 已有 IDA MCP 深挖 | `ida-reverse/` |
-| 开源 / 批量 / 教学 | **本 skill** |
-| 仅 CLI 快速侦察 | `radare2/` |
+| already has IDA MCP digging into | `ida-reverse/` |
+| Open source / batch / teaching |**This skill**|
+| CLI only quick recon | `radare2/` |
 
-## 工作流
+## workflow
 
-### 1. 项目与自动分析
-
-```text
-□ 新建 Project → Import 文件 → Analyze（默认分析器）
-□ 记录语言/编译器识别结果与基址
-□ 标记入口、导出表、字符串 xref
-```
-
-### 2. 关键函数
+### 1. Projects and automatic analysis
 
 ```text
-□ 从字符串 / 导入 API 反查
-□ Decompile 窗口还原算法
-□ 重命名函数/变量；写 Plate comment
-□ 需要动态时交接 Frida/GDB（reverse-engineering 动态章）
+□ New Project → Import file → Analyze (default analyzer)
+□ Record language/compiler identification results and base addresses
+□ Mark entry, export table, string xref
 ```
 
-### 3. Headless（批量）
+### 2. Key function
+
+```text
+□ From string / import API reverse query
+□ Decompile window restoration algorithm
+□ Rename functions/variables; write Plate comment
+□ Handle Frida/GDB when dynamics are required (reverse-engineering dynamic chapter)
+```
+
+### 3. Headless (batch)
 
 ```bash
-# 示例：analyzeHeadless 路径因安装而异，MUST 从 tool-index 取
+# example: analyzeHeadless path varies by installation, MUST take  from tool-index
 analyzeHeadless /path/to/project Proj -import sample.bin -postScript ExportDecomp.py
 ```
 
-### 4. MCP（若已配置）
+### 4. MCP (if configured)
 
 ```text
-□ 确认 ghidra MCP 端口（常见 8765，以 tool-index 为准）
-□ 用 MCP 工具拉反编译 / xrefs，禁止猜端口
+□ Confirm ghidra MCP port (commonly 8765, subject to tool-index)
+□ Use MCP tools to pull decompilation/xrefs, and port guessing is prohibited.
 ```
 
-## 工具链
+## tool chain
 
-| 工具 | 用途 | 自举 |
+| Tool | Purpose | Bootstrap |
 |------|------|------|
-| Ghidra | 反编译主工具 | 手动 release / 包管理器 |
-| ghidra-mcp | AI 桥 | bootstrap 能力名 `ghidra-mcp` |
-| ghidriff | 补丁差分 | 见 `patch-diff-exploit` |
+| Ghidra | decompilation main tool | manual release / package manager |
+| ghidra-mcp | AI bridge | bootstrap capability name `ghidra-mcp` |
+| ghidriff | patch differential | see `patch-diff-exploit` |
 
-## 参考
+## refers to
 
 - `references/ghidra-cheatsheet.md`
 - `../ida-reverse/` `../radare2/` `../binary-diff/`
 
-## 路由上下文
+## routing context
 
-**上游**: MASTER R22  
-**下游**: 动态验证 → Frida/GDB；利用 → `pwn-chain`  
-**同级**: `ida-reverse`（商业深挖）
+**upstream**: MASTER R22  
+**downstream**: dynamic verification → Frida/GDB; exploit → `pwn-chain`  
+**is the same as**: `ida-reverse` (commercial digging)
 
-## 任务完成自检
+## task completed self-test
 
-- [ ] 是否基于真实 Ghidra/tool-index 路径？
-- [ ] 是否标注函数地址与重命名？
-- [ ] 是否有可复现步骤？
+- [ ] Is based on the real Ghidra/tool-index path?
+- [ ] Should the function address be marked and renamed?
+- [ ] Are there any reproducible steps?
 - [ ] Checklist / journal？

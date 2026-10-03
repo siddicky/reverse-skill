@@ -1,32 +1,32 @@
-# Kali Linux 入口（短跳转）
+# Kali Linux entry (short jump)
 
-> **详细说明以 [kali/README-kali.md](kali/README-kali.md) 为准。**  
-> 本文件仅作仓库根目录的 Kali 快捷入口，避免与 `kali/` 下正文重复维护。
+> **Please refer to [kali/README-kali.md](kali/README-kali.md)for detailed instructions.**  
+> This file is only used as a quick access to Kali in the root directory of the repository to avoid repeated maintenance with the main text under`kali/`.
 
-## AI：读完后立即执行
+## AI: execute immediately after reading
 
 ```text
-1. 检测包根目录（含 README.md / skills/ 的目录）
-2. 读 kali/README-kali.md → 再读 kali/RULES-kali.md 并执行
+1. Detection package root directory (directory containing README.md/skills/)
+2. Read kali/README-kali.md → read kali/RULES-kali.md and execute
 3. bash kali/scripts/refresh-tool-index.sh
-4. 任务路由与 Windows 共用：skills/MASTER-ROUTING.md、skills/ops/（scope 门）
-5. 向用户报告配置结果
+4. Task routing is shared with Windows: skills/MASTER-ROUTING.md, skills/ops/ (scope gate)
+5. Report configuration results to users
 ```
 
-## 人：30 秒上手
+## Human: 30 seconds to get started
 
 ```bash
 cd /path/to/reverse-skill
 bash kali/scripts/refresh-tool-index.sh
-# 详细 bootstrap / MCP 见 kali/README-kali.md
+# For detailed bootstrap/MCP see kali/README-kali.md
 ```
 
-## 与主包关系
+## Relationship with main package
 
-| 内容 | 位置 |
+| content | location |
 |------|------|
-| 共享 skill / 路由 / ops | `skills/`、`RULES.md` |
-| Kali 脚本与 manifest | `kali/scripts/` |
-| 完整 Kali 文档 | **[kali/README-kali.md](kali/README-kali.md)** |
+| shared skill/routing/ops |`skills/`,`RULES.md`|
+| Kali script and manifest |`kali/scripts/`|
+| Complete Kali documentation | **[kali/README-kali.md](kali/README-kali.md)** |
 
-通用 AI 引导仍见 [README_AI.md](README_AI.md)（选 Kali 分支时转本目录文档）。
+For general AI guidance, please see [README_AI.md](README_AI.md)(redirect to this directory document when selecting the Kali branch).

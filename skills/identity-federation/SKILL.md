@@ -5,52 +5,52 @@ description: Use for authorized assessment of federated identity systems includi
 
 # Identity Federation (SAML / OIDC / OAuth)
 
-## ACTION REQUIRED（读完后立刻执行）
+## ACTION REQUIRED (execute immediately after reading)
 
-1. `NOW`: 读取 precedent-pentest；SSO 测试账号与 IdP/SP 范围入 scope
-2. `NOW`: 禁止锁定真实用户账户的暴力尝试
-3. `NEXT`: 抓包工具与文档（元数据 URL）
-4. `ACT`: 协议流映射 → 常见错配 → 验证
+1. `NOW`: Read precedent-pentest; SSO test account and IdP/SP scope into scope
+2. `NOW`: Disable brute force attempts to lock real user accounts
+3. `NEXT`: Packet capture tool and documentation (metadata URL)
+4. `ACT`: Protocol Flow Mapping → Common Mismatches → Verification
 
-## 适用场景
+## Applicable scenarios
 
-- SAML Response 签名/断言篡改面（经典缺陷模式）
-- OIDC 隐式/授权码 + PKCE 缺失
-- redirect_uri / state / nonce 问题
-- IdP 与 SP 元数据、多租户 issuer 混淆
-- 与 `api-security` JWT 攻击互补（本 skill 偏联邦与 SSO 流）
+- SAML Response signature/assertion tampering surface (classic flaw pattern)
+- OIDC implicit/authorization code + PKCE missing
+- redirect_uri/state/nonce issue
+- IdP and SP metadata, multi-tenant issuer confusion
+- Complementary with `api-security` JWT attack (this skill focuses on federation and SSO flow)
 
-## 工作流
+## Workflow
 
 ```text
-□ 画清：User → SP → IdP → Token → SP
-□ 收集：/.well-known/openid-configuration、SAML metadata
-□ 检查：redirect_uri 精确匹配、state 绑定、PKCE
-□ 检查：SAML 签名覆盖范围、algorithm 降级
-□ 会话固定与登出失效
+□ Clear picture: User → SP → IdP → Token → SP
+□ Collection:/.well-known/openid-configuration, SAML metadata
+□ Check: redirect_uri exact match, state binding, PKCE
+□ Check: SAML signature coverage, algorithm downgrade
+□ Session fixation and logout invalidation
 ```
 
-## 工具链
+## tool chain
 
-| 工具 | 用途 |
+| Tools | Purpose |
 |------|------|
-| Burp + SAML Raider 等 | 断言编辑（授权） |
-| jwt_tool | JWT 段 |
-| 浏览器 DevTools | 重定向链 |
-| IdP 管理日志 | 审计 |
+| Burp + SAML Raider and more | Assertion editing (authorization) |
+| jwt_tool | JWT segment |
+| Browser DevTools | Redirect Chain |
+| IdP Management Log | Audit |
 
-## 参考
+## refer to
 
 - `references/sso-flow-checklist.md`
-- `../api-security/` `../windows-ad/`（企业 IdP）
+- `../api-security/` `../windows-ad/` (Enterprise IdP)
 
-## 路由上下文
+## routing context
 
-**上游**: MASTER R37  
-**下游**: 纯 API JWT → api-security；云 IdP → cloud-k8s
+**Upstream**: MASTER R37  
+**Downstream**: Pure API JWT → api-security; Cloud IdP → cloud-k8s
 
-## 任务完成自检
+## Task completion self-check
 
-- [ ] 是否映射完整 SSO 流？
-- [ ] 每个 Finding 是否有复现与影响？
+- [ ] Map full SSO flow?
+- [ ] Does each Finding have recurrence and impact?
 - [ ] Checklist？

@@ -1,5 +1,5 @@
-# 狩猎环
+# hunting ring
 
 Hypothesis → Data → Query → Investigate → Detect/Dismiss → Tune → Document
 
-每轮输出：假说状态（confirmed/rejected/inconclusive）+ Evidence ID。
+Output of each round: hypothesis status (confirmed/rejected/inconclusive) + Evidence ID.

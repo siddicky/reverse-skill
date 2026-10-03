@@ -5,89 +5,89 @@ description: Use for authorized OT/ICS security assessment covering Purdue model
 
 # OT / ICS Security
 
-## ACTION REQUIRED（读完后立刻执行）
+## ACTION REQUIRED (execute immediately after reading)
 
-1. `NOW`: 读取 `../field-journal/precedent-pentest.md` — **工控环境误操作可致物理危害**
-2. `NOW`: 书面授权必须写清：站点、网段、是否允许主动扫描/写寄存器
-3. `NOW`: case-init；默认 **passive-first**；`ready_for_act` 前禁止对 PLC 写操作
-4. `NEXT`: tool-index；多数工控工具需手动与隔离实验网
-5. `ACT`: 资产与分区识别 → 暴露面 → 只读验证
+1. `NOW`: Read `../field-journal/precedent-pentest.md` —**Misoperation in industrial control environment can cause physical hazard**
+2. `NOW`: Written authorization must state clearly: site, network segment, whether active scanning/writing of register  is allowed
+3. `NOW`: case-init; default**passive-first**; writing to PLC is prohibited before `ready_for_act`
+4. `NEXT`: tool-index; Most industrial control tools require manual and isolation experiment network
+5. `ACT`: Asset and partition identification → Exposed surface → Read-only verification
 
-## 适用场景
+## applicable scenarios
 
-- 工控/SCADA/DCS 安全评估（授权）
-- Purdue 模型分区与跨区通道
-- Modbus/DNP3/S7/EtherNet/IP 等协议暴露
-- 工程师站、HMI、历史库、跳板主机
-- IT/OT 融合边界（防火墙规则、单向闸）
+- Industrial control/SCADA/DCS security assessment (authorization)
+- Purdue model partition and cross-zone channel
+- Modbus/DNP3/S7/EtherNet/IP and other protocols exposed
+- engineering station, HMI, history library, springboard host
+- IT/OT Converged Boundary (Firewall Rules, One-Way Gate)
 
-## 安全铁律（MUST）
-
-```text
-MUST NOT 在未明确允许时：
-- 对 PLC 写线圈/寄存器
-- 全网高速率扫描生产 OT
-- 中断安全仪表系统（SIS）相关路径
-优先：只读识别、流量镜像、离线固件/配置分析
-```
-
-## 工作流
-
-### Phase 1 — 分区与资产
+## Iron Law of Safety (MUST)
 
 ```text
-□ Purdue L0–L5 草图：现场设备 → 控制 → 监督 → 站点 DMZ → 企业
-□ 资产清单：PLC/RTU/HMI/工程师站/历史库/Jump host
-□ 协议与端口基线（仅授权网段）
+MUST NOT When not explicitly allowed:
+- Write coil/register to PLC
+- High-speed scanning of the entire network to produce OT
+- Interrupt safety instrumented system (SIS) related paths
+Priority: read-only identification, traffic mirroring, offline firmware/configuration analysis
 ```
 
-### Phase 2 — 被动与只读
+## workflow
+
+### Phase 1 — Partitions and Assets
 
 ```text
-□ SPAN/镜像 PCAP → protocol-reverse / Wireshark 工控解析器
-□ 配置与工程文件离线审计（TIA/RSLogix 导出等）
-□ 默认口令与明文协议（Modbus 无认证）记录为 Finding，不写盘改值
+□ Purdue L0–L5 Sketch: Field Equipment → Control → Supervision → Site DMZ → Enterprise
+□ Asset list: PLC/RTU/HMI/engineering station/history library/Jump host
+□ Protocol and port baseline (only authorized network segments)
 ```
 
-### Phase 3 — 受限主动（仅授权）
+### Phase 2 — Passive and read-only
 
 ```text
-□ 低速识别，维护窗口
-□ 只读功能码优先
-□ 每步 Evidence；异常立即停止并通报
+□ SPAN/mirror PCAP → protocol-reverse / Wireshark industrial control parser
+□ Offline audit of configuration and project files (TIA/RSLogix export, etc.)
+□ The default password and plain text protocol (Modbus without authentication) are recorded as Finding, and the value is not written to the disk.
 ```
 
-### Phase 4 — 固件/补丁面
+### Phase 3 — Restricted Active (authorization only)
 
 ```text
-□ 控制器固件版本 → CVE 映射（不盲刷固件）
-□ 联合 firmware-pentest 做离线镜像分析
+□ Low speed identification, maintenance window
+□ Read-only function code takes priority
+□Evidence for each step; abnormality will be stopped immediately and reported
 ```
 
-## 工具链
+### Phase 4 — Firmware/Patch
 
-| 工具 | 用途 | 注意 |
+```text
+□ Controller firmware version → CVE mapping (no blind flashing of firmware)
+□ Combined with firmware-pentest for offline image analysis
+```
+
+## tool chain
+
+| Tool | Purpose | Note |
 |------|------|------|
-| Wireshark 工控 dissectors | 被动解析 | 镜像流量 |
-| Nmap NSE（受限） | 识别 | 速率与时间窗 |
-| Claroty/Nozomi 等 | 资产发现 | 商业/现场 |
-| PLC 厂商工程软件 | 配置审计 | 离线优先 |
-| binwalk / Ghidra | 固件 | 离线 |
+| Wireshark industrial control dissectors | passive analysis | mirror traffic |
+| Nmap NSE (limited) | identification | rate and time window |
+| Claroty/Nozomi etc. | Asset Discovery | Commercial/Onsite |
+| PLC manufacturer engineering software | configuration audit | offline priority |
+| binwalk / Ghidra | firmware | offline |
 
-## 参考
+## refers to
 
 - `references/ot-safe-assessment.md`
 - `../firmware-pentest/` `../protocol-reverse/` `../network` via pentest-tools
 
-## 路由上下文
+## routing context
 
-**上游**: MASTER R28  
-**下游**: 固件深挖 `firmware-pentest`；协议 `protocol-reverse`；IT 横向 `windows-ad`/`attack-chain`  
-**同级**: 不要用普通 Web 扫默认参数打 OT
+**upstream**: MASTER R28  
+**downstream**: firmware dig `firmware-pentest`; protocol `protocol-reverse`; IT horizontal `windows-ad`/`attack-chain`  
+**is the same level as**: Do not use the default parameters of ordinary web scan to scan OT
 
-## 任务完成自检
+## task completed self-test
 
-- [ ] 是否默认被动/只读并记录授权边界？
-- [ ] 是否避免对控制回路写操作（除非明确允许）？
-- [ ] Finding 是否含物理/过程影响说明？
+- [ ] Does default to passive/read-only and record authorization boundaries?
+- [ ] Avoid writes to control loops (unless explicitly allowed)?
+- [ ] Does Finding include a description of physical/process effects?
 - [ ] Checklist / journal？

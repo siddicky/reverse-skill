@@ -5,47 +5,47 @@ description: Use for authorized RF/SDR security research including signal identi
 
 # RF / SDR Security Research
 
-## ACTION REQUIRED（读完后立刻执行）
+## ACTION REQUIRED (execute immediately after reading)
 
-1. `NOW`: **频谱与发射受法律严格管制**；仅授权频段/屏蔽室/实验目标
-2. `NOW`: scope 写明设备、频段、是否允许发射（默认只收）
-3. `ACT`: 只接收识别 → 解调分析 → 实验室复现评估
+1. `NOW`:**spectrum and emission are strictly controlled by law**; only authorized frequency band/shielded room/experimental target
+2. `NOW`: scope Specify the device, frequency band, and whether it is allowed to transmit (default only receives)
+3. `ACT`: only receive identification → demodulation analysis → laboratory reproduction evaluation
 
-## 适用场景
+## applicable scenarios
 
-- 无线遥控/传感器等非 Wi-Fi RF（授权）
-- ADS-B/遥控等协议研究（合法接收）
-- 与 wifi-wireless 分工：本 skill 偏 **SDR 通用 RF**；Wi-Fi 攻防走 R29
+- Wireless remote control/sensor and other non-Wi-Fi RF (authorized)
+- ADS-B/remote control and other protocols research (legal reception)
+- Division of work between and wifi-wireless: This skill is**SDR, general RF**; Wi-Fi attack and defense R29
 
-## 工作流
+## workflow
 
 ```text
-□ 法规与许可确认
-□ 只收：识别中心频率与调制
-□ GNU Radio / URH 分析
-□ 重放仅屏蔽室且书面允许
-□ 结论侧重：是否可未授权控制 / 加固建议
+□ Regulations and licensing confirmation
+□ Accept only: Identify center frequency and modulation
+□ GNU Radio / URH Analysis
+□ Replays only in shielded rooms and with written permission
+□ Conclusion focuses on: whether unauthorized control is possible/reinforcement suggestions
 ```
 
-## 工具链
+## tool chain
 
-| 工具 | 用途 |
+| Tool | Purpose |
 |------|------|
-| RTL-SDR / HackRF（合规） | 收发硬件 |
-| URH / GNU Radio | 分析 |
-| Inspectrum | 信号 |
+| RTL-SDR / HackRF (Compliant) | Transceiver Hardware |
+| URH / GNU Radio | Analysis |
+| Inspectrum | Signal |
 
-## 参考
+## refers to
 
 - `references/sdr-lab-rules.md`
 - `../wifi-wireless/` `../ot-ics/` `../hardware-security/`
 
-## 路由上下文
+## routing context
 
-**上游**: MASTER R38  
-**MUST NOT**: 干扰公共通信、未授权发射
+**upstream**: MASTER R38  
+**MUST NOT**: Interference with public communications, unauthorized transmission of
 
-## 任务完成自检
+## task completed self-test
 
-- [ ] 是否默认只收并记录法规边界？
+- [ ] Does only accept and record regulatory boundaries by default?
 - [ ] Checklist？

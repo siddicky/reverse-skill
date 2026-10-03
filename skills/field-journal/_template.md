@@ -1,114 +1,114 @@
-# [日期] [项目简称]
+# [date] [project name]
 
-## 场景分类
-<!-- APK逆向 / JS签名 / 二进制分析 / 渗透测试 / CTF / 抓包分析 / 其他 -->
+## Scene classification
+<!-- APK reverse engineering / JS signature / binary analysis / penetration testing / CTF / packet capture analysis / others -->
 
-## 目标概述
-<!-- 一句话说明在干什么 -->
+## Goal overview
+<!-- Explain what you are doing in one sentence -->
 
-## Scope 摘要（脱敏）
-<!-- auth.basis / network_profile.mode / in_scope 类型（勿写真实域名/IP） -->
+## Scope Summary (redaction)
+<!-- auth.basis / network_profile.mode / in_scope type (do not write the real domain name/IP) -->
 - auth_basis:
 - network_profile:
 - asset_types: []
 
-## 角色
-<!-- lead / cie / cpe / cre / … 见 skills/ops/role-map.md -->
+## Role
+<!-- lead / cie / cpe / cre / … see skills/ops/role-map.md -->
 - lead_role: lead
 - specialists: []
 
-## 完整执行链路
-<!-- 从拿到目标到产出结果的完整步骤，包括走过的弯路 -->
+## Complete execution link
+<!-- The complete steps from getting the goal to producing the results, including the detours taken -->
 
 1. ...
 2. ...
 3. ...
 
-## Evidence 链摘要（脱敏）
-<!-- 最多 3 条：E-id + 命令模式 + 结论类型；完整证据在用户项目 -->
-<!-- 字段对齐 skills/case-review/scripts/review_case.py 契约（见下方说明） -->
-| E-id | severity | status | source_type | 可复用命令模式 | 关联 Finding |
+## Evidence chain summary (redaction)
+<!-- Up to 3 items: E-id + command mode + conclusion type; complete evidence is in the user project -->
+<!-- Field alignment skills/case-review/scripts/review_case.py contract (see description below) -->
+| E-id | severity | status | source_type | Reusable command mode | Association Finding |
 |------|----------|--------|-------------|----------------|--------------|
 | E-001 | info | observed | command | `checksec --file=./pwn1` | F-001 |
 | E-002 | high | validated | command | `python3 exploit.py REMOTE` | F-001 |
 
-> **契约对齐（review_case.py）**：若本次 case 产出了独立证据目录（`evidence/E-xxx.md`），
-> 每条证据须满足 `skills/case-review/scripts/review_case.py` 的字段契约，否则 `--strict` 校验会 FAIL：
+> **Contract alignment (review_case.py)**: If this case produces an independent evidence directory (`evidence/E-xxx.md`),
+> Each piece of evidence must satisfy the field contract of `skills/case-review/scripts/review_case.py`, otherwise the `--strict` verification will FAIL:
 >
-> - 标题：`### E-xxx`（须与文件名一致，如 `E-001.md` → `### E-001`）
+> - Title: `### E-xxx` (must be consistent with the file name, such as `E-001.md` → `### E-001`)
 > - `- severity:` ∈ critical / high / medium / low / info / n/a
 > - `- status:` ∈ observed / candidate / validated / false_positive / accepted_risk
-> - `- repro_command:` 必填（离线场景在 notes 中注明 offline/离线 可豁免）
-> - `- content_hash:` sha256 或 n/a；填 sha256 时配套 `- artifact_path:`（case 内相对路径）
-> - `- linked_workitem:` 可选，WI-xxx 必须真实存在
+> - `- repro_command:` required (for offline scenarios, please indicate offline/offline in notes and can be exempted)
+> - `- content_hash:` sha256 or n/a; when filling in sha256, match `- artifact_path:` (relative path within case)
+> - `- linked_workitem:` is optional, WI-xxx must really exist
 >
-> 自检：`python skills/case-review/scripts/review_case.py <case_root> --verify-hashes --strict`
+> Self-test: `python skills/case-review/scripts/review_case.py <case_root> --verify-hashes --strict`
 
-## Finding / Path 摘要
+## Finding/Path Summary
 - top_finding:
 - path_type: attack | callflow | solve
 - path_one_liner:
 
-## 踩坑记录
+## Trampling on pit records
 
-| 问题 | 原因 | 解决方案 | 耗时 |
+| Problem | Cause | Solution | Time consuming |
 |------|------|---------|------|
 | ... | ... | ... | ... |
 
-## 工具链发现
-<!-- 用到了哪些工具，哪些好用，哪些有坑，版本兼容性问题 -->
+## Toolchain discovery
+<!-- Which tools are used, which ones are easy to use, which ones have pitfalls, and version compatibility issues -->
 
-## 关键代码/命令
+## Key code/command
 
 ```
-<!-- 贴实际用到的关键命令、hook 脚本、解密逻辑 -->
+<!-- Post the actual key commands, hook scripts, and decryption logic -->
 ```
 
-## 对本包的改进建议
-<!-- 路由是否准确？bootstrap 是否缺失？文档是否需要补充？新工具是否需要加入 manifest？ -->
+## Suggestions for improvements to this package
+<!-- Is the routing accurate? Is bootstrap missing? Does the documentation need to be supplemented? Do new tools need to be added to the manifest? -->
 
-## 可复用的模式/脚本片段
-<!-- 如果产出了可复用的 hook 脚本、解密逻辑、绕过方案，贴在这里 -->
+## Reusable patterns/script snippets
+<!-- If you produce reusable hook scripts, decryption logic, and bypass solutions, post them here -->
 
-## 进化动作
-<!-- 本次回写后实际执行了哪些更新 -->
-- [ ] 更新了路由矩阵
-- [ ] 更新了 tool-index
-- [ ] 更新了 bootstrap-manifest
-- [ ] 更新了子 skill 文档
-- [ ] 新增了 pitfalls 记录
-- [ ] 无需更新
+## evolution action
+<!-- What updates were actually performed after this writeback -->
+- [ ] Updated routing matrix
+- [ ] updated tool-index
+- [ ] updated bootstrap-manifest
+- [ ] Updated sub-skill documentation
+- [ ] Added pitfalls record
+- [ ] No update required
 
-## 环境信息
-<!-- 记录当时的关键环境 -->
+## environmental information
+<!-- Record the key environment at that time -->
 - OS:
-- 工具版本:
-- 目标平台/版本:
+- Tool version:
+- Target platform/version:
 
-## 脱敏要求
+## redaction requirements
 
-> **本文件可能随仓库同步到远程，必须脱敏。完整规范见 [`anonymization.md`](anonymization.md)（占位符总表 + 自动检测脚本）。**
+> **This file may be synchronized to the remote location with the repository and must be redacted. For the complete specification, see [`anonymization.md`](anonymization.md) (placeholder list + automatic detection script).**
 
-- 目标域名/IP：用 `{target_domain}` / `{target_ip}` 替代（详见 `anonymization.md`）
-- 真实 URL 路径：保留结构，替换域名
-- Token/Cookie/密码/JWT/API key：用 `{token}` / `{password}` / `{api_key}` 占位
-- 用户名/手机号/邮箱：用 `{username}` / `{phone}` / `{user_email}` 占位
-- 内部 IP/端口：内网 IP 段保留前两段（`10.0.x.x`）
-- 漏洞 payload：可保留技术内容，但替换目标特征参数（如 `?id={user_id}`）
+- Target domain name/IP: Replace with `{target_domain}` / `{target_ip}` (see `anonymization.md` for details)
+- Real URL path: keep structure, replace domain name
+- Token/Cookie/Password/JWT/API key: Use `{token}` / `{password}` / `{api_key}` placeholder
+- Username/mobile phone number/email: use `{username}` / `{phone}` / `{user_email}`
+- Internal IP/Port: Keep the first two segments of the internal IP segment (`10.0.x.x`)
+- Vulnerability payload: The technical content can be retained, but the target characteristic parameters are replaced (such as `?id={user_id}`)
 
-提交前对照 `anonymization.md` 末尾的 **Field-Journal 必查项 checklist** 跑一遍正则扫描。
+Before submitting, run a regular scan against the **Field-Journal mandatory checklist** at the end of `anonymization.md`.
 
-如果是私有仓库且确认不会公开，可以放宽以上限制，但仍建议脱敏。
+If it is a private repository and it is confirmed that it will not be made public, the above restrictions can be relaxed, but redaction is still recommended.
 
-## 索引同步（提交前最后一步）
+## Index synchronization (last step before commit)
 
-写完本日志后，必须同步更新 `_index.md`：
+After writing this log, `_index.md` must be updated simultaneously:
 
-1. 在「按场景分类」对应小节新增一行（含日期、关键词）
-2. 在「高频成功模式（按技术）」对应技术下追加本文件名
-3. 在「实体倒排（按目标特征）」对应实体下追加本文件名
-4. 更新「累计统计」的总数与"最近更新"日期
+1. Add a new line (including date, keywords) in the corresponding section of "Classification by Scenario"
+2. Add this file name under the corresponding technology of "High Frequency Success Model (by Technology)"
+3. Add this file name under the corresponding entity of "Entity inversion (according to target characteristics)"
+4. Update "Cumulative Statistics" totals and "Last Updated" date
 
 ---
-<!-- [进化统计] 本包累计完成项目: N | 本次新增模式: X | 本次修复工具链问题: Y -->
-<!-- [社区贡献] 完成后询问用户是否 PR 到主仓库。流程见 CONTRIBUTE-BACK.md -->
+<!-- [Evolution Statistics] The total number of completed projects in this package: N | This new mode: X | This time the tool chain problem is fixed: Y -->
+<!-- [Community Contribution] After completion, ask the user whether to PR to the main repository. See CONTRIBUTE-BACK.md for the process -->

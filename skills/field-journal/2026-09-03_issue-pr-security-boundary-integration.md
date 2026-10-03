@@ -1,40 +1,40 @@
-# 2026-09-03 多 Issue/PR 安全边界集成
+# 2026-09-03 Multiple Issue/PR security boundary integration
 
-## 场景
+## scene
 
-维护一个公开安全技能路由仓库：本地主工作树包含大量用户改动且落后远端，需要同时审查多个开放 PR、解决历史 Issue、补功能、发布安全复审，并确保 GitHub 状态和跨平台 CI 闭环。
+ maintains a public security skills routing repository: the local main working tree contains a large number of user changes and lags behind the remote end. It needs to review multiple open PRs at the same time, resolve historical issues, supplement functions, release security reviews, and ensure GitHub status and cross-platform CI closed loops.
 
-## 可复用模式
+## reusable mode
 
-1. **脏工作树隔离：** 先 fetch 远端，再从 `origin/main` 创建独立 worktree；所有 PR merge、冲突解决、测试和提交都在隔离目录完成。
-2. **保留 PR 归属：** 将接受的 PR head 作为 merge commit 父提交合入集成分支；最终快进推送 main 后，GitHub 自动把对应 PR 标记为 merged/closed。
-3. **状态冻结：** 合并前记录每个 PR 的 head SHA；推送前重新 fetch，要求远端 main 仍等于审查基线，并验证所有接受的 PR head 都是最终 HEAD 的祖先。
-4. **AV 隔离下审查：** 对可能被 Defender 隔离的 payload 文档，不依赖工作树文件；用 `git show :path` / Git index blob 做哈希、链接和内容边界检查。
-5. **参考/可执行分层：** 被动 Markdown/JSON payload 可以保留，但可执行脚本不得引用它；CI 固定 corpus hash、二进制 allowlist、符号链接、危险模式和 GitHub Action full-SHA。
-6. **功能 PR 不盲合：** 除运行原 PR 测试外，还要检查跨实例状态、路径/端口隔离和主线新约束。本次发现 IDA keepalive 文件未按端口隔离，并在合并提交中修正。
-7. **Issue 清仓有依据：** 每个 Issue 先回可追溯结论，再用 completed / duplicate / not_planned 关闭；不以“批量清理”为理由省略说明。
+1. **dirty worktree isolation:**first fetches the remote end, and then creates an independent worktree from `origin/main`; all PR merge, conflict resolution, testing and submission are completed in the isolation directory.
+2. **retains the PR ownership:**and merges the accepted PR head into the integration branch as the merge commit parent submission; after the final fast forward push to main, GitHub automatically marks the corresponding PR as merged/closed.
+3. **state freeze:**records the head SHA of each PR before merging; re-fetch before pushing, requiring the remote main to still be equal to the review baseline, and verifying that all accepted PR heads are ancestors of the final HEAD.
+4. **AV Review under isolation:**does not rely on the working tree file for payload documents that may be isolated by Defender; use `git show :path` / Git index blob for hashing, linking and content boundary checking.
+5. **reference/executable layering:**passive Markdown/JSON payload may be retained, but executable scripts must not reference it; CI fixed corpus hash, binary allowlist, symlinks, danger mode, and GitHub Action full-SHA.
+6. **feature PR is not blindly matched:**In addition to running the original PR test, it also checks cross-instance status, path/port isolation and mainline new constraints. This time it was discovered that IDA keepalive files were not isolated by port, and this was corrected in the merge commit.
+7. **Issue There is a basis for clearing:**Each Issue first returns the traceable conclusion, and then closes it with completed / duplicate / not_planned; do not omit explanations on the grounds of "batch cleaning".
 
-## 踩坑
+## steps on
 
-| 问题 | 原因 | 处理 |
+| Problem | Cause | Process |
 |---|---|---|
-| PR 在 GitHub 显示 mergeable，但合入最新主线仍有语义冲突 | PR base 落后，且多个 PR 修改同一 CI/路由文件 | 本地模拟 merge，按最新 SSoT 解决后重跑全套测试 |
-| AV 删除 payload 工作树文件导致普通扫描漏检 | 扩展名为 Markdown 也会命中特征签名 | 从 Git index blob 读取，禁止“读不到就跳过” |
-| Binary Ninja MCP 来源易被误认为官方 | MCP 项目是社区 GPL 插件，不是 Vector 35 官方组件 | 在 skill 中明确来源、审查 commit、bridge 版本与回环绑定 |
-| Git Bash 无法等价模拟 Linux Python→bash 子进程 | Windows CreateProcess 优先解析系统 `bash.exe`/WSL | 本地跑 Bash 语法和直接契约，最终以 Ubuntu/macOS CI 为准 |
+| PR shows mergeable on GitHub, but there are still semantic conflicts when merging into the latest mainline. | PR base is lagging behind, and multiple PRs modify the same CI/routing file. | locally simulates merge, and reruns the full set of tests after resolving it according to the latest SSoT. |
+| AV deletes the payload work tree file, causing normal scanning to miss detection | with the extension of Markdown will also hit the feature signature | reads from the Git index blob, prohibiting "skip if not read" |
+| Binary Ninja MCP source is easily mistaken for the official | The MCP project is a community GPL plug-in, not an official Vector 35 component | Clarify the source, review the commit, bridge version, and loopback binding in the skill |
+| Git Bash cannot equivalently simulate Linux Python → bash sub-process | Windows CreateProcess prioritizes parsing system `bash.exe`/WSL | runs Bash syntax and direct contract locally, ultimately subject to Ubuntu/macOS CI |
 
-## 验证
+## validates
 
-- 路由回归：175/175
-- Windows PowerShell 5.1 与 PowerShell 7：P0、编码、Evidence、IDA、smoke 全通过
-- Python：case-review、文档链接、repository security 全通过
-- Bash：语法、case workflow、新 Binary Ninja 路由通过
-- GitHub：Windows、Ubuntu、macOS、Gradle Wrapper Validation 全通过
-- 远端开放 Issue / PR：均为 0
+- routing return: 175/175
+- Windows PowerShell 5.1 and PowerShell 7: P0, encoding, Evidence, IDA, smoke all passed
+- Python: case-review, document link, repository security all passed
+- Bash: syntax, case workflow, new Binary Ninja routing via
+- GitHub: Windows, Ubuntu, macOS, Gradle Wrapper Validation all pass
+- remote open Issue / PR: both are 0
 
-## 环境
+## environment
 
 - OS：Windows
-- Git：隔离 worktree + PR head ancestor verification
+- Git: isolate worktree + PR head ancestor verification
 - CI：Windows、Ubuntu、macOS
-- 数据处理：仅公开仓库元数据和脱敏方法记录
+- data processing: only expose repository metadata and redaction method records
