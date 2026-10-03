@@ -9,7 +9,7 @@ Use this skill only as a downstream specialization after `$ctf-sandbox-orchestra
 
 Use this skill when the decisive question is which sandbox node, proxy rule, or header-derived branch actually serves the live request.
 
-Reply in Simplified Chinese unless the user explicitly requests English.
+Reply in English unless the user explicitly requests another language.
 
 ## Quick Start
 

@@ -1,102 +1,102 @@
-# [种子] IoT 路由器固件提取 + UART 串口拿 root
+# [Seed] IoT router firmware extraction + obtain root via UART
 
-## 场景分类
-固件 / IoT 安全
+## Scene classification
+Firmware/IoT Security
 
-## 目标概述
-一台中低端家用路由器，从厂商网站拿到 firmware bin，用 binwalk 提取 squashfs，再用串口接到设备 UART 拿到 root shell，分析其 Web 管理界面与启动脚本。
+## Goal overview
+For a mid- to low-end home router, get the firmware bin from the manufacturer's website, use binwalk to extract squashfs, then use the serial port to connect to the device UART to get the root shell, and analyze its Web management interface and startup script.
 
-## 完整执行链路
+## Complete execution link
 
-### 第 1 部分：固件分析
+### Part 1: Firmware Analysis
 
-1. 下载固件文件（厂商官网 / OpenWRT / 自己 dump 闪存）
-2. 基础识别
+1. Download the firmware file (manufacturer’s official website / OpenWRT / own dump flash memory)
+2. Basic identification
    ```bash
    file firmware.bin
-   binwalk firmware.bin                    # 看到 LZMA / SquashFS / U-Boot
-   binwalk -E firmware.bin                 # 熵图判断有无加密
+   binwalk firmware.bin                    # look for LZMA / SquashFS / U-Boot
+   binwalk -E firmware.bin                 # use the entropy graph to check for encryption
    ```
-3. 提取
+3. extract
    ```bash
    binwalk -e firmware.bin
    cd _firmware.bin.extracted/squashfs-root
    ```
-4. 静态分析关键点
+4. Key points of static analysis
    ```bash
-   find . -name 'shadow' -exec cat {} \;          # 默认密码 hash
-   find . -name '*.cgi' -o -name 'lighttpd*'      # Web 服务
-   find . -name 'rcS' -o -name 'init.d'           # 启动脚本
-   grep -r 'telnetd\|busybox' .                   # 可疑后门
+   find . -name 'shadow' -exec cat {} \;          # default password hash
+   find . -name '*.cgi' -o -name 'lighttpd*'      # Web services
+   find . -name 'rcS' -o -name 'init.d'           # startup scripts
+   grep -r 'telnetd\|busybox' .                   # suspicious backdoors
    strings $(find . -name 'httpd') | grep -i 'admin\|debug\|backdoor'
    ```
-5. 拿到 `/etc/shadow` 离线破：
+5. Get`/etc/shadow`and break it offline:
    ```bash
    john --wordlist=rockyou.txt shadow
    ```
 
-### 第 2 部分：硬件 UART
+### Part 2: Hardware UART
 
-1. 拆机看 PCB → 找 4 针 / 6 针未占的接口（通常未焊或焊有针脚）
-2. 用万用表识别
-   - GND（连接地铜片）
-   - VCC（3.3V，启动时稳定）
-   - TX（启动时电平跳变较多，向 UART → PC 方向输出）
-   - RX（启动时基本不变）
-3. 接 USB-TTL 转换器（CP2102 / FT232）
-   - 路由 TX → USB-TTL RX
-   - 路由 RX → USB-TTL TX
-   - 路由 GND → USB-TTL GND
-   - **不接 VCC**（设备自供电）
-4. 在主机上开串口监听
+1. Disassemble the machine and look at the PCB → Look for the unoccupied 4-pin/6-pin interface (usually unsoldered or with pins soldered)
+2. Use a multimeter to identify
+   - GND (connected to ground copper)
+   - VCC (3.3V, stable at startup)
+   - TX (level jumps more when starting, output in UART → PC direction)
+   - RX (basically unchanged at startup)
+3. Connect to USB-TTL converter (CP2102 / FT232)
+   - Route TX → USB-TTL RX
+   - Route RX → USB-TTL TX
+   - Routing GND → USB-TTL GND
+   - **Do not connect to VCC** (the device is self-powered)
+4. Open serial port monitoring on the host
    ```bash
    sudo screen /dev/ttyUSB0 115200
-   # 或：minicom / picocom
+   # Or: minicom/picocom
    ```
-5. 上电启动 → 看 U-Boot 输出 → Linux 启动 → 通常进入 login 提示
-6. 尝试默认凭据 / 破出来的 shadow 密码 → 拿到 root shell
+5. Power on → Look at U-Boot output → Linux starts → Usually enter the login prompt
+6. Try default credentials/broken shadow password → get root shell
 
-## 踩坑记录
+## Trampling on pit records
 
-| 问题 | 原因 | 解决方案 | 耗时 |
+| Problem | Cause | Solution | Time consuming |
 |------|------|---------|------|
-| binwalk 提取后是空目录 | 部分固件用了非标准格式（厂商私有头） | 用 `dd` 切片对照偏移手动提取，或 `unblob` 替代 binwalk | 1h |
-| binwalk -E 显示熵接近 1 | 整体加密 | 找到固件升级时的解密 key（通常硬编码在 OEM 工具里）| 数小时 |
-| UART 看不到任何字符 | 波特率不对 | 试 9600 / 38400 / 57600 / 115200 / 460800 / 921600 | 30min |
-| UART 看到字符但是乱码 | TX/RX 接反 / 电平不匹配 | 1) 互换 TX RX  2) 确认 USB-TTL 是 3.3V 而非 5V | 30min |
-| login 提示但无密码可用 | 没破出来 + 厂商默认密码已改 | U-Boot 阶段按键中断 → `setenv bootargs ${bootargs} init=/bin/sh` → 进单用户 | 1.5h |
-| U-Boot 没有按键中断响应 | 厂商关闭了 console / 改了 prompt | 在固件里找 `bootdelay`，物理短接 SPI flash 制造启动失败让 U-Boot 进交互 | 数小时 |
-| 进了 root 但 telnetd 不工作 | 镜像里没 dropbear/telnetd | mount usb 上拷一个 busybox-static 进去 | 1h |
+| is an empty directory after binwalk extraction | Some firmware uses non-standard format (manufacturer private header) | is manually extracted using`dd`slice control offset, or`unblob`is used instead of binwalk | 1h |
+| binwalk -E shows entropy close to 1 | overall encryption | finds decryption key when firmware upgrade (usually hardcoded in OEM tools) | hours |
+| UART cannot see any characters | The baud rate is wrong | Try 9600 / 38400 / 57600 / 115200 / 460800 / 921600 | 30min |
+| UART sees characters but garbled characters | TX/RX reverse connection/level mismatch | 1) Swap TX RX 2) Confirm USB-TTL is 3.3V instead of 5V | 30min |
+| login prompt but no password available | has not been broken + the manufacturer's default password has been changed | U-Boot phase key interruption →`setenv bootargs ${bootargs} init=/bin/sh`→ enter single user | 1.5h |
+| U-Boot does not respond to key interrupts | The manufacturer has closed the console / changed the prompt | Find`bootdelay`in the firmware, physically short SPI flash manufacturing startup failed and let U-Boot interact | for several hours |
+| has entered root but telnetd does not work | There is no dropbear/telnetd in the image | mount usb and copy busybox-static into it | 1h |
 
-## 工具链发现
+## Toolchain discovery
 
-- **unblob** 比 binwalk 更强（自动识别更多格式，不会卡在私有头）
-- **firmware-mod-kit** 老牌但仍能用于解包/打包
-- **firmwalker** 自动扫提取后 squashfs 里的"敏感线索"（凭据/私钥/URL/二进制后门）
-- **EMBA** 是综合固件审计平台（自动化版 firmwalker + 二进制 CVE 扫描 + 模拟启动）
-- **FirmAE** 用 QEMU 模拟启动 IoT 固件，不需要真机就能动态分析 Web 界面
-- **ChirpStack USB-TTL** / **Bus Pirate** / **Tigard** 都行，便宜的 CP2102 也够
+- **unblob** is stronger than binwalk (automatically recognizes more formats and will not get stuck in private headers)
+- **firmware-mod-kit** Old but still useful for unpacking/packing
+- **firmwalker** automatically scans and extracts "sensitive clues" (credentials/private keys/URL/binary backdoors) in squashfs
+- **EMBA** is a comprehensive firmware audit platform (automated version of firmwalker + binary CVE scanning + simulated boot)
+- **FirmAE** Use QEMU to simulate starting IoT firmware and dynamically analyze the web interface without the need for a real machine
+- **ChirpStack USB-TTL** / **Bus Pirate** / **Tigard** are all fine, the cheap CP2102 is also enough
 
-## 关键代码/命令
+## Key code/command
 
-固件审计一条龙：
+One-stop firmware audit:
 
 ```bash
-# 1. 提取
+# 1. Extract
 unblob -k firmware.bin -o extracted/
 
-# 2. 跑 firmwalker
+# 2. Run firmwalker
 git clone https://github.com/craigz28/firmwalker
 ./firmwalker.sh extracted/squashfs-root
 
-# 3. 模拟启动（如果支持）
+# 3. Simulate startup (if supported)
 docker run -it --rm -v $(pwd):/firmware firmae:latest \
   /work/run.sh -d 1 /firmware/firmware.bin
 
-# 4. 已模拟起 Web → 用 nuclei / nikto / curl 直接扫
+# 4. Web has been simulated → use nuclei / nikto / curl to scan directly
 ```
 
-UART 自动尝试常见波特率：
+The UART automatically tries common baud rates:
 
 ```bash
 for baud in 9600 19200 38400 57600 115200 460800 921600; do
@@ -105,50 +105,50 @@ for baud in 9600 19200 38400 57600 115200 460800 921600; do
 done
 ```
 
-U-Boot 单用户 bypass 经典招：
+U-Boot single-user bypass classic trick:
 
 ```text
-# U-Boot 阶段按键中断（一般是按住空格或 Ctrl+C）
+# U-Boot phase key interrupt (usually hold down space or Ctrl+C)
 => setenv bootargs "console=ttyS0,115200 root=/dev/mtdblock2 rootfstype=squashfs init=/bin/sh"
 => saveenv
 => boot
-# 启动后直接进 sh，无需密码
+# Enter sh directly after startup, no password required
 ```
 
-## 对本包的改进建议
+## Suggestions for improvements to this package
 
-- `reverse-engineering/platforms.md` 已含固件章节，建议拆出 `references/iot-firmware-cheatsheet.md`
-- 新增 `reverse-engineering/references/uart-debug.md` 涵盖 UART/JTAG/SWD 入门
-- bootstrap manifest 加入 unblob / firmwalker
+- `reverse-engineering/platforms.md`already contains the firmware chapter, it is recommended to remove`references/iot-firmware-cheatsheet.md`
+- Added`reverse-engineering/references/uart-debug.md`to cover getting started with UART/JTAG/SWD
+- bootstrap manifest added unblob / firmwalker
 
-## 可复用的模式/脚本片段
+## Reusable patterns/script snippets
 
-**IoT 安全测试 4 阶段**：
+**IoT Security Testing 4 Phases**:
 
 ```text
-阶段 1 — 软件
-  · 厂商固件下载 + binwalk/unblob 提取
-  · firmwalker 跑一遍
-  · grep 默认凭据 / 私钥 / 后门字符串
-  · QEMU 模拟启动跑 Web 漏扫
+Stage 1 - Software
+  · Download vendor firmware and extract it with binwalk/unblob
+  · Run firmwalker
+  · grep for default credentials / private keys / backdoor strings
+  · Emulate startup in QEMU and scan the web interface
 
-阶段 2 — 硬件
-  · 拆机找 UART/JTAG 焊点
-  · 万用表识别 GND/VCC/TX/RX
-  · USB-TTL 接线，确认电平 3.3V
+Stage 2 - Hardware
+  · Open the device and locate UART/JTAG pads
+  · Identify GND/VCC/TX/RX with a multimeter
+  · Connect USB-TTL and confirm 3.3 V logic
 
-阶段 3 — 调试
-  · screen/minicom 监听
-  · U-Boot 阶段中断进交互
-  · init=/bin/sh 单用户绕密码
+Phase 3 - Debugging
+  · Listen with screen/minicom
+  · Interrupt U-Boot startup to enter its interactive console
+  · Use init=/bin/sh to enter single-user mode and bypass the password
 
-阶段 4 — 利用
-  · 拿到 root → 看 /etc/shadow 离线破
-  · 看 Web 管理界面 CGI 二进制 → 找命令注入 / SSRF
-  · 看 UPnP / mDNS / 蓝牙广播逻辑
+Stage 4 - Exploitation
+  · After obtaining root → inspect /etc/shadow and crack hashes offline
+  · Inspect CGI binaries for the web admin interface → look for command injection / SSRF
+  · Inspect UPnP / mDNS / Bluetooth broadcast logic
 ```
 
-**默认凭据速查**（厂商常见）：
+**Default Credentials Quick Check** (common among vendors):
 
 ```text
 admin / admin
@@ -160,15 +160,15 @@ ubnt / ubnt          # Ubiquiti
 admin / 1234         # ZyXEL
 ```
 
-## 进化动作
-- [ ] 拆出 iot-firmware-cheatsheet.md
-- [ ] 新建 uart-debug.md
-- [ ] bootstrap-manifest 加入 unblob / firmwalker
+## evolution action
+- [ ] Uninstall iot-firmware-cheatsheet.md
+- [ ] Create new uart-debug.md
+- [ ] bootstrap-manifest added unblob/firmwalker
 
-## 环境信息
+## environmental information
 - Kali 2026.x（binwalk / unblob / squashfs-tools / firmwalker）
-- USB-TTL 转换器: CP2102 / FT232（3.3V 电平）
-- 目标: ARMv7 / MIPS 路由器（OpenWRT 衍生固件常见）
+- USB-TTL converter: CP2102 / FT232 (3.3V level)
+- Target: ARMv7 / MIPS routers (common with OpenWRT derived firmware)
 
-## 脱敏要求
-本条目为种子数据，基于公开 IoT 安全测试方法编写，不涉及任何真实厂商或型号。
+## redaction requirements
+This entry is seed data, written based on public IoT security testing methods, and does not involve any real manufacturer or model.

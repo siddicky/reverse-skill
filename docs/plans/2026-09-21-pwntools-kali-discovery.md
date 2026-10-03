@@ -122,7 +122,7 @@ git commit -m "test(kali): cover pwntools discovery integration"
 Change the #144 row to:
 
 ```bash
-"pwntools|reverse-engineering|CTF pwn 利用开发框架|version|pwn"
+"pwntools|reverse-engineering|CTF pwn utilization development framework|version|pwn"
 ```
 
 Change the client-neutral catalog version command from `pwn --version` to `pwn version`, and make its version runner pass only populated arguments rather than an extra empty placeholder. Both indexes must invoke the stub with exactly one argument and record the first merged stdout/stderr line from the real CLI contract, `[*] Pwntools v4.15.0`. Preserve the generic runner's previous empty-spec semantics: parse and invoke a version specification only when it is both non-empty and not `none`.

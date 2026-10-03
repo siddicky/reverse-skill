@@ -143,9 +143,9 @@ For comprehensive anti-analysis techniques and bypasses (30+ methods with code),
 ## Specialized Patterns
 
 ### S-Box / Keystream Patterns
-**Xorshift32:** Shifts 13, 17, 5  
-**Xorshift64:** Shifts 12, 25, 27  
-**Magic constants:** `0x2545f4914f6cdd1d`, `0x9e3779b97f4a7c15`
+**Xorshift32:**Shifts 13, 17, 5  
+**Xorshift64:**Shifts 12, 25, 27  
+**Magic constants:**`0x2545f4914f6cdd1d`, `0x9e3779b97f4a7c15`
 
 ### Custom VM Analysis
 1. Identify structure: registers, memory, IP
@@ -156,7 +156,7 @@ For comprehensive anti-analysis techniques and bypasses (30+ methods with code),
 
 See [patterns.md](patterns.md#custom-vm-reversing) for VM workflow, opcode tables, and state machine BFS.
 
-**Sequential key-chain brute-force:** When a VM validates input in small blocks (e.g., 3 bytes = 2^24 candidates) with each block's output key feeding the next, brute-force each block sequentially with OpenMP parallelization. Compile solver with `gcc -O3 -march=native -fopenmp`. See [patterns-ctf-3.md](patterns-ctf-3.md#vm-sequential-key-chain-brute-force-midnight-flag-2026).
+**Sequential key-chain brute-force:**When a VM validates input in small blocks (e.g., 3 bytes = 2^24 candidates) with each block's output key feeding the next, brute-force each block sequentially with OpenMP parallelization. Compile solver with `gcc -O3 -march=native -fopenmp`. See [patterns-ctf-3.md](patterns-ctf-3.md#vm-sequential-key-chain-brute-force-midnight-flag-2026).
 
 ### Python Bytecode Reversing
 XOR flag checkers with interleaved even/odd tables are common. See [languages.md](languages.md#python-bytecode-reversing-disdis-output) for bytecode analysis tips and reversing patterns.
@@ -174,10 +174,10 @@ Locate with `objdump -s -j .rodata binary | less` — look near comparison instr
 Sign extension and 32-bit truncation pitfalls. See [patterns.md](patterns.md#x86-64-gotchas) for details and code examples.
 
 ### Iterative Solver Pattern
-Try each byte (0-255) per position, match against expected output. **Uniform transform shortcut:** if one input byte only changes one output byte, build 0..255 mapping then invert. See [patterns.md](patterns.md) for full implementation.
+Try each byte (0-255) per position, match against expected output.**Uniform transform shortcut:**if one input byte only changes one output byte, build 0..255 mapping then invert. See [patterns.md](patterns.md) for full implementation.
 
 ### Unicorn Emulation (Complex State)
-`from unicorn import *` -- map segments, set up stack, hook to trace. **Mixed-mode pitfall:** 64-bit stub jumping to 32-bit via `retf` requires switching to UC_MODE_32 and copying GPRs + EFLAGS + XMM regs. See [tools.md](tools.md#unicorn-emulation).
+`from unicorn import *` -- map segments, set up stack, hook to trace.**Mixed-mode pitfall:**64-bit stub jumping to 32-bit via `retf` requires switching to UC_MODE_32 and copying GPRs + EFLAGS + XMM regs. See [tools.md](tools.md#unicorn-emulation).
 
 ### Multi-Stage Shellcode Loaders
 Nested shellcode with XOR decode loops; break at `call rax`, bypass ptrace with `set $rax=0`, extract flag from `mov` instructions. See [patterns.md](patterns.md#multi-stage-shellcode-loaders).
@@ -186,7 +186,7 @@ Nested shellcode with XOR decode loops; break at `call rax`, bypass ptrace with 
 Validation time varies per correct character; measure elapsed time per candidate to recover flag byte-by-byte. See [patterns.md](patterns.md#timing-side-channel-attack).
 
 ### Unstripped Binary Information Leaks
-**Pattern:** Debug info and file paths leak author identity. Quick checks: `strings binary | grep "/home/"` (home dirs), `file binary` (stripped?), `readelf -S binary | grep debug` (debug sections).
+**Pattern:**Debug info and file paths leak author identity. Quick checks: `strings binary | grep "/home/"` (home dirs), `file binary` (stripped?), `readelf -S binary | grep debug` (debug sections).
 
 ### Custom Mangle Function Reversing
 Binary mangles input 2 bytes at a time with running state; extract target from `.rodata`, write inverse function. See [patterns.md](patterns.md#custom-mangle-function-reversing).
@@ -212,7 +212,7 @@ Binary mmaps `.rodata` blob, XOR-deobfuscates, uses it to validate input. Reimpl
 Binary hashes every prefix independently. Recover one character at a time by matching prefix hashes. See [patterns-ctf-2.md](patterns-ctf-2.md#prefix-hash-brute-force-nullcon-2026).
 
 ### Mathematical Convergence Bitmap
-**Pattern:** Binary classifies coordinate pairs by Newton's method convergence (e.g., z^3-1=0). Grid of pass/fail results renders ASCII art flag. Key: the binary is a classifier, not a checker — reverse the math and visualize. See [patterns-ctf.md](patterns-ctf.md#mathematical-convergence-bitmap-ehax-2026).
+**Pattern:**Binary classifies coordinate pairs by Newton's method convergence (e.g., z^3-1=0). Grid of pass/fail results renders ASCII art flag. Key: the binary is a classifier, not a checker — reverse the math and visualize. See [patterns-ctf.md](patterns-ctf.md#mathematical-convergence-bitmap-ehax-2026).
 
 ### RISC-V Binary Analysis
 Statically linked, stripped RISC-V ELF. Use Capstone with `CS_MODE_RISCVC | CS_MODE_RISCV64` for mixed compressed instructions. Emulate with `qemu-riscv64`. Watch for fake flags and XOR decryption with incremental keys. See [tools.md](tools.md#risc-v-binary-analysis-ehax-2026).
@@ -236,40 +236,40 @@ Binary validates flag via matrix multiplication with 64-bit coefficients; soluti
 N-layer binary where each layer decrypts the next using user-provided key bytes + SHA-NI. Use oracle (correct key → valid code with expected pattern). JIT execution with fork-per-candidate COW isolation for speed. See [patterns-ctf-2.md](patterns-ctf-2.md#multi-layer-self-decrypting-binary-dicectf-2026).
 
 ### GLSL Shader VM with Self-Modifying Code
-**Pattern:** WebGL2 fragment shader implements Turing-complete VM on a 256x256 RGBA texture (program memory + VRAM). Self-modifying code (STORE opcode) patches drawing instructions. GPU parallelism causes write conflicts — emulate sequentially in Python to recover full output. See [patterns-ctf-3.md](patterns-ctf-3.md#glsl-shader-vm-with-self-modifying-code-apoorvctf-2026).
+**Pattern:**WebGL2 fragment shader implements Turing-complete VM on a 256x256 RGBA texture (program memory + VRAM). Self-modifying code (STORE opcode) patches drawing instructions. GPU parallelism causes write conflicts — emulate sequentially in Python to recover full output. See [patterns-ctf-3.md](patterns-ctf-3.md#glsl-shader-vm-with-self-modifying-code-apoorvctf-2026).
 
 ### GF(2^8) Gaussian Elimination for Flag Recovery
-**Pattern:** Binary performs Gaussian elimination over GF(2^8) with the AES polynomial (0x11b). Matrix + augmentation vector in `.rodata`; solution vector is the flag. Look for constant `0x1b` in disassembly. Addition is XOR, multiplication uses polynomial reduction. See [patterns-ctf-2.md](patterns-ctf-2.md#gf28-gaussian-elimination-for-flag-recovery-apoorvctf-2026).
+**Pattern:**Binary performs Gaussian elimination over GF(2^8) with the AES polynomial (0x11b). Matrix + augmentation vector in `.rodata`; solution vector is the flag. Look for constant `0x1b` in disassembly. Addition is XOR, multiplication uses polynomial reduction. See [patterns-ctf-2.md](patterns-ctf-2.md#gf28-gaussian-elimination-for-flag-recovery-apoorvctf-2026).
 
 ### Z3 for Single-Line Python Boolean Circuit
-**Pattern:** Single-line Python (2000+ semicolons) with walrus operator chains validates flag as big-endian integer via boolean circuit. Obfuscated XOR `(a | b) & ~(a & b)`. Split on semicolons, translate to Z3 symbolically, solve in under a second. See [patterns-ctf-3.md](patterns-ctf-3.md#z3-for-single-line-python-boolean-circuit-bearcatctf-2026).
+**Pattern:**Single-line Python (2000+ semicolons) with walrus operator chains validates flag as big-endian integer via boolean circuit. Obfuscated XOR `(a | b) & ~(a & b)`. Split on semicolons, translate to Z3 symbolically, solve in under a second. See [patterns-ctf-3.md](patterns-ctf-3.md#z3-for-single-line-python-boolean-circuit-bearcatctf-2026).
 
 ### Sliding Window Popcount Differential Propagation
-**Pattern:** Binary validates input via expected popcount for each position of a 16-bit sliding window. Popcount differences create a recurrence: `bit[i+16] = bit[i] + (data[i+1] - data[i])`. Brute-force ~4000-8000 valid initial 16-bit windows; each determines the entire bit sequence. See [patterns-ctf-3.md](patterns-ctf-3.md#sliding-window-popcount-differential-propagation-bearcatctf-2026).
+**Pattern:**Binary validates input via expected popcount for each position of a 16-bit sliding window. Popcount differences create a recurrence: `bit[i+16] = bit[i] + (data[i+1] - data[i])`. Brute-force ~4000-8000 valid initial 16-bit windows; each determines the entire bit sequence. See [patterns-ctf-3.md](patterns-ctf-3.md#sliding-window-popcount-differential-propagation-bearcatctf-2026).
 
 ### Ruby/Perl Polyglot Constraint Satisfaction
-**Pattern:** Single file valid in both Ruby and Perl, each imposing different constraints on a key. Exploits `=begin`/`=end` (Ruby block comment) vs `=begin`/`=cut` (Perl POD) to run different code per interpreter. Intersect constraints from both languages to recover the unique key. See [languages-platforms.md](languages-platforms.md#rubyperl-polyglot-constraint-satisfaction-bearcatctf-2026).
+**Pattern:**Single file valid in both Ruby and Perl, each imposing different constraints on a key. Exploits `=begin`/`=end` (Ruby block comment) vs `=begin`/`=cut` (Perl POD) to run different code per interpreter. Intersect constraints from both languages to recover the unique key. See [languages-platforms.md](languages-platforms.md#rubyperl-polyglot-constraint-satisfaction-bearcatctf-2026).
 
 ### Verilog/Hardware RE
-**Pattern:** Verilog HDL source for state machines with hidden conditions gated on shift register history. Analyze `always @(posedge clk)` blocks and `case` statements to find correct input sequences. See [languages-platforms.md](languages-platforms.md#veriloghardware-reverse-engineering-srdnlenctf-2026).
+**Pattern:**Verilog HDL source for state machines with hidden conditions gated on shift register history. Analyze `always @(posedge clk)` blocks and `case` statements to find correct input sequences. See [languages-platforms.md](languages-platforms.md#veriloghardware-reverse-engineering-srdnlenctf-2026).
 
 ### Custom binfmt Kernel Module with RC4 Flat Binaries
-**Pattern:** Kernel module registers binfmt handler for encrypted flat binaries. Reverse the `.ko` to find RC4 key (in `movabs` immediates), decrypt the flat binary, import at the fixed virtual address from the module's `vm_mmap` call. See [patterns-ctf.md](patterns-ctf.md#custom-binfmt-kernel-module-with-rc4-flat-binaries-bsidessf-2026).
+**Pattern:**Kernel module registers binfmt handler for encrypted flat binaries. Reverse the `.ko` to find RC4 key (in `movabs` immediates), decrypt the flat binary, import at the fixed virtual address from the module's `vm_mmap` call. See [patterns-ctf.md](patterns-ctf.md#custom-binfmt-kernel-module-with-rc4-flat-binaries-bsidessf-2026).
 
 ### Hash-Resolved Imports / No-Import Ransomware
-**Pattern:** Binary with zero visible imports resolves APIs via symbol name hashing at runtime. Skip the hash reversing — hook OpenSSL functions via `LD_PRELOAD` in Docker to capture AES keys directly. See [patterns-ctf.md](patterns-ctf.md#hash-resolved-imports-no-import-ransomware-bsidessf-2026).
+**Pattern:**Binary with zero visible imports resolves APIs via symbol name hashing at runtime. Skip the hash reversing — hook OpenSSL functions via `LD_PRELOAD` in Docker to capture AES keys directly. See [patterns-ctf.md](patterns-ctf.md#hash-resolved-imports-no-import-ransomware-bsidessf-2026).
 
 ### ELF Section Header Corruption for Anti-Analysis
-**Pattern:** Corrupted section headers crash analysis tools but program headers are intact so binary runs normally. Patch `e_shoff` to zero or use `readelf -l` (program headers only). Flag hidden after corrupted sections with magic marker + XOR. See [patterns-ctf.md](patterns-ctf.md#elf-section-header-corruption-for-anti-analysis-bsidessf-2026).
+**Pattern:**Corrupted section headers crash analysis tools but program headers are intact so binary runs normally. Patch `e_shoff` to zero or use `readelf -l` (program headers only). Flag hidden after corrupted sections with magic marker + XOR. See [patterns-ctf.md](patterns-ctf.md#elf-section-header-corruption-for-anti-analysis-bsidessf-2026).
 
 ### Brainfuck Character-by-Character Static Analysis
-**Pattern:** BF programs validating input have `,` (read char) followed by `+` operations whose count = expected ASCII value. Extract increment counts per input position to recover expected input without execution. See [languages.md](languages.md#brainfuck-character-by-character-static-analysis-bsidessf-2026).
+**Pattern:**BF programs validating input have `,` (read char) followed by `+` operations whose count = expected ASCII value. Extract increment counts per input position to recover expected input without execution. See [languages.md](languages.md#brainfuck-character-by-character-static-analysis-bsidessf-2026).
 
 ### Brainfuck Side-Channel via Read Count Oracle
-**Pattern:** BF input validators read more bytes when a character is correct. Count `,` operations per candidate — highest read count = correct byte. Character-by-character recovery. See [languages.md](languages.md#brainfuck-side-channel-via-read-count-oracle-bsidessf-2026).
+**Pattern:**BF input validators read more bytes when a character is correct. Count `,` operations per candidate — highest read count = correct byte. Character-by-character recovery. See [languages.md](languages.md#brainfuck-side-channel-via-read-count-oracle-bsidessf-2026).
 
 ### Brainfuck Comparison Idiom Detection
-**Pattern:** Compiled BF uses fixed idioms for equality checks (`<[-<->] +<[>-<[-]]>[-<+>]`). Instrument interpreter to detect patterns and extract comparison operands (expected flag bytes). See [languages.md](languages.md#brainfuck-comparison-idiom-detection-bsidessf-2026).
+**Pattern:**Compiled BF uses fixed idioms for equality checks (`<[-<->] +<[>-<[-]]>[-<+>]`). Instrument interpreter to detect patterns and extract comparison operands (expected flag bytes). See [languages.md](languages.md#brainfuck-comparison-idiom-detection-bsidessf-2026).
 
 ### Backdoored Shared Library Detection
 Binary works in GDB but fails when run normally (suid)? Check `ldd` for non-standard libc paths, then `strings | diff` the suspicious vs. system library to find injected code/passwords. See [patterns-ctf.md](patterns-ctf.md#backdoored-shared-library-detection-via-string-diffing-hacklu-ctf-2012).
@@ -278,7 +278,7 @@ Binary works in GDB but fails when run normally (suid)? Check `ldd` for non-stan
 Large static binary with `go.buildid`? Use GoReSym to recover function names (works even on stripped binaries). Go strings are `{ptr, len}` pairs — not null-terminated. Look for `main.main`, `runtime.gopanic`, channel ops (`runtime.chansend1`/`chanrecv1`). Use Ghidra golang-loader plugin for best results. See [languages-compiled.md](languages-compiled.md#go-binary-reversing).
 
 ### Go Binary UUID Patching for C2 Enumeration
-**Pattern:** Go C2 client with UUID from `-ldflags -X`. Binary-patch UUID bytes (same length), register with C2, enumerate clients/files via API. See [languages-compiled.md](languages-compiled.md#go-binary-uuid-patching-for-c2-client-enumeration-bsidessf-2026).
+**Pattern:**Go C2 client with UUID from `-ldflags -X`. Binary-patch UUID bytes (same length), register with C2, enumerate clients/files via API. See [languages-compiled.md](languages-compiled.md#go-binary-uuid-patching-for-c2-client-enumeration-bsidessf-2026).
 
 ### D Language Binary Reversing
 D language binaries have unique symbol mangling (not C++ style). Template-heavy, many function variants. Look for `_D` prefix in symbols. See [languages-compiled.md](languages-compiled.md#d-language-binary-reversing-csaw-ctf-2016).
@@ -290,7 +290,7 @@ Binary with `core::panicking` strings and `_ZN` mangled symbols? Use `rustfilt` 
 Hook runtime functions without modifying binary. `frida -f ./binary -l hook.js` to spawn with instrumentation. Hook `strcmp`/`memcmp` to capture expected values, bypass anti-debug by replacing `ptrace` return value, scan memory for flag patterns, replace validation functions. See [tools-dynamic.md](tools-dynamic.md#frida-dynamic-instrumentation).
 
 ### Frida Firebase Cloud Functions Bypass
-**Pattern:** Android app validates via Firebase Cloud Functions. Post-login Frida hook constructs valid payload (UID + value + timestamp) and calls Cloud Function directly, bypassing QR/payment validation. See [languages-platforms.md](languages-platforms.md#frida-firebase-cloud-functions-bypass-bsidessf-2026).
+**Pattern:**Android app validates via Firebase Cloud Functions. Post-login Frida hook constructs valid payload (UID + value + timestamp) and calls Cloud Function directly, bypassing QR/payment validation. See [languages-platforms.md](languages-platforms.md#frida-firebase-cloud-functions-bypass-bsidessf-2026).
 
 ### angr Symbolic Execution
 Automatic path exploration to find inputs satisfying constraints. Load binary with `angr.Project`, set find/avoid addresses, call `simgr.explore()`. Constrain input to printable ASCII and known prefix for faster solving. Hook expensive functions (crypto, I/O) to prevent path explosion. See [tools-dynamic.md](tools-dynamic.md#angr-symbolic-execution).
@@ -329,7 +329,7 @@ Binary uses signal handler chains for per-character password validation. Hook `s
 Custom OpenType font maps multi-character ligature sequences to single glyphs; reverse the GSUB table to decode hidden messages. See [patterns-ctf-3.md](patterns-ctf-3.md#opentype-font-ligature-exploitation-for-hidden-messages-hack-the-vote-2016).
 
 ### Instruction Counter as Cryptographic State
-**Pattern:** Hand-written assembly uses a dedicated register (e.g., `r12`) as an instruction counter incremented after nearly every instruction. The counter feeds into XOR/ROL/multiply transformations on input bytes, making transformation path-dependent. Byte-by-byte brute force with Unicorn emulation recovers the flag. See [patterns-ctf-3.md](patterns-ctf-3.md#instruction-counter-as-cryptographic-state-metactf-flash-2026).
+**Pattern:**Hand-written assembly uses a dedicated register (e.g., `r12`) as an instruction counter incremented after nearly every instruction. The counter feeds into XOR/ROL/multiply transformations on input bytes, making transformation path-dependent. Byte-by-byte brute force with Unicorn emulation recovers the flag. See [patterns-ctf-3.md](patterns-ctf-3.md#instruction-counter-as-cryptographic-state-metactf-flash-2026).
 
 ### Burrows-Wheeler Transform Inversion
 Invert BWT without terminator character by trying all possible row indices. Standard `bwtool` or manual column-sorting reconstruction. See [patterns-ctf-3.md](patterns-ctf-3.md#burrows-wheeler-transform-inversion-without-terminator-asis-ctf-finals-2016).
@@ -365,9 +365,9 @@ Fork/pipe IPC where parent writes data and exits, child reads and continues. Rea
 
 ### Signed Cookie Key Reuse: access token to admin_session
 
-**Case:** `class.pangbaoba.me` CTF homework system. Public `/access/<token>` route set a signed `student_gate`; the same access token also worked as the HMAC key for `admin_session`, allowing direct admin API access by forging the exact session payload shape.
+**Case:**`class.pangbaoba.me` CTF homework system. Public `/access/<token>` route set a signed `student_gate`; the same access token also worked as the HMAC key for `admin_session`, allowing direct admin API access by forging the exact session payload shape.
 
-**Core pattern:** A visible invite/access token is reused as a server-side signing secret. If one signed cookie can be validated offline, test whether sibling auth cookies use the same signing scheme and key.
+**Core pattern:**A visible invite/access token is reused as a server-side signing secret. If one signed cookie can be validated offline, test whether sibling auth cookies use the same signing scheme and key.
 
 **Triage workflow:**
 1. Capture `Set-Cookie` from the gated entry route, especially cookies shaped like `<base64url-json>.<base64url-signature>`.
@@ -376,7 +376,7 @@ Fork/pipe IPC where parent writes data and exits, child reads and continues. Rea
 4. If the signature matches, enumerate *payload shape*, not passwords: try likely authorization claims on the correct cookie name (`admin_session`, `session`, `auth`, etc.).
 5. Verify with read-only endpoints first (`/api/admin/me`, settings/status/list routes) before any write action.
 
-**Important lesson:** The first obvious payload may fail. In this case `{"access":"admin"}`, `{"role":"admin"}`, and `{"access":"student","isAdmin":true}` failed, while the backend actually checked:
+**Important lesson:**The first obvious payload may fail. In this case `{"access":"admin"}`, `{"role":"admin"}`, and `{"access":"student","isAdmin":true}` failed, while the backend actually checked:
 
 ```json
 {"admin":true}
@@ -401,9 +401,9 @@ print(f"admin_session={payload_b64}.{sig_b64}")
 - Other read-only admin endpoints return real data with the forged cookie.
 - A JSON-cookie value like `admin_session=j:{}` causing `500` suggests Express/cookie-parser type confusion and confirms fragile cookie parsing; it is not required for the bypass but helps identify the stack and parsing assumptions.
 
-**What to avoid:** Do not brute-force admin passwords or enumerate unrelated user IDs when a signed-cookie structure is visible. Work offline on signatures and use low-frequency read-only verification.
+**What to avoid:**Do not brute-force admin passwords or enumerate unrelated user IDs when a signed-cookie structure is visible. Work offline on signatures and use low-frequency read-only verification.
 
-**Fix guidance:** Never use public route/access tokens as HMAC secrets. Use server-only cookie signing secrets, separate student/admin secrets, server-side sessions for admin identity, strict cookie type checks, and return `401` on parse/verify failure instead of `500`.
+**Fix guidance:**Never use public route/access tokens as HMAC secrets. Use server-only cookie signing secrets, separate student/admin secrets, server-side sessions for admin identity, strict cookie type checks, and return `401` on parse/verify failure instead of `500`.
 
 ## Web Phishing Infrastructure
 
@@ -417,12 +417,12 @@ Two-server phishing infrastructure impersonating a government agency. Full victi
 - Both behind NAT ({internal_ip} internal), nginx, SSL-only
 - Web root: `/www/wwwroot/{target_domain_b}/`
 
-**Victim Flow:** Landing page (fake subsidy quotas) → 1.html (ID/bank card form → `submit.php`) → 4.html (PIN → `get-ayment.php`) → server-controlled staged pages (9-16) via 1-second `status_check.php` polling.
+**Victim Flow:**Landing page (fake subsidy quotas) → 1.html (ID/bank card form → `submit.php`) → 4.html (PIN → `get-ayment.php`) → server-controlled staged pages (9-16) via 1-second `status_check.php` polling.
 
 **Key Findings:**
 - Admin panel at `register.php` → `qichuang.php` (login form), `list.php` (dashboard template)
 - Auth via PHP session (`PHPSESSID`); `login.php` and `check_login_ajax.php` removed (404)
-- **Data leak**: `db.php` returns victim name list without auth (49+ records, **no bank details** — only id/username/note/description fields)
+- **Data leak**: `db.php` returns victim name list without auth (49+ records,**no bank details**— only id/username/note/description fields)
 - **No-auth write**: `save_note.php` accepts data without authentication
 - `backend.php` gives SQL error suggesting admin registration endpoint (broken)
 - Rate limiting on `submit.php` (multi-factor), no SQLi or session bypass found
@@ -438,102 +438,102 @@ Two-server phishing infrastructure impersonating a government agency. Full victi
 
 ---
 
-## 分析前预判：文件伪装与名字欺骗
+## Prejudgment before analysis: File disguise and name spoofing
 
-### 文件后缀不可信
+### file suffix is ​​not trusted
 
-**核心原则：永远用 `file` 命令或 magic bytes 判断文件类型，不要相信后缀名。**
+**core principle: Always use the `file` command or magic bytes to determine the file type, and do not trust the suffix name.**
 
-常见伪装手法：
+Common disguise techniques:
 
-| 伪装后缀 | 实际类型 | 目的 |
+| disguise suffix | actual type | purpose |
 |---------|---------|------|
-| `.sh` | ELF 二进制 | 让人以为是脚本，降低警惕 |
-| `.txt` | PE/ELF | 绕过简单的文件类型过滤 |
-| `.jpg`/`.png` | 可执行文件或压缩包 | 隐藏在图片中 |
-| `.dll` | 实际是 .NET assembly | 混淆分析方向 |
-| `.so` | 实际是加密 payload | 需要先解密 |
-| 无后缀 | 任何类型 | Linux 下常见 |
+| `.sh` | ELF binary | makes people think it is a script, lower your vigilance |
+| `.txt` | PE/ELF | Bypass simple file type filtering |
+| `.jpg`/`.png` | Executable file or compressed package | Hidden in the picture |
+| `.dll` | is actually .NET assembly | Confusion analysis direction |
+| `.so` | is actually an encrypted payload | that needs to be decrypted first |
+| No suffix | Any type | Common under Linux |
 
 ```bash
-# 正确做法：用 file 命令
+# Correct approach: Use the file command
 file suspicious_file.sh
-# 输出: ELF 64-bit LSB executable, ARM aarch64...
+# output: ELF 64-bit LSB executable, ARM aarch64...
 
-# 用 xxd 看 magic bytes
+# uses xxd to view magic bytes
 xxd suspicious_file.sh | head -1
 # 7f454c46 = ELF magic
 ```
 
-### 文件名不可信
+### The file name is not trusted
 
-**"DriverLoader" 不一定加载驱动，"Updater" 不一定更新。**
+**"DriverLoader" may not load the driver, and "Updater" may not update it.**
 
-常见名字欺骗：
+ Common name spoofing:
 
-| 文件名暗示 | 实际行为 |
+| filename implies | actual behavior |
 |-----------|---------|
-| `DriverLoader` | 可能是 ptrace 注入器 / 进程 hook |
-| `SystemService` | 可能是后门 / C2 agent |
-| `Updater` / `Update` | 可能是 dropper / 下载器 |
-| `Helper` / `Assistant` | 可能是提权工具 |
-| `lib*.so` | 可能是注入 payload |
+| `DriverLoader` | Possibly ptrace injector/process hook |
+| `SystemService` | may be a backdoor / C2 agent |
+| `Updater` / `Update` | may be a dropper / downloader |
+| `Helper` / `Assistant` | may be a privilege escalation tool |
+| `lib*.so` | may be the injected payload |
 
-**分析时应该：**
-- 忽略文件名暗示，按实际代码行为判断
-- 关注 `mmap`、`ptrace`、`/proc/self/mem` 等系统调用
-- 如果看到"加载驱动"但没有 `insmod`/`init_module` 调用，说明名不副实
+**should be analyzed as:**
+- ignores file name hints and judges  based on actual code behavior
+- follows `mmap`, `ptrace`, `/proc/self/mem` and other systems calling
+- If you see "Loading Driver" but there is no `insmod`/`init_module` call, it means that the name  is not worthy of the name.
 
-### 静态分析不够时的动态补充
+### Dynamic supplement  when static analysis is not enough
 
-纯静态分析只能看到代码骨架。以下场景必须配合动态分析：
+ pure static analysis can only see the code skeleton. The following scenarios must cooperate with dynamic analysis:
 
-| 场景 | 推荐动态方法 |
+| Scenario | Recommended dynamic method |
 |------|-------------|
-| 代码有解密/解压逻辑 | 在解密后下断点，dump 明文 |
-| 大量间接调用（函数指针表） | strace/ltrace 跟踪实际调用 |
-| 疑似反调试 | 先 strace 看 ptrace 调用 |
-| 内嵌 shellcode/payload | QEMU 用户态模拟执行 |
-| 网络通信协议未知 | tcpdump/Wireshark 抓包 |
+| code has decryption/decompression logic | Set a breakpoint after decryption and dump the plain text |
+| A large number of indirect calls (function pointer table) | strace/ltrace trace actual calls |
+| is suspected of anti-debugging |. First strace to see the ptrace call |
+| embedded shellcode/payload | QEMU user mode simulation execution |
+| Unknown network communication protocol | tcpdump/Wireshark capture packet |
 
 ```bash
-# strace 跟踪系统调用（重点关注）
+# strace traces system calls (focus on)
 strace -f -e trace=open,mmap,ptrace,execve,connect ./binary
 
-# ltrace 跟踪库函数调用
+# ltrace traces library function calls
 ltrace -f ./binary
 
-# QEMU 用户态模拟（不需要真实设备）
+# QEMU User mode simulation (no real device required)
 qemu-aarch64 -strace ./binary_arm64
 
-# 检查反调试：看是否 ptrace 自追踪
+# Check for anti-debugging: see if ptrace self-traces
 strace ./binary 2>&1 | grep ptrace
-# 如果看到 ptrace(PTRACE_TRACEME, ...) 说明有反调试
+# If you see ptrace(PTRACE_TRACEME, ...), it means there is anti-debugging
 ```
 
-### 进程注入/保护壳类样本的常见模式
+### Common patterns for process injection/protection of shell samples
 
-这类样本（如 `LinYuDriverLoader`）通常：
+Samples like  (such as `LinYuDriverLoader`) usually:
 
-1. **不是真正加载内核驱动**（需要 root 权限，大多数场景没有）
-2. **实际行为是进程注入**：
-   - `ptrace` attach 到目标进程
-   - 通过 `/proc/<pid>/mem` 读写目标内存
-   - `mmap` 映射 shellcode 到目标进程空间
-3. **内嵌加密 payload**：
-   - 运行时解密一段 shellcode
-   - 解密后的 payload 才是真正的 hook 代码
-4. **反调试保护**：
-   - `ptrace(PTRACE_TRACEME)` 自追踪
-   - 时间检测（`clock_gettime` 前后对比）
-   - `/proc/self/status` 检查 TracerPid
+1. **does not really load the kernel driver**(requires root permissions, which is not available in most scenarios)
+2. The actual behavior of **is that the process injects**:
+   - `ptrace` attach to target process
+   - reads and writes target memory  through `/proc/<pid>/mem`
+   - `mmap` maps shellcode to the target process space
+3. **embedded encryption payload**:
+   - decrypts a piece of shellcode while running
+   - The decrypted payload of is the real hook code
+4. **anti-debugging protection**:
+   - `ptrace(PTRACE_TRACEME)` self-tracking
+   - time detection (`clock_gettime` before and after comparison)
+   - `/proc/self/status` Check TracerPid
 
-**分析策略**：
+**analysis strategy**:
 ```text
-1. file 命令确认真实类型
-2. strings 看有没有明显的路径/库名/错误信息
-3. rabin2 -I 看架构/编译器/保护
-4. 静态找 mmap/ptrace/open 调用
-5. 如果有解密逻辑 → 动态跑到解密后 dump
-6. 如果有反调试 → 先 patch 掉或用 LD_PRELOAD 绕过
+1. The file command confirms the true type
+2. Strings to see if there is any obvious path/library name/error message
+3. rabin2 -I to see architecture/compiler/protection
+4. Staticly find mmap/ptrace/open calls
+5. If there is decryption logic → run dynamically to dump after decryption
+6. If there is anti-debugging → patch it out first or use LD_PRELOAD to bypass it
 ```

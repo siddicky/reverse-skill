@@ -48,13 +48,13 @@ python3 skills/case-review/scripts/review_case.py work/<case> --format markdown
 
 Confirm that `scope.md`, `timeline.md`, `workitems.md`, and `evidence/` are present. A non-strict review reports scope warnings while a strict review treats warnings as handoff blockers.
 
-## 建议下一步（选一个编号）
+## Suggest next step (choose a number)
 
-1. 修复 scope.md 中的授权、范围或 network_profile 字段
-2. 继续检查 Evidence 记录的可复现命令和来源
-3. 导出当前 review 结果并附到阶段性报告
-4. 换 JSON 输出接入 CI 或其他审查工具
-5. 暂停，先确认审查范围
+1. Fix authorization, scope or network_profile fields in scope.md
+2. Continue to check the Evidence record for reproducible commands and sources
+3. Export the current review results and attach them to the phased report
+4. Convert JSON output to CI or other review tools
+5. Pause, confirm the review scope first
 
 ### Phase 2: Traceability
 
@@ -75,13 +75,13 @@ Use JSON when another tool needs stable fields:
 python3 skills/case-review/scripts/review_case.py work/<case> --format json
 ```
 
-## 建议下一步（选一个编号）
+## Suggest next step (choose a number)
 
-1. 补写缺失的 Evidence，并保留原始命令
-2. 将候选 Finding 绑定到 Evidence 后重新审查
-3. 为调用链或攻击链补充 P-id 和 Path 步骤
-4. 生成 Markdown handoff summary
-5. 换回 PRIMARY skill 继续分析
+1. Fill in missing Evidence and keep the original command
+2. Re-examine after binding candidate Finding to Evidence
+3. Supplement the call chain or attack chain with P-id and Path steps
+4. Generate Markdown handoff summary
+5. Switch back to PRIMARY skill to continue analysis
 
 ### Phase 3: Fixity verification
 
@@ -99,13 +99,13 @@ The PowerShell Evidence helper can record a hash while appending a record:
 powershell -File skills/scripts/append-evidence.ps1 -CaseRoot work\<case> -Id E-001 -Title "Sample hash" -ReproCommand "sha256sum evidence/sample.bin" -ArtifactPath "evidence\sample.bin"
 ```
 
-## 建议下一步（选一个编号）
+## Suggest next step (choose a number)
 
-1. 修复 hash mismatch 或替换已污染的工作副本
-2. 为未固定的原始文件补充 SHA-256 和 artifact_path
-3. 继续进入报告生成阶段
-4. 导出 JSON 结果供 CI 保存
-5. 暂停并请求人工复核
+1. Fix hash mismatch or replace tainted working copy
+2. Supplement SHA-256 and artifact_path for unpinned raw files
+3. Continue to the report generation stage
+4. Export JSON results for CI to save
+5. Pause and request manual review
 
 ### Phase 4: Handoff
 
@@ -117,18 +117,18 @@ python3 skills/case-review/scripts/review_case.py work/<case> --strict --format 
 
 The command is read-only with respect to the case unless shell redirection is explicitly used to save its output. The review is not legal advice and does not replace organizational evidence handling procedures.
 
-## 建议下一步（选一个编号）
+## Suggest next step (choose a number)
 
-1. 将通过的 review 结果交给 `docs-generator/` 生成正式报告
-2. 回到 PRIMARY skill 补齐新的分析证据
-3. 归档 Markdown 和 JSON review 结果
-4. 暂停并请求人工复核
+1. Submit the passed review results to`docs-generator/`to generate a formal report
+2. Return to PRIMARY skill to complete new analysis evidence
+3. Archive Markdown and JSON review results
+4. Pause and request manual review
 
 ## Language behavior contract
 
 - Internal reasoning, tool selection, and phase control: English.
-- User-visible messages, section labels, reports, and next-step menus: Chinese unless the user requests another language.
-- Default bilingual labels place Chinese first and English second, separated by `/`.
+- User-visible messages, section labels, reports, and next-step menus: English unless the user requests another language.
+- Default bilingual labels place English first and the other language second, separated by `/`.
 
 ## Bootstrap boundary
 
@@ -148,10 +148,10 @@ This skill has no third-party dependency. If Python 3 is unavailable, the only a
 - [SWGDE Best Practices for Computer Forensic Acquisitions](https://www.swgde.org/documents/published-complete-listing/17-f-002-2-1/)
 - [SWGDE Best Practices for Archiving Digital and Multimedia Evidence](https://www.swgde.org/documents/published-complete-listing/19-f-003-best-practices-for-archiving-digital-and-multimedia-evidence/)
 
-## 任务完成自检
+## Task completion self-check
 
-- [ ] 我是否审查了 scope.md、timeline.md、workitems.md 和 evidence/？
-- [ ] 所有 Finding 是否引用了现存 Evidence？
-- [ ] 所有 Path 是否包含合法 path_type 和 Evidence 引用？
-- [ ] 是否执行了 hash verification，或记录了未执行原因？
-- [ ] 是否以 strict 模式重新运行并保存了 review 结果？
+- [ ] Have I reviewed scope.md, timeline.md, workitems.md and evidence/?
+- [ ] Do all Findings reference existing Evidence?
+- [ ] Do all Paths contain legal path_type and Evidence references?
+- [ ] Was hash verification performed, or was the reason why it was not performed documented?
+- [ ] Did you rerun in strict mode and save the review results?

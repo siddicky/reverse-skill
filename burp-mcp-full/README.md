@@ -1,10 +1,10 @@
 # BurpSuite MCP Full Control Extension
 
-通过 MCP 协议完整控制 BurpSuite 的所有核心功能。跨平台支持 Windows / Linux (Kali) / macOS。
+Complete control of all core functionality of BurpSuite via MCP protocol. Cross-platform support Windows / Linux (Kali) / macOS.
 
-## 快速开始
+## Quick start
 
-### 1. 编译扩展
+### 1. Compile extension
 
 **Windows**:
 ```cmd
@@ -19,117 +19,117 @@ chmod +x build.sh
 ./build.sh
 ```
 
-构建脚本会自动：检测 JDK 21+、下载依赖（montoya-api 2025.5 / gson / nanohttpd）、编译、把扩展描述符（`META-INF/extensions/burp-extension.properties`）打入 jar、打包 fat jar。无需 Gradle。
+The build script will automatically: detect JDK 21+, download dependencies (montoya-api 2025.5 / gson / nanohttpd), compile, enter extension descriptors (`META-INF/extensions/burp-extension.properties`) into jar, and package fat jar. No Gradle required.
 
-输出：`build/libs/burp-mcp-full.jar`。
+Output: `build/libs/burp-mcp-full.jar`.
 
-### 2. 加载到 Burp
+### 2. Load into Burp
 
 ```
-Burp Suite → Extensions → Add → Java → 选择 build/libs/burp-mcp-full.jar
+Burp Suite → Extensions → Add → Java → Select build/libs/burp-mcp-full.jar
 ```
 
-加载后在 Output 看到：
+After loading, you will see this in Output:
 ```
 [MCP] Server started on http://127.0.0.1:9876
 ```
 
-### 3. 鉴权（v2 起默认启用）
+### 3. Authentication (enabled by default since v2)
 
-扩展启动时自动生成随机 token 并写入 `~/.burp-mcp-token`。`mcp-bridge.js` 会自动读取该文件并在每个请求携带 `Authorization: Bearer <token>` 头，无需手动配置。
+When the extension starts, a random token is automatically generated and written to `~/.burp-mcp-token`. `mcp-bridge.js` will automatically read this file and carry the `Authorization: Bearer <token>` header in each request, no manual configuration is required.
 
-需要固定 token 时（例如多个客户端共享），可用：
-- JVM 参数：`-Dburp.mcp.token=<token>`
-- 环境变量：`BURP_MCP_TOKEN=<token>`（同时用于 bridge 侧）
+When the token needs to be fixed (for example, shared by multiple clients), you can use:
+- JVM parameter: `-Dburp.mcp.token=<token>`
+- Environment variable: `BURP_MCP_TOKEN=<token>` (also used on the bridge side)
 
-所有 `/health`、`/tools`、`/`（POST）请求均要求携带该头，否则返回 403。CORS 已收敛为仅允许 `http://127.0.0.1` 来源。
+All `/health`, `/tools`, `/` (POST) requests are required to carry this header, otherwise 403 will be returned. CORS has converged to only allow `http://127.0.0.1` origins.
 
-### 4. 配置 MCP 客户端
+### 4. Configure MCP client
 
-在任何 MCP 客户端（Claude Code / Kiro / Cursor / Cline / Windsurf）中添加（stdio 模式）：
+Add (stdio mode) in any MCP client (Claude Code / Kiro / Cursor / Cline / Windsurf):
 
 ```json
 {
   "mcpServers": {
     "burpsuite": {
       "command": "node",
-      "args": ["<本目录路径>/mcp-bridge.js"]
+      "args": ["<path to this directory>/mcp-bridge.js"]
     }
   }
 }
 ```
 
-### 5. 开始使用
+### 5. Get started
 
-对 AI 说："分析 Burp 代理历史中的请求，找出安全漏洞"
+Say to AI: "Analyze requests in Burp proxy history to find security vulnerabilities"
 
-## 功能列表
+## Function list
 
-扩展暴露 78 个工具。常用分类如下（完整列表见 `src/main/java/com/burpmcp/McpHttpServer.java` 的 `getToolList()`，或访问 `GET http://127.0.0.1:9876/tools`，需携带 Authorization 头）：
+The extension exposes 78 tools. Commonly used categories are as follows (for the complete list, see `getToolList()` in `src/main/java/com/burpmcp/McpHttpServer.java`, or visit `GET http://127.0.0.1:9876/tools`, which requires the Authorization header):
 
-| 分类 | 工具 |
+| Categories | Tools |
 |------|------|
-| Proxy 历史 | `proxy_history`, `proxy_detail`, `proxy_history_filtered`, `proxy_websocket`, `proxy_clear`, `search_history`, `highlight`, `annotate`, `compare` |
-| 发送请求 | `send_request`, `send_to_repeater`, `repeater_send`, `repeater_modify_send`, `send_to_intruder` |
-| Intruder 攻击 | `intruder_attack`, `intruder_attack_async`, `intruder_attack_wordlist`, `intruder_pitchfork`, `intruder_cluster_bomb`, `intruder_battering_ram`, `intruder_with_options`, `payload_process` |
-| 扫描 / 爬取 | `scan`(主动/被动), `scan_active`, `scan_results`, `scan_issue_detail`, `crawl`, `sequencer` |
+| Proxy History | `proxy_history`, `proxy_detail`, `proxy_history_filtered`, `proxy_websocket`, `proxy_clear`, `search_history`, `highlight`, `annotate`, `compare` |
+| Send request | `send_request`, `send_to_repeater`, `repeater_send`, `repeater_modify_send`, `send_to_intruder` |
+| Intruder attack | `intruder_attack`, `intruder_attack_async`, `intruder_attack_wordlist`, `intruder_pitchfork`, `intruder_cluster_bomb`, `intruder_battering_ram`, `intruder_with_options`, `payload_process` |
+| Scanning/Crawling | `scan`(active/passive), `scan_active`, `scan_results`, `scan_issue_detail`, `crawl`, `sequencer` |
 | Scope / Sitemap | `sitemap`, `target_info`, `get_scope`, `add_to_scope`, `remove_from_scope`, `add_issue` |
-| 拦截 / 规则 | `intercept_toggle`, `register_http_handler`, `remove_http_handler`, `register_proxy_rule`, `remove_proxy_rule` |
-| 编解码 | `encode`, `decode`, `convert_request`, `export_request`, `generate_csrf_poc`, `extract_from_response`, `token_analysis` |
+| Intercept/Rules | `intercept_toggle`, `register_http_handler`, `remove_http_handler`, `register_proxy_rule`, `remove_proxy_rule` |
+| Encoding | `encode`, `decode`, `convert_request`, `export_request`, `generate_csrf_poc`, `extract_from_response`, `token_analysis` |
 | Collaborator | `collaborator_generate`, `collaborator_poll` |
-| 配置 | `export_config`, `import_config`, `set_upstream_proxy`, `set_dns_override`, `set_http2`, `cookie_jar`, `save_project`, `burp_version`, `extensions_list`, `log` |
+| Configuration | `export_config`, `import_config`, `set_upstream_proxy`, `set_dns_override`, `set_http2`, `cookie_jar`, `save_project`, `burp_version`, `extensions_list`, `log` |
 
-> 扫描/爬取（`scan`、`scan_active`、`crawl`）需要 **Burp Professional**。Community 版会返回明确的许可证错误。手动添加的 issue（`add_issue`）会写入 Site map。
+> Scanning/crawling (`scan`, `scan_active`, `crawl`) requires **Burp Professional**. Community edition returns an explicit license error. Manually added issues (`add_issue`) will be written to the Site map.
 
-## 关键工具参数
+## Key tool parameters
 
-### `intruder_attack` — 自动化枚举攻击
+### `intruder_attack` — Automated enumeration attack
 
-| 参数 | 说明 |
+| Parameters | Description |
 |------|------|
-| `url_template` | URL 模板，占位符默认 `@@` |
-| `placeholder` | 占位符字符串（默认 `@@`） |
-| `from` / `to` | 枚举起止值 |
-| `pad_digits` | 补零位数（0 不补） |
-| `method` | HTTP 方法（默认 GET） |
-| `body_template` | 请求体模板（含占位符） |
-| `headers` | 请求头对象 |
-| `success_length_not` | 命中条件：响应长度 ≠ 此值 |
-| `success_contains` | 命中条件：响应体包含此字符串 |
+| `url_template` | URL template, placeholder default `@@` |
+| `placeholder` | Placeholder string (default `@@`) |
+| `from` / `to` | Enumeration stop value |
+| `pad_digits` | Pad zero digits (0 is not padded) |
+| `method` | HTTP method (default GET) |
+| `body_template` | Request body template (including placeholder) |
+| `headers` | Request header object |
+| `success_length_not` | Hit condition: response length ≠ this value |
+| `success_contains` | Hit condition: The response body contains this string |
 
-### `scan` — 启动审计
+### `scan` — Start auditing
 
-| 参数 | 说明 |
+| Parameters | Description |
 |------|------|
-| `url` | 目标 URL（必填，自动加入 scope） |
-| `mode` | `active`（默认）或 `passive` |
+| `url` | Target URL (required, automatically added to scope) |
+| `mode` | `active` (default) or `passive` |
 
-启动后用 `scan_results` 轮询 issues 与活动审计状态（请求数、错误数、插入点数）。
+After startup, use `scan_results` to poll issues and active audit status (number of requests, number of errors, number of insertion points).
 
-### `register_proxy_rule` — 代理请求拦截规则
+### `register_proxy_rule` — proxy request interception rule
 
-| 参数 | 说明 |
+| Parameters | Description |
 |------|------|
-| `url_contains` | 命中条件：URL 包含此串 |
-| `intercept` | `true` 拦截 / `false` 放行不拦截（默认 true） |
+| `url_contains` | Hit condition: URL contains this string |
+| `intercept` | `true` intercepts / `false` releases but does not intercept (default true) |
 
-通过 `remove_proxy_rule` 注销规则（基于 `Registration.deregister()`，真正从 Burp 卸载）。
+Deregister the rule via `remove_proxy_rule` (based on `Registration.deregister()`, truly uninstalled from Burp).
 
-## 调用示例
+## Call example
 
-### 查看代理历史
+### View proxy history
 ```json
 POST http://127.0.0.1:9876
 {"tool": "proxy_history", "params": {"limit": 10, "url_filter": "personalblog"}}
 ```
 
-### 发送请求
+### Send request
 ```json
 POST http://127.0.0.1:9876
 {"tool": "send_request", "params": {"method": "GET", "url": "https://example.com/api/test"}}
 ```
 
-### 自动化枚举攻击（核心功能）
+### Automated enumeration attack (core function)
 ```json
 POST http://127.0.0.1:9876
 {
@@ -146,36 +146,36 @@ POST http://127.0.0.1:9876
 }
 ```
 
-### 开关拦截
+### Switch interception
 ```json
 POST http://127.0.0.1:9876
 {"tool": "intercept_toggle", "params": {"enable": false}}
 ```
 
-## 端口配置
+## Port configuration
 
-默认监听 `127.0.0.1:9876`。如需更改（例如与 PortSwigger 官方 MCP 扩展同端口冲突）：
+Default listening is `127.0.0.1:9876`. If changes are required (e.g. conflict with PortSwigger official MCP extension on the same port):
 
-1. **Burp 侧**：启动 Burp 时传 JVM 参数 `-Dburp.mcp.port=9877`，或设环境变量 `BURP_MCP_PORT=9877`。
-2. **桥接侧**：MCP 客户端配置里设环境变量 `BURP_MCP_PORT=9877` 与 `BURP_MCP_HOST=127.0.0.1`。
+1. **Burp side**: When starting Burp, pass the JVM parameter `-Dburp.mcp.port=9877`, or set the environment variable `BURP_MCP_PORT=9877`.
+2. **Bridge side**: Set the environment variables `BURP_MCP_PORT=9877` and `BURP_MCP_HOST=127.0.0.1` in the MCP client configuration.
 
-两侧端口必须一致。若 Burp 未运行或端口不通，桥接会在 `tools/list` 与 `tools/call` 返回明确的连接错误指引。
+The ports on both sides must be consistent. If Burp is not running or the port is unreachable, the bridge will return clear connection error instructions in `tools/list` and `tools/call`.
 
-## 故障排查
+## Troubleshooting
 
-| 现象 | 排查 |
+| Phenomenon | Troubleshooting |
 |------|------|
-| Burp Output 无 "[MCP] Server started" | 端口被占用或扩展加载失败，查 Burp Errors 面板 |
-| MCP 客户端报 "Burp MCP not connected" | 确认 Burp 已运行且扩展已加载；确认两侧端口一致 |
-| 扫描返回 "requires Burp Professional" | 正常，Community 版不支持 Scanner API |
-| `remove_http_handler` / `remove_proxy_rule` 无效 | 确认之前 `register_*` 返回 success=true |
+| Burp Output None "[MCP] Server started" | The port is occupied or the extension loading failed, check the Burp Errors panel |
+| MCP client reports "Burp MCP not connected" | Confirm that Burp is running and the extension is loaded; confirm that the ports on both sides are consistent |
+| Scan returns "requires Burp Professional" | Normal, Community version does not support Scanner API |
+| `remove_http_handler` / `remove_proxy_rule` is invalid | `register_*` returns success=true before confirming |
 
-## 源码构建（Gradle 可选）
+## Source code build (Gradle optional)
 
 ```bash
 cd burp-mcp-full
-gradle jar      # 需本机已装 Gradle 8.7+
-# 输出: build/libs/burp-mcp-full.jar
+gradle jar      # Gradle 8.7+ needs to be installed on the machine
+# Output: build/libs/burp-mcp-full.jar
 ```
 
-> 推荐使用 `build.bat` / `build.sh`（零依赖，自动下载 jar）。Gradle 路径仅作备选。
+> It is recommended to use `build.bat` / `build.sh` (zero dependencies, automatically download jar). Gradle paths are alternatives only.

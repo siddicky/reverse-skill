@@ -1,363 +1,363 @@
-﻿# 逆向/渗透/安全任务自动路由规则（Kali Linux 版）
+﻿# Reverse/penetration/security task automatic routing rules (Kali Linux version)
 
-> **本文件是 Kali 路径适配层，不是第二套行为链。** 行为与授权以仓库根 `RULES.md` 为准。
-> 核心知识库（`skills/config/routing.json`、SKILL.md、references）与 Windows 版共享。
-> **禁止**把本文件写入 `~/.claude/CLAUDE.md` 或其他客户端全局配置。核心脚本不得写客户端全局文件。
+> **This file is the Kali path adaptation layer, not the second set of behavior chains.** Behavior and authorization are subject to the repository root `RULES.md`.
+> The core knowledge base (`skills/config/routing.json`, SKILL.md, references) is shared with the Windows version.
+> **It is prohibited** to write this file to `~/.claude/CLAUDE.md` or other client global configurations. Core scripts must not write client global files.
 
-热路径（与 `RULES.md` 相同）：`skills/scripts/master-route.sh` → `case-init.sh`（`auth.status=granted` 前禁止对目标 ACT）→ PRIMARY `SKILL.md`。身份：`skills/ops/IDENTITY.md`。脚本用本目录 `kali/scripts/*.sh`。
+Hot path (same as `RULES.md`): `skills/scripts/master-route.sh` → `case-init.sh` (no ACTs on target before `auth.status=granted`) → PRIMARY `SKILL.md`. Identity: `skills/ops/IDENTITY.md`. The script uses this directory `kali/scripts/*.sh`.
 
 ---
 
-## 触发关键词（与 Windows 版完全一致）
+## Trigger keyword (exactly the same as Windows version)
 
-- APK、Android 逆向、反编译、smali、jadx、apktool、Frida、Hook
-- 二进制分析、IDA、radare2、r2、反汇编、逆向工程、RE、还原源码、源码还原、逆向还原
-- 前端签名、加密参数、JS 逆向、jshookmcp、CDP、SourceMap
-- 抓包、HTTP 捕获、请求重放、anything-analyzer
-- CTF、Pwn、Web 渗透、漏洞利用、提权
-- MCP 逆向工具、idalib-mcp
-- 重打包、签名、证书校验、root 检测、反调试
-- so 分析、native hook、JNI
-- 渗透测试、红队、安全评估、蓝队、应急响应
-- 写报告、写文档、出报告、writeup、技术文档、渗透报告、逆向报告
-- 浏览器自动化、打开网页、填表、爬取、截图、自动化登录、Playwright、agent-browser、headless
-- 符号迁移、bindiff、跨版本、PDB 缺失、函数偏移迁移、symbol migration、版本对比、旧版符号
-- N-day、Nday、补丁差分、patch diff、patch tuesday、1day、CVE 复现、漏洞还原、ghidriff、Diaphora、DeepDiff、补丁分析
-- pwn、栈溢出、堆溢出、ROP、ret2libc、ret2csu、one_gadget、libc-database、tcache、fastbin、kernel pwn、SMEP、SMAP、KASLR、modprobe_path、commit_creds、pwntools、GEF、pwndbg
-- 固件、firmware、IoT、binwalk、unblob、squashfs、UBI、JFFS2、Firmadyne、FAT、QEMU 全系统仿真、EMBA、固件渗透、路由器固件、嵌入式漏洞利用、AFL++、boofuzz、UART、JTAG
-- BurpSuite、Burp MCP、Intruder、Repeater、Collaborator、代理历史分析
-- LLM 安全、AI 安全测试、Prompt 注入、jailbreak、越狱、Agent 安全、garak、PyRIT
-- API 安全测试、GraphQL 安全、JWT 攻击、供应链安全、SBOM、Trivy
-- iOS 逆向、Objection、YARA、恶意软件分析、AI 反编译、LLM4Decompile
-- Agent 不干活、AI 懒、跳过步骤、Prompt 工程、Agent 服从性
-- EDR 绕过、AV bypass、免杀、unhook、direct syscall、indirect syscall、Hell's Gate、SysWhispers、ETW patch、AMSI patch、call stack spoofing、MITRE T1562、CrowdStrike 绕过、Defender 绕过、SentinelOne 绕过、pe-sieve
-- 端口扫描、Nmap、漏洞扫描、Nuclei、SQL 注入、SQLMap、目录爆破、FFUF、密码破解、Hashcat、Hydra、Metasploit、Impacket、pentestMCP
-- SRC、Bug Bounty、众测、漏洞赏金、HackerOne、WAF bypass、绕过 WAF、IDOR、越权、任意账号
-- 画图、流程图、架构图、攻击路径图、时序图、状态图、数据流图、Mermaid、Graphviz、PlantUML、diagram
-- 恶意软件分析、病毒分析、样本分析、沙箱、YARA、IOC
-- 内核驱动、Rootkit、LKM、IOCTL、DeviceIoControl
-- 密码学、加解密、AES、RSA、哈希碰撞、签名验证
-- 协议逆向、自定义协议、Protobuf、序列化
-- 固件逆向、IoT、binwalk、ARM、MIPS、嵌入式
-- WASM、WebAssembly、Python 字节码、pyc、.NET、dnSpy、IL
+- APK, Android reverse engineering, decompilation, smali, jadx, apktool, Frida, Hook
+- Binary analysis, IDA, radare2, r2, disassembly, reverse engineering, RE, source code restoration, source code restoration, reverse restoration
+- Front-end signature, encryption parameters, JS reverse engineering, jshookmcp, CDP, SourceMap
+- Packet capture, HTTP capture, request replay, anything-analyzer
+- CTF, Pwn, Web penetration, vulnerability exploitation, privilege escalation
+- MCP reverse tool, idalib-mcp
+- Repackaging, signing, certificate verification, root detection, anti-debugging
+- so analysis, native hook, JNI
+- Penetration testing, red team, security assessment, blue team, emergency response
+- Write reports, write documents, produce reports, writeup, technical documents, penetration reports, reverse reports
+- Browser automation, opening web pages, filling out forms, crawling, screenshots, automated login, Playwright, agent-browser, headless
+- Symbol migration, bindiff, cross-version, PDB missing, function offset migration, symbol migration, version comparison, old version symbols
+- N-day, Nday, patch difference, patch diff, patch tuesday, 1day, CVE recurrence, vulnerability restoration, ghidriff, Diaphora, DeepDiff, patch analysis
+- pwn, stack overflow, heap overflow, ROP, ret2libc, ret2csu, one_gadget, libc-database, tcache, fastbin, kernel pwn, SMEP, SMAP, KASLR, modprobe_path, commit_creds, pwntools, GEF, pwndbg
+- Firmware, firmware, IoT, binwalk, unblob, squashfs, UBI, JFFS2, Firmadyne, FAT, QEMU full system emulation, EMBA, firmware penetration, router firmware, embedded exploits, AFL++, boofuzz, UART, JTAG
+- BurpSuite, Burp MCP, Intruder, Repeater, Collaborator, Agent History Analysis
+- LLM security, AI security testing, prompt injection, jailbreak, jailbreak, Agent security, garak, PyRIT
+- API security testing, GraphQL security, JWT attacks, supply chain security, SBOM, Trivy
+- iOS reverse engineering, Objection, YARA, malware analysis, AI decompilation, LLM4Decompile
+- Agent does not work, AI is lazy, skips steps, Prompt project, Agent compliance
+- EDR bypass, AV bypass, anti-virus, unhook, direct syscall, indirect syscall, Hell's Gate, SysWhispers, ETW patch, AMSI patch, call stack spoofing, MITER T1562, CrowdStrike bypass, Defender bypass, SentinelOne bypass, pe-sieve
+- Port scanning, Nmap, vulnerability scanning, Nuclei, SQL injection, SQLMap, directory brute forcing, FFUF, password cracking, Hashcat, Hydra, Metasploit, Impacket, pentestMCP
+- SRC, Bug Bounty, public testing, bug bounty, HackerOne, WAF bypass, WAF bypass, IDOR, unauthorized access, any account
+- Drawing, flow chart, architecture diagram, attack path diagram, sequence diagram, state diagram, data flow diagram, Mermaid, Graphviz, PlantUML, diagram
+- Malware analysis, virus analysis, sample analysis, sandbox, YARA, IOC
+- Kernel driver, Rootkit, LKM, IOCTL, DeviceIoControl
+- Cryptography, encryption and decryption, AES, RSA, hash collision, signature verification
+- Protocol reverse, custom protocol, Protobuf, serialization
+- Firmware reverse engineering, IoT, binwalk, ARM, MIPS, embedded
+- WASM, WebAssembly, Python bytecode, pyc, .NET, dnSpy, IL
 - macOS、iOS、Mach-O、ObjC、Swift、Frida iOS
-- Go 逆向、Rust 逆向、stripped binary、GoReSym
-- 内存转储、memory dump、取证、forensic、隐写、steganography
-- 云安全、容器逃逸、K8s、Docker、AWS、Azure
-- Prompt 注入、AI 安全、Agent 安全、LLM 攻击
-- 内网渗透、横向移动、Pass-the-Hash、域渗透、AD 攻击、BloodHound
-- 权限提升、提权、SUID、Potato、UAC bypass
-- 凭证提取、Mimikatz、Kerberoasting、DCSync、LSASS
-- C2、远控、持久化、后门、Cobalt Strike、反弹 shell
-- 蓝队、检测、防御、应急响应、SIEM、EDR、威胁狩猎、IOC
-- 移动安全测试、OWASP MASTG、APP 安全、脱壳、加固分析
-- SSTI、模板注入、SSTImap、XSS、XSStrike、跨站脚本
-- WordPress、WPScan、WPProbe、CMS 渗透
-- AdaptixC2、C2 框架、对抗模拟、红队模拟、Atomic Red Team
-- WiFi 攻击、无线渗透、Fluxion、aircrack-ng、deauth
-- NTLM relay、Coercer、认证强制、PetitPotam
-- WinRM、evil-winrm、Windows 远程执行
-- NetExec、nxc、CrackMapExec、SMB 枚举
-- AI 自动渗透、HexStrike、MetasploitMCP、mcp-kali-server
-- Pentest Swarm、pentestswarm、群体渗透、Swarm AI、自主扫描、stigmergy
-- Bug Bounty 自动化、攻击面管理、ASM、持续监控
-- GEF、GDB 增强、调试框架
-- Wireshark、tshark、PCAP 分析、抓包分析
-- BurpSuite、Web 代理、拦截请求、Intruder
-- Responder、LLMNR 投毒、NBT-NS、MDNS
-- BloodHound、AD 路径、攻击图、SharpHound
-- Certipy、AD CS、证书攻击、ESC1、ESC8
-- wfuzz、参数模糊、Web Fuzz
-- objdump、strings、file、静态分析
-- ProxyCat、代理池、IP 轮换
-- 红队、HW、攻防演练、打点、初始突破、边界突破
-- 完整渗透、全流程渗透、从外网打到内网、从外打到域控
-- 攻击面评估、攻击路径规划、攻击链、kill chain
-- 拿到 shell 下一步、后渗透、据点扩展、纵深渗透
-- 近源渗透、BadUSB、Rubber Ducky、WiFi Pineapple、Proxmark3、RFID 克隆
-- EDR 绕过、免杀、AV bypass、Shellcode 加载器、无文件攻击
-- 钓鱼邮件、社会工程、OAuth 钓鱼、HTML 走私
-- 供应链攻击、组件投毒、第三方渗透
-- 痕迹清理、反取证、日志清除、时间戳修改
-- Cobalt Strike、Sliver、Havoc、Mythic、C2 框架
+- Go reverse engineering, Rust reverse engineering, stripped binary, GoReSym
+- memory dump, memory dump, forensics, forensics, steganography, steganography
+- Cloud security, container escape, K8s, Docker, AWS, Azure
+- Prompt injection, AI security, Agent security, LLM attack
+- Internal-network pivoting, lateral movement, Pass-the-Hash, domain penetration, AD attack, BloodHound
+- Privilege escalation, privilege escalation, SUID, Potato, UAC bypass
+- Credential extraction, Mimikatz, Kerberoasting, DCSync, LSASS
+- C2, remote control, persistence, backdoor, Cobalt Strike, rebound shell
+- Blue Team, Detection, Defense, Incident Response, SIEM, EDR, Threat Hunting, IOC
+- Mobile security testing, OWASP MASTG, APP security, unpacking, reinforcement analysis
+- SSTI, template injection, SSTImap, XSS, XSStrike, cross-site scripting
+- WordPress, WPScan, WPProbe, CMS penetration
+- AdaptixC2, C2 framework, adversarial simulation, red team simulation, Atomic Red Team
+- WiFi attack, wireless penetration, Fluxion, aircrack-ng, deauth
+- NTLM relay, Coercer, authentication enforcement, PetitPotam
+- WinRM, evil-winrm, Windows remote execution
+- NetExec, nxc, CrackMapExec, SMB enumeration
+- AI automatic penetration, HexStrike, MetasploitMCP, mcp-kali-server
+- Pentest Swarm, pentestswarm, swarm penetration, Swarm AI, autonomous scanning, stigmergy
+- Bug Bounty Automation, Attack Surface Management, ASM, Continuous Monitoring
+- GEF, GDB enhancement, debugging framework
+- Wireshark, tshark, PCAP analysis, packet capture analysis
+- BurpSuite, Web proxy, interception requests, Intruder
+- Responder, LLMNR poisoning, NBT-NS, MDNS
+- BloodHound, AD Path, Attack Map, SharpHound
+- Certipy, AD CS, certificate attack, ESC1, ESC8
+- wfuzz, parameter fuzz, Web Fuzz
+- objdump, strings, file, static analysis
+- ProxyCat, proxy pool, IP rotation
+- Red team, HW, offensive and defensive drills, RBI, initial breakthrough, boundary breakthrough
+- Complete penetration, full-process penetration, from external network to intranet, from external network to domain control
+- Attack surface assessment, attack path planning, attack chain, kill chain
+- Get the shell, next step, post-infiltration, base expansion, deep penetration
+- Near source penetration, BadUSB, Rubber Ducky, WiFi Pineapple, Proxmark3, RFID cloning
+- EDR evasion, AV evasion, Shellcode loader, fileless attack
+- Phishing emails, social engineering, OAuth phishing, HTML smuggling
+- Supply chain attacks, component poisoning, third-party penetration
+- Trace cleaning, anti-forensics, log cleaning, timestamp modification
+- Cobalt Strike, Sliver, Havoc, Mythic, C2 framework
 
 ---
 
-## 路由入口
+## Route entry
 
-> **检测方法**：找到本文件（`RULES-kali.md`）所在目录的父目录即为包根目录。
+> **Detection method**: Find the parent directory of the directory where this file (`RULES-kali.md`) is located, which is the package root directory.
 
-热路径（与 `RULES.md` / `routing.json` 相同）：
+Hot path (same as `RULES.md` / `routing.json`):
 
-1. `skills/scripts/master-route.sh -Hint "<任务>"` — PRIMARY
-2. `skills/scripts/case-init.sh` — `scope.md`；`auth.status=granted` 前禁止对目标 ACT
+1. `skills/scripts/master-route.sh -Hint "<Task>"` — PRIMARY
+2. `skills/scripts/case-init.sh` — `scope.md`; ACT on the target is prohibited before `auth.status=granted`
 3. PRIMARY `SKILL.md` ACTION REQUIRED
-4. `skills/tool-index.md` — 真路径；缺则 `kali/scripts/bootstrap-reverse.sh`
+4. `skills/tool-index.md` — True path; if missing, `kali/scripts/bootstrap-reverse.sh`
 
 ---
 
-## 执行原则（与 Windows 版一致，仅命令不同）
+## Execution principles (the same as the Windows version, only the commands are different)
 
-### 工具使用
-- **永远不要猜工具路径**，先读 `tool-index.md`
-- 缺少工具时先调用 `bootstrap-reverse.sh` 自动补齐
-- Kali 大量工具预装，bootstrap 失败概率远低于 Windows
-- 同一工具自动安装失败 2 次后，停止重试，输出手动步骤
-- MCP 服务端口不一致时，询问用户实际端口，帮用户更新配置
+### Tool usage
+- **Never guess tool paths**, read `tool-index.md` first
+- When tools are missing, first call `bootstrap-reverse.sh` to automatically complete them.
+- Kali has a large number of pre-installed tools, and the probability of bootstrap failure is much lower than that of Windows
+- After the automatic installation of the same tool fails 2 times, it stops retrying and outputs manual steps.
+- When the MCP service port is inconsistent, ask the user for the actual port and help the user update the configuration.
 
-### 路由决策
-- 路由未命中时**不要硬塞进现有 skill**，主动提议新增
-- 一条路走不通就换一条：静态不行换动态，Java 层不行看 so，IDA 不行换 r2
-- 跨模块任务按 `routing.md` 的"路径交叉"章节组合使用多个 skill
+### routing decisions
+- When the route is not hit, don’t force it into the existing skill, but actively propose to add it.
+- If one path doesn't work, just change it: static can't be changed to dynamic, Java layer can't read so, IDA can't be changed to r2
+- Cross-module tasks use multiple skills in combination according to the "Path Crossing" chapter of `routing.md`
 
-### 经验复用
-- 每次进入路由前**必须先查** `field-journal/_index.md`
-- 有同类经验时先读取对应日志，复用已验证方案
-- 如果历史方案不适用，在新日志中说明原因
+### Experience reuse
+- **You must check** `field-journal/_index.md` before entering the route every time
+- If you have similar experience, read the corresponding log first and reuse the verified solution.
+- If the historical solution does not apply, explain why in a new log
 
-### 安全边界
-- 所有操作必须在用户授权范围内
-- 渗透测试必须确认用户有合法授权（SRC/Bug Bounty/自有系统/CTF）
-- 不主动扩大攻击面，不超出用户指定的目标范围
-- 发现高危漏洞时立即告知用户，等待指示再继续
-- 不在报告或日志中保留未脱敏的敏感信息
+### security boundary
+- All operations must be within the scope of user authorization
+- Penetration testing must confirm that the user has legal authorization (SRC/Bug Bounty/Owned System/CTF)
+- Do not actively expand the attack surface and do not exceed the target range specified by the user
+- Notify users immediately when high-risk vulnerabilities are discovered and wait for instructions before continuing.
+- Do not retain unredacted sensitive information in reports or logs
 
-### 输出质量
-- 关键操作必须给出可复现的命令（不要只描述步骤）
-- 逆向分析必须标注地址/偏移/函数名（不要只说"某个函数"）
-- 渗透测试必须给出完整的 PoC（curl 命令/脚本/截图路径）
-- 不确定的结论必须标注置信度
+### Output quality
+- Key operations must give reproducible commands (don’t just describe the steps)
+- Reverse analysis must mark the address/offset/function name (don't just say "a certain function")
+- Penetration testing must give a complete PoC (curl command/script/screenshot path)
+- Uncertain conclusions must be marked with a confidence level
 
 ---
 
-## 完整行为链
+## Complete behavior chain
 
 ```
-1. 识别任务属于安全/逆向类
-2. 包根 = 本文件父目录
+1. Identify whether the task involves security or reverse engineering
+2. Package root = the parent directory of this file
 3. master-route.sh → PRIMARY（routing.json）
-4. case-init.sh / scope.md — auth.status=granted 前禁止对目标 ACT
-5. 打开 PRIMARY SKILL.md
-6. 缺工具 → kali/scripts/bootstrap-reverse.sh
-7. 不要写入客户端全局配置
+4. case-init.sh / scope.md — do not ACT on the target until auth.status=granted
+5. Open PRIMARY SKILL.md
+6. Missing tool → kali/scripts/bootstrap-reverse.sh
+7. Do not write to client-global configuration
 ```
 
 ---
 
-## Bootstrap 命令（Kali 版）
+## Bootstrap commands (Kali version)
 
 ```bash
-bash "<本包根目录>/kali/scripts/bootstrap-reverse.sh" <capability1> [capability2] ... [--start-services]
+bash "<Root directory of this package>/kali/scripts/bootstrap-reverse.sh" <capability1> [capability2] ... [--start-services]
 ```
 
-### 常用组合
+### Common combinations
 
 ```bash
-# 一键配齐 Kali 原生 MCP（推荐首次使用时执行）
+# Configure Kali native MCP with one click (recommended for first use)
 bash kali/scripts/bootstrap-reverse.sh mcp-kali-server metasploitmcp hexstrike-ai
 
-# 安装 2026.1 全部新工具
+# Install all new 2026.1 tools
 bash kali/scripts/bootstrap-reverse.sh adaptixc2 atomic-operator sstimap xsstrike wpprobe fluxion gef
 
-# AD/内网渗透工具链
+# AD/intranet penetration tool chain
 bash kali/scripts/bootstrap-reverse.sh coercer evil-winrm-py netexec responder bloodhound certipy
 
-# 逆向分析工具链
+# Reverse analysis tool chain
 bash kali/scripts/bootstrap-reverse.sh jadx frida gef ghidra-mcp
 
-# Web 渗透工具链
+# Web Penetration Toolchain
 bash kali/scripts/bootstrap-reverse.sh sstimap xsstrike wpprobe nuclei
 ```
 
-支持的全部能力名：jadx、apktool、frida、idalib-mcp、jshookmcp、xquik-mcp、anything-analyzer、idapro、r2、rabin2、adb、agent-browser、ghidra-mcp、nmap、sqlmap、hashcat、hydra、gobuster、ffuf、msfconsole、nuclei、seclists、proxycat、mcp-kali-server、metasploitmcp、hexstrike-ai、pentestswarm、adaptixc2、atomic-operator、sstimap、xsstrike、wpprobe、fluxion、gef、evil-winrm-py、coercer、netexec、responder、crackmapexec、bloodhound、certipy、wfuzz、aircrack-ng
+All supported capability names: jadx, apktool, frida, idalib-mcp, jshookmcp, xquik-mcp, anything-analyzer, idapro, r2, rabin2, adb, age nt-browser, ghidra-mcp, nmap, sqlmap, hashcat, hydra, gobuster, ffuf, msfconsole, nuclei, seclists, proxycat, mcp- kali-server, metasploitmcp, hexstrike-ai, pentestswarm, adaptixc2, atomic-operator, sstimap, xsstrike, wpprobe, fluxion, gef, evil-winrm-py, coercer, netexec, responder, crackmapexec, bloodhound, certipy, wfuzz, aircrack-ng
 
-## 刷新工具索引
+## Refresh tool index
 
 ```bash
-bash "<本包根目录>/kali/scripts/refresh-tool-index.sh"
+bash "<Root directory of this package>/kali/scripts/refresh-tool-index.sh"
 ```
 
 ---
 
-## MCP 服务管理
+## MCP service management
 
-### Kali 原生 MCP（apt 直装，无需额外配置）
+### Kali native MCP (apt direct installation, no additional configuration required)
 
-| 服务 | 包名 | 端口 | 用途 | 启动方式 |
+| service | package name | port | purpose | startup method |
 |------|------|------|------|---------|
-| mcp-kali-server | mcp-kali-server | 5000 | Kali 官方 MCP，AI 直接调用终端工具 | `kali-server-mcp --port 5000` |
-| MetasploitMCP | metasploitmcp | 8085/stdio | Metasploit Framework MCP 接口 | `metasploitmcp --transport stdio` |
-| HexStrike AI | hexstrike-ai | — | 150+ 安全工具 MCP 自动化平台 | `hexstrike-ai` |
+| mcp-kali-server | mcp-kali-server | 5000 | Kali official MCP, AI directly calls the terminal tool | `kali-server-mcp --port 5000` |
+| MetasploitMCP | metasploitmcp | 8085/stdio | Metasploit Framework MCP interface | `metasploitmcp --transport stdio` |
+| HexStrike AI | hexstrike-ai | — | 150+ Security Tools MCP Automation Platform | `hexstrike-ai` |
 
-### 第三方 MCP 服务
+### Third-party MCP services
 
-| 服务 | 端口 | 用途 | 启动方式 |
+| service | port | purpose | startup mode |
 |------|------|------|---------|
-| Pentest Swarm AI | stdio | 群体智能自主渗透（recon→classify→exploit→report） | `pentestswarm mcp serve` |
-| idapro | 13337-13350 | IDA Pro 逆向工具 | `bash kali/scripts/ida-start.sh` |
-| anything-analyzer | 23816 | 浏览器自动化 + HTTP 捕获 | `cd ~/tools/anything-analyzer && pnpm dev` |
+| Pentest Swarm AI | stdio | Swarm intelligent autonomous penetration (recon→classify→exploit→report) | `pentestswarm mcp serve` |
+| idapro | 13337-13350 | IDA Pro reverse tool | `bash kali/scripts/ida-start.sh` |
+| anything-analyzer | 23816 | Browser Automation + HTTP Capture | `cd ~/tools/anything-analyzer && pnpm dev` |
 | jshookmcp | — | JS Hook/CDP/Network/AST | `npx -y @jshookmcp/jshook@0.3.4`（stdio） |
-| ghidra | 8765 | Ghidra 免费反编译 | Ghidra GUI 启动后自动监听 |
-| burpsuite | 9876 | BurpSuite Web 代理 | BurpSuite 扩展启动 |
+| ghidra | 8765 | Ghidra free decompilation | Ghidra GUI automatically monitors | after startup
+| burpsuite | 9876 | BurpSuite Web Agent | BurpSuite Extension Startup |
 
-### MCP 优先级建议（Kali 2026.1）
+### MCP Priority Recommendations (Kali 2026.1)
 
-对于渗透测试场景，推荐的 MCP 使用优先级：
+For penetration testing scenarios, the recommended MCP usage priorities are:
 
-1. **pentestswarm** — 全自动群体渗透，适合大规模目标（1000+ 子域名）和 Bug Bounty 持续监控
-2. **mcp-kali-server** — 最通用，可以调用 Kali 上任何终端工具
-3. **metasploitmcp** — Metasploit 专用，exploit/payload/session 管理
-4. **hexstrike-ai** — 自动化编排，适合多工具联动场景
-5. **jshookmcp** — Web/JS 逆向专用
+1. **pentestswarm** — Fully automatic group penetration, suitable for large-scale targets (1000+ subdomains) and continuous monitoring of Bug Bounty
+2. **mcp-kali-server** — the most versatile, can call any terminal tool on Kali
+3. **metasploitmcp** — Metasploit-specific, exploit/payload/session management
+4. **hexstrike-ai** — automated orchestration, suitable for multi-tool linkage scenarios
+5. **jshookmcp** — Web/JS reverse engineering only
 
-一键配齐所有渗透 MCP：
+Complete all penetration MCPs with one click:
 ```bash
 bash kali/scripts/bootstrap-reverse.sh mcp-kali-server metasploitmcp hexstrike-ai pentestswarm
 ```
 
 ---
 
-## 错误处理策略
+## Error handling strategy
 
-| 场景 | AI 应该做什么 |
+| Scenario | What the AI ​​should do |
 |------|-------------|
-| bootstrap 成功 | 继续任务 |
-| apt install 失败 | 检查网络/源，尝试 `apt update` 后重试一次 |
-| pip install 失败 | 尝试加 `--break-system-packages`，或建议用 venv |
-| GitHub 下载失败 | 检查网络/代理，给出手动下载链接 |
-| 服务端口不一致 | 询问实际端口，帮用户更新 MCP 配置 |
-| 同一工具失败 2 次 | 给完整手动步骤，不再重试 |
+| bootstrap successful | Continue task |
+| apt install failed | Check network/source, try `apt update` and try again |
+| pip install failed | Try adding `--break-system-packages`, or it is recommended to use venv |
+| GitHub download failed | Check the network/proxy and give the manual download link |
+| The service port is inconsistent | Ask for the actual port and help the user update the MCP configuration |
+| The same tool failed 2 times | Give complete manual steps and no longer try again |
 
 ---
 
-## Kali 特有优势提示
+## Kali’s unique advantage tips
 
-AI 在 Kali 2026.1 环境下应该知道：
+AI in the Kali 2026.1 environment should know:
 
-1. **大量工具预装** — nmap/sqlmap/hashcat/hydra/metasploit/gobuster/ffuf/radare2/binwalk/burpsuite/wireshark/nikto/impacket/netexec/responder/bloodhound 等无需安装
-2. **原生 MCP 支持** — `mcp-kali-server`、`metasploitmcp`、`hexstrike-ai` 三个 MCP 工具已进入 Kali 官方仓库，`apt install` 即可
-3. **2026.1 新增工具** — AdaptixC2（C2框架）、Atomic-Operator（红队测试）、SSTImap（SSTI检测）、XSStrike（XSS扫描）、WPProbe（WP枚举）、Fluxion（WiFi社工）、GEF（GDB增强）
-4. **2025.4 新增工具** — evil-winrm-py（WinRM远程执行）、hexstrike-ai（AI安全自动化）、bpf-linker
-5. **内核 6.18** — 支持最新硬件，NetHunter 无线注入补丁（QCACLD-3.0）
-6. **Wayland 全面支持** — GNOME 49 + KDE Plasma 6.5，VM 中也支持 Wayland
-7. **apt 源丰富** — `apt install ghidra`、`apt install seclists`、`apt install coercer` 等一行搞定
-8. **Python 环境完整** — python3/pip3 预装，frida-tools 直接 pip install
-9. **无权限限制** — 默认 root 或 sudo 无密码
-10. **网络工具齐全** — nc/curl/wget/socat/proxychains/chisel 等预装
-11. **SecLists 路径** — apt 安装后在 `/usr/share/seclists/`
-12. **Wordlists** — `/usr/share/wordlists/` 下有 rockyou 等常用字典
-13. **LLM 集成** — Kali 官方博客有 Claude Desktop + Ollama + 5ire 的本地 LLM 集成教程
-14. **BackTrack 模式** — `kali-undercover --backtrack` 可切换经典 BackTrack 5 外观（社工场景）
-
----
-
-## 禁止行为（与 Windows 版一致）
-
-- ❌ 不要在没有读 routing.md 的情况下直接开始逆向/渗透操作
-- ❌ 不要猜测工具路径，必须从 tool-index 获取
-- ❌ 不要跳过 field-journal 查询直接开始任务
-- ❌ 不要在任务完成后跳过 Checklist
-- ❌ 不要在报告中保留未脱敏的真实目标信息
-- ❌ 不要在用户未授权的情况下扩大渗透范围
-- ❌ 不要反复重试已失败 2 次的自动安装
-- ❌ 不要沉默 — 遇到问题必须立即告知用户
-- ❌ 不要自己编造工具版本号或功能描述
+1. **Lots of tools pre-installed** — nmap/sqlmap/hashcat/hydra/metasploit/gobuster/ffuf/radare2/binwalk/burpsuite/wireshark/nikto/impacket/netexec/responder/bloodhound, etc. No need to install
+2. **Native MCP support** — `mcp-kali-server`, `metasploitmcp`, `hexstrike-ai` three MCP tools have entered the official Kali repositories, `apt install` can
+3. **2026.1 New tools** — AdaptixC2 (C2 framework), Atomic-Operator (red team testing), SSTImap (SSTI detection), XSStrike (XSS scanning), WPProbe (WP enumeration), Fluxion (WiFi social engineering), GEF (GDB enhancement)
+4. **2025.4 New tools** — evil-winrm-py (WinRM remote execution), hexstrike-ai (AI security automation), bpf-linker
+5. **Kernel 6.18** — Supports latest hardware, NetHunter wireless injection patch (QCACLD-3.0)
+6. **Full Wayland support** — GNOME 49 + KDE Plasma 6.5, Wayland also supported in VM
+7. **apt source is rich** — `apt install ghidra`, `apt install seclists`, `apt install coercer`, etc. can be done in one line
+8. **Python environment is complete** — python3/pip3 is pre-installed, frida-tools can be directly pip installed
+9. **No permission restrictions** — Default root or sudo no password
+10. **Complete network tools** — nc/curl/wget/socat/proxychains/chisel etc. pre-installed
+11. **SecLists path** — apt installed at `/usr/share/seclists/`
+12. **Wordlists** — There are commonly used dictionaries such as rockyou under `/usr/share/wordlists/`
+13. **LLM integration** — Kali official blog has a local LLM integration tutorial for Claude Desktop + Ollama + 5ire
+14. **BackTrack Mode** — `kali-undercover --backtrack` switchable classic BackTrack 5 appearance (social engineering scenario)
 
 ---
 
-## 任务完成后的硬性 Checklist（不可跳过）
+## Prohibited Behavior (Same as Windows version)
 
-当任务执行完毕（漏洞已验证/逆向已完成/flag 已拿到）后，AI **必须**逐项执行：
+- ❌ Do not start the reverse/penetration operation directly without reading routing.md
+- ❌ Do not guess the tool path, it must be obtained from tool-index
+- ❌ Do not skip the field-journal query and start the task directly
+- ❌ Don’t skip the Checklist after completing the task
+- ❌ Do not keep unredacted real target information in reports
+- ❌ Do not expand the scope of penetration without user authorization
+- ❌ Do not retry an automatic installation that has failed 2 times
+- ❌ Don’t be silent—if you encounter a problem, you must inform the user immediately
+- ❌ Don’t make up tool version numbers or function descriptions yourself
+
+---
+
+## Hard Checklist after task completion (cannot be skipped)
+
+When the task is completed (the vulnerability has been verified/the reverse engineering has been completed/the flag has been obtained), the AI ​​**must** execute the following items one by one:
 
 ```text
-□ 1. 生成正式报告（docs-generator skill）
-     - 使用对应模板（逆向报告/渗透报告/CTF writeup/签名报告）
-     - 必须包含：目标概述、完整步骤、关键证据、复现命令
-     - 输出到用户项目目录（不是 skill 包内）
+□ 1. Generate formal reports (docs-generator skill)
+- Use the corresponding template (reverse report/penetration report/CTF writeup/signature report)
+- Must include: goal overview, complete steps, key evidence, and reproduction commands
+- Output to the user project directory (not within the skill package)
 
-□ 2. 生成图表（diagram-generator skill）
-     - 至少 1 张流程图嵌入报告
-     - 类型选择：渗透→攻击路径图 / 逆向→调用关系图 / JS→时序图 / CTF→解题流程
+□ 2. Generate diagrams (diagram-generator skill)
+- At least 1 flowchart embedded in the report
+- Type selection: Penetration → Attack Path Diagram / Reverse → Call Diagram / JS → Sequence Diagram / CTF → Problem Solving Process
 
-□ 3. 回写 field-journal（已脱敏）
-     - 按 field-journal/_template.md 格式
-     - 必须包含：踩坑记录、可复用模式、工具链发现、环境信息
-     - 脱敏检查：无真实域名/IP/Token/用户名
+□ 3. Write back field-journal (desensitized)
+- According to field-journal/_template.md format
+- Must include: pitfall records, reusable modes, tool chain discovery, and environment information
+- Desensitization check: no real domain name/IP/Token/user name
 
-□ 4. 沉淀搜索到的知识（如果本次任务中联网搜索过）
-     - 将搜索到的有价值内容写入对应 skill 的 references/
-     - 标注来源 URL 和日期
-     - 如果发现了新工具 → 更新 bootstrap-manifest.json
-     - 如果发现了新场景 → 更新 routing.md + RULES-kali.md 关键词
+□ 4. Precipitate the searched knowledge (if you searched online during this task)
+- Write the searched valuable content into references/ of the corresponding skill
+- Mark the source URL and date
+- If new tools are discovered → update bootstrap-manifest.json
+- If new scenarios are discovered → update routing.md + RULES-kali.md keywords
 
-□ 5. 询问社区贡献
-     - "是否将本次经验贡献到社区主仓库？数据已脱敏，只提交 field-journal 文件。"
-     - 用户同意 → 按 CONTRIBUTE-BACK.md 流程创建 PR
-     - 用户拒绝 → 跳过
+□ 5. Ask about community contributions
+- "Do you want to contribute this experience to the community main repository? The data has been desensitized and only the field-journal file is submitted."
+- User agrees → Create PR according to CONTRIBUTE-BACK.md process
+- User rejected → Skip
 
-□ 6. 更新系统索引
-     - 更新 field-journal/_index.md（新增条目）
-     - 检查是否需要更新：routing.md / bootstrap-manifest / tool-index
-     - 如果发现新工具或新场景 → 执行对应更新
+□ 6. Update system index
+- Update field-journal/_index.md (new entry)
+- Check if updates are needed: routing.md/bootstrap-manifest/tool-index
+- If new tools or new scenarios are discovered → perform corresponding updates
 ```
 
-如果 AI 在任务完成后没有执行以上清单，用户可以提醒："你忘了写报告和回写经验"，AI 必须立即补上。
+If the AI ​​does not perform the above checklist after the task is completed, the user can remind: "You forgot to write the report and write back the experience", and the AI ​​must make up for it immediately.
 
 ---
 
-## 多任务与中断处理
+## Multitasking and interrupt handling
 
-- 如果用户在任务执行中切换话题，先保存当前进度到 field-journal（标记为"未完成"）
-- 用户回来继续时，从 field-journal 恢复上下文
-- 如果用户同时给出多个安全任务，按优先级逐个执行，不要并行（避免工具冲突）
-- 长时间任务（如大文件 IDA 分析）要定期汇报进度，不要让用户以为卡死了
+- If the user switches topics during task execution, first save the current progress to field-journal (marked as "Unfinished")
+- When the user comes back to continue, restore the context from field-journal
+- If the user gives multiple security tasks at the same time, execute them one by one according to priority and not in parallel (to avoid tool conflicts)
+- The progress of long-term tasks (such as large file IDA analysis) must be reported regularly to avoid letting users think they are stuck.
 
 ---
 
-## 联网知识补充（有搜索能力时必须使用）
+## Internet knowledge supplement (must be used if you have search capabilities)
 
-当 AI 具备联网搜索能力时，**必须在以下场景主动搜索**：
+When AI has the ability to search on the Internet, it must actively search in the following scenarios:
 
-| 场景 | 搜索什么 | 搜索后做什么 |
+| Scenario | What to search for | What to do after searching |
 |------|---------|-------------|
-| 遇到未知壳/保护/混淆 | 搜索该壳的脱壳方法和工具 | 将方法写入对应 skill 的 references/ |
-| 遇到未知框架/协议 | 搜索逆向/渗透该框架的方法 | 写入 references/ 或提议新增 skill |
-| 工具报错/不兼容 | 搜索错误信息 + 版本兼容性 | 写入 field-journal 踩坑记录 |
-| 发现新 CVE/漏洞 | 搜索 PoC 和利用方法 | 写入 pentest-tools/references/ |
-| 路由未命中（全新场景） | 搜索该领域的方法论和工具 | 提议新增 skill 并附上搜索到的资料 |
-| 需要特定 Frida 脚本 | 搜索 GitHub/CodeShare 上的现成脚本 | 写入 apk-reverse/references/ 或直接使用 |
-| 需要特定 payload | 搜索 PayloadsAllTheThings/HackTricks | 写入 pentest-tools/payloads/ |
-| 工具版本过旧 | 搜索最新版本和 breaking changes | 更新 bootstrap-manifest 和文档 |
+| Encounters an unknown shell/protection/obfuscation | Searches for the unpacking method and tool of the shell | Writes the method into the references/| of the corresponding skill
+| Encounters an unknown framework/protocol | Searches for methods to reverse engineer/penetrate the framework | Write references/or propose new skills |
+| Tool error/incompatibility | Search error information + version compatibility | Write to field-journal Pitfall record |
+| Discover new CVE/vulnerabilities | Search for PoC and exploit methods | Write to pentest-tools/references/ |
+| Routing miss (new scenario) | Search methodologies and tools in this field | Propose new skills and attach the searched information |
+| requires a specific Frida script | Search for a ready-made script on GitHub/CodeShare | Write to apk-reverse/references/ or use | directly
+| requires specific payload | Search PayloadsAllTheThings/HackTricks | Write pentest-tools/payloads/ |
+| tool version is out of date | Search for the latest version and breaking changes | Update bootstrap-manifest and documentation |
 
-### 搜索后的知识沉淀流程
+### Knowledge precipitation process after search
 
 ```text
-1. 搜索获取信息
-2. 验证信息可靠性（优先官方文档 > GitHub > 博客 > 论坛）
-3. 提取可操作的内容（命令/脚本/配置/步骤）
-4. 写入本包对应位置：
-   - 通用方法论 → 对应 skill 的 references/*.md
-   - 特定工具用法 → 对应 skill 的 references/ 或 SKILL.md
-   - 踩坑经验 → field-journal/
-   - 新工具发现 → kali/scripts/bootstrap-manifest.json + tool-discovery.sh
-   - 新场景发现 → routing.md + RULES-kali.md 关键词
-5. 标注来源（URL + 日期），便于后续验证时效性
-6. 如果信息量足够大（新领域），提议新增独立 skill
+1. Search for information
+2. Verify the reliability of the information (prioritize official documents > GitHub > Blog > Forum)
+3. Extract actionable content (commands/scripts/configurations/steps)
+4. Write the corresponding location of this package:
+- General methodology → references/*.md corresponding to skill
+- Specific tool usage → references/ or SKILL.md corresponding to the skill
+- Pitfall experience → field-journal/
+- New tool discovery → kali/scripts/bootstrap-manifest.json + tool-discovery.sh
+- New scene discovery → routing.md + RULES-kali.md keywords
+5. Mark the source (URL + date) to facilitate subsequent verification of timeliness.
+6. If the amount of information is large enough (new field), it is recommended to add independent skills
 ```
 
-### 搜索质量要求
+### Search quality requirements
 
-- **不要搜索后只给用户一个链接** — 必须提取关键内容写入本包
-- **不要盲信搜索结果** — 对照官方文档验证，标注置信度
-- **优先中文资源**（如果用户用中文交流）— 但技术细节以英文官方文档为准
-- **标注时效性** — 安全领域变化快，标注搜索日期，过期内容标记 `[可能过时]`
+- **Don’t just give users a link after searching** — Key content must be extracted and written into this package
+- **Don’t blindly trust search results** — Verify against official documents and mark the confidence level
+- **Priority to Chinese resources** (if users communicate in Chinese) - but technical details are subject to official English documents
+- **Mark timeliness** — The security field changes rapidly, mark the search date, and mark expired content `[may be outdated]`
 
 ---
 
-## 新增 Skill
+## Add Skill
 
-当发现路由矩阵无法覆盖当前任务类型时，按 `CONTRIBUTING.md` 流程新增 skill。
+When it is found that the routing matrix cannot cover the current task type, follow the `CONTRIBUTING.md` process to add a skill.
 
-路径：`<本包根目录>/skills/CONTRIBUTING.md`
+Path: `<Root directory of this package>/skills/CONTRIBUTING.md`
 
-新增后必须同步更新：routing.md、kali/scripts/bootstrap-manifest.json、kali/scripts/lib/tool-discovery.sh、kali/scripts/refresh-tool-index.sh。
+After adding, they must be updated simultaneously: routing.md, kali/scripts/bootstrap-manifest.json, kali/scripts/lib/tool-discovery.sh, kali/scripts/refresh-tool-index.sh.

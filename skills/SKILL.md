@@ -4,188 +4,188 @@ description: Routes reverse engineering, exploitation, penetration testing, malw
 ---
 # Reverse Engineering Skills Master Control
 
-本目录收录了一系列逆向工程相关的技能模块，每个子目录是一个独立模块，内含 `SKILL.md` 描述其适用场景、工具链和工作流程。
+This directory contains a series of reverse engineering-related skill modules. Each subdirectory is an independent module containing `SKILL.md` describing its applicable scenarios, tool chains and workflows.
 
-## CRITICAL: 路由执行契约（必须立即执行）
+## CRITICAL: routing execution contract (must be executed immediately)
 
-读完本文件后，不允许只回复“已读/已理解”。必须按顺序执行：
+After reading this document, only "read/understood" replies are not allowed. Must be executed in order:
 
-1. `NOW`：跑平台原生 router（Windows `scripts/master-route.ps1`；Linux/macOS/Kali `scripts/master-route.sh`），从 `config/routing.json` 定 PRIMARY；疑难再读 `routing.md` 三轴附录。
-2. `NOW`：平台原生 `case-init` 落地当前分析项目的 `work/<case>/scope.md`；**auth 未 granted 禁止对目标 ACT**。本地离线样本使用 `offline-sample` preset + explicit sample；Force 不得绕过硬门。
-3. `ACT`：立即打开 PRIMARY `SKILL.md` 执行 ACTION REQUIRED。
-4. `NEXT`：工具路径只认 `tool-index.md`；缺工具 → 平台原生 bootstrap（仅 manifest）。
-5. 结论用 Evidence→Finding→Path。报告/journal 是 SHOULD，除非用户要交付物。
+1. `NOW`: Run the platform's native router (Windows `scripts/master-route.ps1`; Linux/macOS/Kali `scripts/master-route.sh`), and set the PRIMARY from `config/routing.json`; if you have any questions, read the `routing.md` three-axis appendix.
+2. `NOW`: Run the platform-native `case-init` to initialize `work/<case>/scope.md` for the current analysis project. **Do not ACT on the target until `auth.status=granted`.** For local offline samples, use the `offline-sample` preset with an explicit sample; `Force` must not bypass this authorization gate.
+3. `ACT`: Open PRIMARY `SKILL.md` immediately to execute ACTION REQUIRED.
+4. `NEXT`: The tool path only recognizes `tool-index.md`; missing tool → platform native bootstrap (manifest only).
+5. Use Evidence→Finding→Path to conclude. report/journal is SHOULD unless the user wants deliverables.
 
-**身份**：见 `ops/IDENTITY.md`（轻量路由包 + 工具自举 + journal；**不是** Z3r0 式平台）。
+**Identity**: See `ops/IDENTITY.md` (lightweight routing package + tool bootstrapping + journal; **not** a Z3r0-style platform).
 
-如果路由无法命中，必须先联网补充方法论并提议新增 skill，禁止硬塞到不匹配模块。
+If the route cannot be hit, you must first connect to the Internet to supplement the methodology and propose new skills. It is forbidden to force unmatched modules.
 
-## 指令语义级别（RFC 2119）
+## Directive semantic level (RFC 2119)
 
-- `MUST`：必须执行，违背即任务失败。
-- `MUST NOT`：禁止执行，违背即安全违规。
-- `SHOULD`：原则上要做，不做必须说明原因。
-- `MAY`：可选动作。
-## 当前模块
+- `MUST`: It must be executed. If it is violated, the task will fail.
+- `MUST NOT`: Prohibited execution, violation is a security violation.
+- `SHOULD`: In principle, you should do it. If you don’t do it, you must explain why.
+- `MAY`: Optional action.
+## current module
 
-| 模块 | 目录 | 适用场景 |
+| module | catalog | applicable scenario |
 |------|------|---------|
-| **通用逆向** | `reverse-engineering/` | GDB / Frida / angr / Unicorn / Qiling / 反分析对抗 / 全语言平台逆向 / CTF 模式库 |
-| **APK 逆向** | `apk-reverse/` | Android APK 解包、jadx 反编译、smali 修改、Frida Hook、重打包签名安装 |
-| **.NET / C# 逆向** | `dotnet-reverse/` | 托管 PE 逆向、dnSpyEx + de4dot 脱混淆（ConfuserEx/SmartAssembly/Babel）、IL patch、Sharp* 红队工具分析、dnSpy MCP 联动 |
-| **IDA Pro 逆向** | `ida-reverse/` | IDA Pro MCP HTTP 服务器（72 个工具）：反编译、反汇编、数据流追踪、交叉引用 |
-| **前端 JS 逆向** | `js-reverse/` | 浏览器端签名定位、加密参数分析、运行时采样、Node 补环境复现；优先用现有 `js-reverse_*`，需要更强的浏览器/CDP/Hook 面时接入 jshookmcp，但前提是先把该 MCP server 下载/注册并启用 |
-| **radare2 分析** | `radare2/` | CLI 二进制侦察、反汇编、patch：r2 / rabin2 / rasm2 / radiff2 |
-| **CTF 入口** | `ctf-sandbox/` | 单 PRIMARY；下游仍在 sidecar `../CTF-Sandbox-Orchestrator/` |
-| **技术文档编写** | `docs-generator/` | 任务完成后自动生成逆向报告、渗透报告、CTF writeup、签名逆向报告 |
-| **Evidence 图审查** | `case-review/` | 校验 scope、Evidence→Finding→Path 可追溯性、workitems、timeline 与 artifact hash |
-| **浏览器与桌面自动化** | `browser-automation/` | 浏览器操作（Playwright）+ Windows 桌面应用操作（OpenReverse UIA/CUA）+ 网络观察 |
-| **跨版本符号迁移** | `binary-diff/` | 有旧版符号迁移到新版、缺 PDB 推导、程序更新后批量迁移函数名 |
-| **N-day 补丁差分→利用** | `patch-diff-exploit/` | 从厂商补丁定位漏洞点、写 PoC、N-day 武器化（与 binary-diff 分工：本 skill 偏攻击侧） |
-| **RE→利用链** | `pwn-chain/` | 从逆向走到可用 exploit：栈/堆/内核 pwn、pwntools、libc-database、CTF 到真实远程的稳定化 |
-| **固件渗透链** | `firmware-pentest/` | OWASP FSTM 九阶段：提取→EMBA 自动化→Firmadyne/QEMU 仿真→AFL++ fuzz→实机利用 |
-| **EDR 绕过逆向** | `edr-bypass-re/` | 红队场景：逆向 EDR 的 hook 表/ETW/AMSI → 直接 syscall / Hell's Gate / 硬件断点 / call stack spoof |
-| **渗透测试工具链** | `pentest-tools/` | Nmap/Nuclei/SQLMap/FFUF/Hashcat/Pentest Swarm 等 20+ 渗透工具，通过 MCP 暴露给 AI |
-| **图表生成** | `diagram-generator/` | 从自然语言生成 Mermaid/Graphviz/PlantUML 图表（攻击路径图、数据流图、架构图、状态机） |
-| **攻击链编排** | `attack-chain/` | 多阶段攻击路径规划与执行的总指挥；完整渗透、HW 演练、从外网打到域控等跨阶段任务从这里开始 |
-| **LLM/AI 安全测试** | `llm-security/` | OWASP LLM + ASI Top 10：Prompt 注入、工具滥用、记忆投毒、Agent 劫持、系统提示词提取、**Agent 服从性工程** |
-| **API 安全测试** | `api-security/` | REST/GraphQL/WebSocket 全协议：BOLA/IDOR、JWT/OAuth 攻击、10 阶段方法论 |
-| **供应链安全** | `supply-chain-security/` | SBOM/SCA/CI-CD 管道：依赖扫描、容器安全、构建完整性、漏洞可达性验证 |
-| **移动逆向工程** | `mobile-reverse/` | Android + iOS：Frida/Objection 动态插桩、SSL Pinning/Root/越狱检测绕过、OWASP MASTG |
-| **恶意软件分析** | `malware-analysis/` | 样本分析六阶段、YARA/Sigma、反分析检测、沙箱编排 |
-| **DSL 虚拟机逆向** | `reverse-engineering/dsl-vm-reverse/` | JS 自定义指令集 VM（IIFE + switch-case opcode）；风控/验证码引擎等 |
-| **作战契约 ops** | `ops/` | Scope / 证据链 / 角色 / 时间线 / 身份 / skill 供应链安全 |
-| **社区 skill 对照** | `references/community-security-skills.md` | 外部安全 skill 索引与借鉴规则（禁止盲装） |
-| **Skill 供应链** | `ops/skill-supply-chain.md` | 外部 skill/MCP 安装门闩（AST10 精简） |
-| **RE 阶段门闩** | `reverse-engineering/references/re-agent-workflow.md` | triage→static→dynamic→synthesis |
-| **授权侦察管线** | `pentest-tools/references/recon-pipeline.md` | scope 门 + 命中≠验证 |
-| **协议逆向** | `protocol-reverse/` | 自定义二进制协议 / Protobuf / gRPC / PCAP 帧布局 |
-| **Ghidra 逆向** | `ghidra-reverse/` | 开源反编译、headless、Ghidra MCP（无 IDA 时主入口） |
-| **Binary Ninja 逆向** | `binary-ninja-reverse/` | HLIL/MLIL/LLIL、Python API，以及可选的社区 MCP/localhost HTTP 集成 |
-| **云 / 容器 / K8s** | `cloud-k8s/` | IMDS/IAM、容器逃逸面、Kubernetes RBAC |
-| **Windows / AD** | `windows-ad/` | Kerberos、AD CS、BloodHound、中继与域路径 |
-| **数字取证** | `digital-forensics/` | 内存/磁盘时间线、PCAP 溯源、IR 保全 |
-| **代码审计 / SAST** | `code-audit/` | Semgrep/CodeQL、白盒、危险 API 与鉴权审查 |
-| **威胁情报 / OSINT** | `threat-intelligence/` | 公开来源 IOC 补充、活动关联、独立核验与情报交接 |
-| **威胁狩猎** | `threat-hunting/` | 假说驱动狩猎、Sigma 检测工程、蓝队验证 |
-| **OT / ICS 工控** | `ot-ics/` | Purdue 分区、PLC/SCADA、被动优先评估 |
-| **Wi-Fi / 无线** | `wifi-wireless/` | 授权无线评估、握手/PMKID、实验室规则 |
-| **浏览器扩展逆向** | `browser-extension-reverse/` | Chrome/Firefox 扩展、MV3 worker、权限面 |
-| **macOS / Mach-O** | `macos-reverse/` | 签名、ObjC/Swift、LaunchAgent、macOS 样本 |
-| **厚客户端** | `thick-client/` | 桌面 C/S、本地存储、IPC、更新通道 |
-| **Go / Rust 逆向** | `go-rust-reverse/` | 剥离符号 Go/Rust、pclntab、panic 字符串 |
-| **硬件调试接口** | `hardware-security/` | UART/JTAG/SWD、只读提取、交接固件 |
-| **数据库安全** | `database-security/` | MySQL/PG/MSSQL/Mongo/Redis 暴露与配置 |
-| **邮件安全** | `email-security/` | 钓鱼拆解、SPF/DKIM/DMARC、BEC |
-| **联邦身份** | `identity-federation/` | SAML/OIDC/OAuth SSO 流与错配 |
-| **RF / SDR** | `radio-sdr/` | 授权射频研究、默认只收 |
+| **Universal reverse engineering** | `reverse-engineering/` | GDB / Frida / angr / Unicorn / Qiling / Anti-analysis confrontation / Full language platform reverse engineering / CTF pattern library |
+| **APK reverse engineering** | `apk-reverse/` | Android APK unpacking, jadx decompilation, smali modification, Frida Hook, repackaging signature installation |
+| **.NET / C# reverse engineering** | `dotnet-reverse/` | managed PE reverse engineering, dnSpyEx + de4dot deobfuscation (ConfuserEx/SmartAssembly/Babel), IL patch, Sharp* red team tool analysis, dnSpy MCP linkage |
+| **IDA Pro Reverse** | `ida-reverse/` | IDA Pro MCP HTTP server (72 tools): decompilation, disassembly, data flow tracing, cross-reference |
+| **Front-end JS reverse engineering** | `js-reverse/` | Browser-side signature positioning, encryption parameter analysis, runtime sampling, Node complement environment reproduction; priority is given to using the existing `js-reverse_*`, which requires a stronger browser/CDP/Hook to access jshookmcp, but the prerequisite is to download/register and enable the MCP server first |
+| **radare2 analysis** | `radare2/` | CLI binary recon, disassembly, patch: r2/rabin2/rasm2/radiff2 |
+| **CTF entry** | `ctf-sandbox/` | single PRIMARY; downstream is still sidecar `../CTF-Sandbox-Orchestrator/` |
+| **Technical document writing** | `docs-generator/` | Automatically generate reverse report, penetration report, CTF writeup, and signature reverse report after the task is completed |
+| **Evidence diagram review** | `case-review/` | Verification scope, Evidence→Finding→Path traceability, workitems, timeline and artifact hash |
+| **Browser and desktop automation** | `browser-automation/` | Browser operation (Playwright) + Windows desktop application operation (OpenReverse UIA/CUA) + Network observation |
+| **Cross-version symbol migration** | `binary-diff/` | There are old version symbols migrated to the new version, lack of PDB derivation, batch migration of function names after program update |
+| **N-day patch difference→utilization** | `patch-diff-exploit/` | Locate vulnerability points from manufacturer patches, write PoC, and N-day weaponization (division of labor with binary-diff: this skill is on the attack side) |
+| **RE→Exploit Chain** | `pwn-chain/` | From reverse engineering to available exploit: stack/heap/kernel pwn, pwntools, libc-database, CTF to real remote stabilization |
+| **Firmware penetration chain** | `firmware-pentest/` | OWASP FSTM nine stages: extraction→EMBA automation→Firmadyne/QEMU simulation→AFL++ fuzz→real machine utilization |
+| **EDR bypass reverse engineering** | `edr-bypass-re/` | Red team scenario: reverse EDR hook table/ETW/AMSI → direct syscall/Hell's Gate/hardware breakpoint/call stack spoof |
+| **Penetration Testing Tool Chain** | `pentest-tools/` | Nmap/Nuclei/SQLMap/FFUF/Hashcat/Pentest Swarm and other 20+ penetration tools, exposed to AI through MCP |
+| **Chart generation** | `diagram-generator/` | Generate Mermaid/Graphviz/PlantUML charts from natural language (attack path diagram, data flow diagram, architecture diagram, state machine) |
+| **Attack chain orchestration** | `attack-chain/` | The general commander of multi-stage attack path planning and execution; complete penetration, HW drills, and cross-stage tasks from external network to domain control start here |
+| **LLM/AI Security Test** | `llm-security/` | OWASP LLM + ASI Top 10: Prompt injection, tool abuse, memory poisoning, Agent hijacking, system prompt word extraction, **Agent compliance engineering** |
+| **API Security Test** | `api-security/` | REST/GraphQL/WebSocket full protocol: BOLA/IDOR, JWT/OAuth attack, 10-stage methodology |
+| **Supply chain security** | `supply-chain-security/` | SBOM/SCA/CI-CD pipeline: dependency scanning, container security, build integrity, vulnerability reachability verification |
+| **Mobile Reverse Engineering** | `mobile-reverse/` | Android + iOS: Frida/Objection dynamic instrumentation, SSL Pinning/Root/jailbreak detection bypass, OWASP MASTG |
+| **Malware Analysis** | `malware-analysis/` | Six stages of sample analysis, YARA/Sigma, anti-analysis detection, sandbox orchestration |
+| **DSL virtual machine reverse engineering** | `reverse-engineering/dsl-vm-reverse/` | JS custom instruction set VM (IIFE + switch-case opcode); risk control/verification code engine, etc. |
+| **Combat Contract ops** | `ops/` | Scope / Evidence Chain / Role / Timeline / Identity / Skill Supply Chain Security |
+| **Community skill comparison** | `references/community-security-skills.md` | External security skill index and reference rules (blind installation is prohibited) |
+| **Skill Supply Chain** | `ops/skill-supply-chain.md` | External skill/MCP mounting latch (AST10 lite) |
+| **RE stage latch** | `reverse-engineering/references/re-agent-workflow.md` | triage→static→dynamic→synthesis |
+| **Authorized reconnaissance pipeline** | `pentest-tools/references/recon-pipeline.md` | scope gate + hit ≠ verification |
+| **Protocol reverse** | `protocol-reverse/` | Custom binary protocol / Protobuf / gRPC / PCAP frame layout |
+| **Ghidra reverse** | `ghidra-reverse/` | Open source decompilation, headless, Ghidra MCP (main entrance without IDA) |
+| **Binary Ninja Reverse** | `binary-ninja-reverse/` | HLIL/MLIL/LLIL, Python API, and optional community MCP/localhost HTTP integration |
+| **Cloud/Container/K8s** | `cloud-k8s/` | IMDS/IAM, container escape surface, Kubernetes RBAC |
+| **Windows / AD** | `windows-ad/` | Kerberos, AD CS, BloodHound, Relays and Domain Paths |
+| **Digital Forensics** | `digital-forensics/` | Memory/disk timeline, PCAP traceability, IR preservation |
+| **Code Audit/SAST** | `code-audit/` | Semgrep/CodeQL, White Box, Dangerous APIs and Authentication Review |
+| **Threat Intelligence/OSINT** | `threat-intelligence/` | Open Source IOC Supplement, Activity Correlation, Independent Verification and Intelligence Handover |
+| **Threat Hunting** | `threat-hunting/` | Hypothesis-driven hunting, Sigma detection engineering, blue team verification |
+| **OT/ICS Industrial Control** | `ot-ics/` | Purdue Partitioning, PLC/SCADA, Passive Priority Assessment |
+| **Wi-Fi/Wireless** | `wifi-wireless/` | Authorized Wireless Evaluation, Handshake/PMKID, Lab Rules |
+| **Browser extension reverse** | `browser-extension-reverse/` | Chrome/Firefox extension, MV3 worker, permission plane |
+| **macOS / Mach-O** | `macos-reverse/` | Signature, ObjC/Swift, LaunchAgent, macOS sample |
+| **Thick Client** | `thick-client/` | Desktop C/S, local storage, IPC, update channel |
+| **Go/Rust reverse** | `go-rust-reverse/` | Strip symbols Go/Rust, pclntab, panic string |
+| **Hardware debugging interface** | `hardware-security/` | UART/JTAG/SWD, read-only extraction, handover firmware |
+| **Database Security** | `database-security/` | MySQL/PG/MSSQL/Mongo/Redis Exposure and Configuration |
+| **Email Security** | `email-security/` | Phishing Disassembly, SPF/DKIM/DMARC, BEC |
+| **Federated Identity** | `identity-federation/` | SAML/OIDC/OAuth SSO Flow and Mismatch |
+| **RF / SDR** | `radio-sdr/` | Authorized RF research, only | accepted by default
 
-## 统一入口
+## unified entrance
 
-遇到逆向、CTF、抓包、前端签名、APK 改包、二进制分析类任务时，先按这个顺序进入：
+When encountering tasks such as reverse engineering, CTF, packet capture, front-end signature, APK package modification, and binary analysis, enter in this order first:
 
-1. 平台原生 router（Windows `scripts/master-route.ps1`；Linux/macOS/Kali `scripts/master-route.sh`）→ PRIMARY（`config/routing.json`）
-2. 平台原生 `case-init` → `scope.md`
-3. 打开 PRIMARY `SKILL.md`
-4. 疑难时读 `routing.md`，需要本机路径时读 `tool-index.md`
+1. Platform native router (Windows `scripts/master-route.ps1`; Linux/macOS/Kali `scripts/master-route.sh`) → PRIMARY (`config/routing.json`)
+2. Platform native `case-init` → `scope.md`
+3. OPEN PRIMARY `SKILL.md`
+4. When in doubt, read `routing.md`, and when a local path is required, read `tool-index.md`
 
-## 工作思路
+## Work ideas
 
-这些模块可以按需组合使用：
+These modules can be combined as needed:
 
-1. **拿到一个目标** → 先看文件类型，选对应的分析工具
-2. **快速捡漏** → strings / rabin2 -z / ltrace 看看有没有直接线索
-3. **深入分析** → 如果需要反编译→IDA；需要动态 Hook→Frida；需要符号执行→angr
-4. **一条路走不通就换一条** → 静态分析不行就动态，Java 层不行就看 so，页面观察不够就断点
+1. **Get a target** → First look at the file type and select the corresponding analysis tool
+2. **Quickly pick up leaks** → strings / rabin2 -z / ltrace to see if there are any direct clues
+3. **In-depth analysis** → If you need to decompile → IDA; if you need dynamic Hook → Frida; if you need symbolic execution → angr
+4. **If one path doesn't work, just change it** → If static analysis doesn't work, use dynamic analysis. If the Java layer doesn't work, use so. If the page observation is not enough, use breakpoints.
 
-## 下一步菜单模式（Next-Step Menu Pattern）
+## Next-Step Menu Pattern
 
-只有在 **genuine decision boundary**（存在两个或以上 materially different、evidence-supported 分支，且用户选择会改变下一动作）时，子 skill 才 `MUST` 提供 3-6 个编号选项。若下一步由 gate / Evidence 唯一决定，`MUST` 直接继续，并按 `ops/timeline-workitem.md` 只记录 `decision_delta` + `carry_forward_refs`；`MUST NOT` 为制造菜单而重新输出 unchanged route/scope/auth/context。
+The sub-skill `MUST` provides 3-6 numbered options only if there are **genuine decision boundary** (two or more materially different, evidence-supported branches exist, and user selection changes the next action). If the next step is solely determined by gate / Evidence, `MUST` continues directly, and `ops/timeline-workitem.md` only records `decision_delta` + `carry_forward_refs`; `MUST NOT` re-outputs unchanged route/scope/auth/context for the manufacturing menu.
 
-格式要求：
-- 每个选项以数字编号（1-6 范围）
-- 每个选项描述一项具体可执行的动作（不是抽象方向）
-- 至少包含一个"导出报告/写 writeup"选项
-- 至少包含一个"继续深入分析"或"换一种方法"选项
-- 必要时包含一个"停止/暂停/询问其他问题"出口
+Format requirements:
+- Each option is numbered (range 1-6)
+- Each option describes a specific executable action (not an abstract direction)
+- Include at least one "export report/writeup" option
+- Include at least one option to "continue further analysis" or "change another approach"
+- Includes a "Stop/Pause/Ask More Questions" exit when necessary
 
-示例：
+Example:
 ```
-## 建议下一步（选一个编号）
+## Suggest next step (choose a number)
 
-1. 对 sub_140001000 做深度反编译，还原算法
-2. 用 Frida 动态 Hook 验证参数猜想
-3. 导出当前已命名函数，生成符号迁移 YAML
-4. 生成当前阶段的分析报告
-5. 换 radare2 做轻量侦察对比
-6. 暂停，我先确认前面的证据
+1. Deeply decompile `sub_140001000` to reconstruct the algorithm
+2. Use Frida dynamic hooks to verify parameter hypotheses
+3. Export currently named functions and generate a symbol migration YAML
+4. Generate an analysis report for the current phase
+5. Switch to radare2 for a lightweight reconnaissance comparison
+6. Pause while I confirm the evidence gathered so far
 ```
 
-## 目录是动态扩充的
+## The directory is dynamically expanded
 
-本目录会持续增长。发现新的子目录时，读它的 `SKILL.md` 就能快速了解用途。
+This directory will continue to grow. When you find a new subdirectory, read its `SKILL.md` to quickly understand its purpose.
 
-新增 skill 时，按 `CONTRIBUTING.md` 的标准流程操作，确保：
-- 路由矩阵能正确分流
-- bootstrap 系统能自动补齐依赖
-- tool-index 能反映新工具状态
+When adding a skill, follow the standard process of `CONTRIBUTING.md` to ensure:
+- The routing matrix can correctly distribute traffic
+- The bootstrap system can automatically complete dependencies
+- tool-index can reflect the new tool status
 
-## 关联资源
+## Related resources
 
-- 本机还有 **anything-analyzer**（端口 23816）MCP 服务器，提供浏览器自动化、HTTP 捕获和 AI 分析能力
-- `tool-index.md` 记录本机逆向工具是否可用、实际路径、版本和脚本引用
-- 包根目录下的 `Readme.md` 提供面向 Claude Code、Codex CLI 与其他代码 AI 客户端的通用安装与接入说明
+- This machine also has the **anything-analyzer** (port 23816) MCP server, which provides browser automation, HTTP capture and AI analysis capabilities
+- `tool-index.md` records whether the native reverse tool is available, actual path, version and script reference
+- `Readme.md` in the package root directory provides general installation and access instructions for Claude Code, Codex CLI and other code AI clients.
 
-## 按需自举
+## Bootstrap on demand
 
-当 workflow 发现缺少工具时，不要直接报错。统一调用平台原生 bootstrap：
+When the workflow finds that a tool is missing, don't report an error directly. Unified call platform native bootstrap:
 
 Windows：
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File "<skill-root>\scripts\bootstrap-reverse.ps1" -Capability @('工具名') -StartServices
+powershell -NoProfile -ExecutionPolicy Bypass -File "<skill-root>\scripts\bootstrap-reverse.ps1" -Capability @('tool-name') -StartServices
 ```
 
 Linux / macOS：
 ```bash
-bash <skill-root>/scripts/bootstrap-reverse.sh 工具名 --start-services
+bash <skill-root>/scripts/bootstrap-reverse.sh tool-name --start-services
 ```
 
 Kali：
 ```bash
-bash <package-root>/kali/scripts/bootstrap-reverse.sh 工具名 --start-services
+bash <package-root>/kali/scripts/bootstrap-reverse.sh tool-name --start-services
 ```
 
-支持的能力（以 `scripts/bootstrap-manifest.json` 为准）：jadx、apktool、jeb-pro、binaryninja、frida、frida-ps、idalib-mcp、reqable-mcp、jshookmcp、xquik-mcp、anything-analyzer、idapro、r2、rabin2、adb、agent-browser、ghidra-mcp、seclists、proxycat、burpsuite-mcp、nmap、pentestswarm、binwalk、yara、pwntools、bkcrack
+Supported capabilities (from `scripts/bootstrap-manifest.json`): jadx, apktool, jeb-pro, binaryninja, frida, frida-ps, idalib-mcp, reqable-mcp, jshookmcp, xquik-mcp, anything-analyzer, idapro , r2, rabin2, adb, agent-browser, ghidra-mcp, seclists, proxycat, burpsuite-mcp, nmap, pentestswarm, binwalk, yara, pwntools, bkcrack
 
-> JEB Pro 已登记为**手动许可安装**能力：bootstrap 只输出指引，绝不下载或规避商业许可。Reqable MCP 仅登记固定版本的官方运行时，仍需要用户自行安装 Reqable 桌面客户端。
+> JEB Pro is registered for **Manual License Installation** capabilities: bootstrap only outputs guidance, never downloads or circumvents commercial licenses. Reqable MCP only registers a fixed version of the official runtime, and users still need to install the Reqable desktop client themselves.
 >
-> 清单中未登记的工具（如 unblob/EMBA 等）`MUST` 在 skill 文档中走手动安装步骤，禁止假装可 bootstrap。
+> For tools not registered in the list (such as unblob/EMBA, etc.) `MUST`, follow the manual installation steps in the skill document, and it is forbidden to pretend to be able to bootstrap.
 
-自举完成后会自动刷新 `tool-index`。
+`tool-index` will be automatically refreshed after the boot is completed.
 
-## 操作先例库（Precedent Files）
+## Precedent Files
 
-在执行任何逆向/渗透操作之前，按顺序 MUST 读取：
+Before performing any reverse engineering/exploitation operations, MUST read in sequence:
 
-| 读序 | 文件 | 何时读 |
+| reading order | file | when to read |
 |------|------|--------|
-| **#1** | `ops/scope-contract.md` + `case-init.ps1` | 可执行授权门。`precedent-auth.md` 不写 granted |
-| **#2** | `field-journal/precedent-reverse.md` 或 `precedent-pentest.md` | 按需 — AI 犹豫时才加载 |
+| **#1** | `ops/scope-contract.md` + `case-init.ps1` | executable authorization gate. `precedent-auth.md` does not write granted |
+| **#2** | `field-journal/precedent-reverse.md` or `precedent-pentest.md` | On demand — AI loads | only after hesitation
 
-**#1 前置，#2 懒加载。**
+**#1 Pre-loading, #2 Lazy loading.**
 
-## 自动进化
+## automatic evolution
 
-每次完成逆向/渗透任务后，必须回写经验到 `field-journal/` 目录。详见 `RULES.md` 的"任务完成后的硬性 Checklist"。
+After each reverse engineering/penetration task is completed, the experience must be written back to the `field-journal/` directory. See `RULES.md`'s "Hard Checklist after Task Completion" for details.
 
-- 模板：`field-journal/_template.md`
-- 索引：`field-journal/_index.md`
-- 先例：`field-journal/precedent-auth.md` → `precedent-reverse.md` → `precedent-pentest.md`
-- 新任务开始前先查索引和先例，复用已有经验
+- Template: `field-journal/_template.md`
+- Index: `field-journal/_index.md`
+- Precedent: `field-journal/precedent-auth.md` → `precedent-reverse.md` → `precedent-pentest.md`
+- Before starting a new task, check the index and precedents and reuse existing experience.
 
-## 任务完成自检（声称完成前 MUST 通过）
+## Task completion self-check (MUST passes before claiming completion)
 
-- [ ] 我是否完成了路由三轴匹配（目标类型 + 用户意图 + 工具链）？
-- [ ] 我是否在路由成功后读取了目标 skill 的 SKILL.md？
-- [ ] 路由未命中时，我是否提议了新增 skill 而非强行匹配？
-- [ ] 我是否基于 `tool-index` 使用了真实工具路径？
+- [ ] Am I done matching the three axes of routing (target type + user intent + toolchain)?
+- [ ] Did I read the target skill's SKILL.md after successful routing?
+- [ ] When the route misses, do I propose adding a new skill instead of forcing a match?
+- [ ] Am I using real toolpaths based on `tool-index`?

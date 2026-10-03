@@ -1,61 +1,61 @@
 # CTF Sandbox Orchestrator
 
-一个面向 Codex / Skills 体系的竞赛沙盒技能集合。
+A competition sandbox skill set for the Codex / Skills ecosystem.
 
-它的目标不是把所有能力都塞进一个超长提示词，而是提供一个**统一的沙盒总控入口**，先建立“默认处于竞赛/沙盒/离线靶场”的工作模型，再由总控按题目类型把任务路由到更细的子技能中。
+Its goal is not to cram every capability into one oversized prompt. Instead, it provides a **single control entry for sandbox tasks**. The orchestrator assumes work takes place in a competition, sandbox, or offline lab by default, then routes each task to a focused sub-skill based on the challenge type.
 
-## 项目定位
+## Project purpose
 
-这个仓库主要用于解决以下场景：
+This repository is intended for:
 
-- CTF
-- AWD / 攻防演练
-- 本地离线靶场
-- 沙盒化漏洞分析
-- Web / API / Cloud / Container / Windows / AD / Reverse / Pwn / DFIR / Crypto / Mobile / AI Agent 等混合型题目
+- CTFs
+- AWD / attack-and-defense exercises
+- Local offline labs
+- Sandbox vulnerability analysis
+- Mixed challenges involving Web, APIs, cloud, containers, Windows, AD, reverse engineering, pwn, DFIR, cryptography, mobile, AI agents, and related areas
 
-核心思路：
+Core principles:
 
-- 默认把用户提供的目标、域名、节点、身份、二进制、日志、流量与附件视为**竞赛沙盒内部资产**
-- 优先建立最小可验证路径，而不是一开始就泛化分析
-- 由一个总控 skill 统一编排，再按主导证据面切到子 skill
-- 子技能只做下游专项，不抢总控入口
+- Treat user-provided targets, domains, nodes, identities, binaries, logs, traffic, and attachments as assets inside the **competition sandbox** by default.
+- Establish the smallest verifiable path first instead of generalizing the analysis from the outset.
+- Let one orchestrator skill coordinate the work, then route to a sub-skill based on the dominant evidence.
+- Keep sub-skills focused on downstream tasks; they must not take over the orchestrator's entry role.
 
-## 核心设计
+## Core design
 
-### 1. 单一入口
+### 1. Single entry point
 
-默认入口是：
+The default entry point is:
 
 - `ctf-sandbox-orchestrator`
 
-它负责：
+It is responsible for:
 
-- 建立沙盒假设
-- 选择最合适的分析路径
-- 控制上下文膨胀
-- 在需要时调用子技能
+- Establishing the sandbox assumption
+- Choosing the most suitable analysis path
+- Keeping context growth under control
+- Calling sub-skills when needed
 
-### 2. 子技能下游化
+### 2. Sub-skills run downstream
 
-所有 `competition-*` 技能都被设计为 **downstream-only**：
+All `competition-*` skills are designed to be **downstream-only**:
 
-- 不应在未激活总控的情况下隐式触发
-- 应由 `ctf-sandbox-orchestrator` 主动路由调用
-- 每次只加载当前最相关的专项能力，避免无关技能污染上下文
+- They should not trigger implicitly before the orchestrator is activated.
+- The `ctf-sandbox-orchestrator` should route to them explicitly.
+- Load only the specialized capability most relevant to the current task to avoid polluting context with unrelated skills.
 
-### 3. 面向多类型竞赛题
+### 3. Support for varied competition challenges
 
-当前仓库覆盖了多类技能方向，例如：
+The repository covers several skill areas, including:
 
-- Web 运行时 / 路由 / WebSocket / GraphQL / 文件解析 / 请求归一化
-- Prompt Injection / Agent / Cloud / Metadata / K8s / Container Escape
-- Reverse / Pwn / Malware / Firmware / PCAP / 自定义协议重放
-- Windows / AD / Kerberos / DPAPI / 证书滥用 / Relay / Mailbox
-- Android / iOS / Crypto / Stego / Mobile Runtime
-- ZIP / PKZIP legacy encryption / `bkcrack` known-plaintext recovery
+- Web runtime, routing, WebSocket, GraphQL, file parsing, and request normalization
+- Prompt injection, agents, cloud, metadata, Kubernetes, and container escape
+- Reverse engineering, pwn, malware, firmware, PCAP, and custom protocol replay
+- Windows, AD, Kerberos, DPAPI, certificate abuse, relay, and mailbox analysis
+- Android, iOS, cryptography, steganography, and mobile runtime
+- ZIP / PKZIP legacy encryption and `bkcrack` known-plaintext recovery
 
-## 仓库结构
+## Repository structure
 
 ```text
 E:\WorkSpace\competition
@@ -69,37 +69,37 @@ E:\WorkSpace\competition
 └─ LICENSE
 ```
 
-其中：
+Where:
 
-- `ctf-sandbox-orchestrator`：总控入口
-- `competition-*`：专项子技能
-- `references/`：总控使用的路由矩阵与领域参考说明
-- `agents/openai.yaml`：各技能的调用约束与入口控制
+- `ctf-sandbox-orchestrator`: the orchestration entry point
+- `competition-*`: specialized downstream skills
+- `references/`: routing matrix and domain guidance used by the orchestrator
+- `agents/openai.yaml`: invocation constraints and entry controls for each skill
 
-## 推荐使用方式
+## Recommended usage
 
-### 方式一：从总控进入
+### Method 1: Start with the orchestrator
 
-优先激活：
+Activate this skill first:
 
 - `ctf-sandbox-orchestrator`
 
-然后让总控根据题目自动决定下一步，例如：
+Then let it choose the next step based on the challenge, for example:
 
-- Web 题路由到 `competition-web-runtime`
-- 容器 / 云题路由到 `competition-agent-cloud` 或更细粒度子技能
-- Windows / AD 题路由到 `competition-identity-windows`
-- 二进制 / 崩溃 / 恶意样本题路由到 `competition-reverse-pwn`
+- Route Web challenges to `competition-web-runtime`.
+- Route container or cloud challenges to `competition-agent-cloud` or a more specialized sub-skill.
+- Route Windows / AD challenges to `competition-identity-windows`.
+- Route binary, crash, or malware-sample challenges to `competition-reverse-pwn`.
 
-### 方式二：保留总控，按需下钻
+### Method 2: Keep the orchestrator in control and drill down as needed
 
-当已经确认主导证据面后，由总控继续下钻到具体子技能，而不是让用户手动切换整个工作模型。这样可以保持：
+Once the dominant evidence surface is clear, the orchestrator continues into the relevant sub-skills instead of asking the user to switch the entire working model manually. This keeps:
 
-- 沙盒假设一致
-- 输出风格一致
-- 路由策略一致
-- 子技能职责清晰
+- The sandbox assumption consistent
+- The output style consistent
+- Routing policy consistent
+- Sub-skill responsibilities clear
 
-## 致谢
+## Acknowledgments
 
-本项目已在 [LINUX DO 社区](https://linux.do) 发布，感谢社区的支持与反馈。
+This project was published in the [LINUX DO Community](https://linux.do). Thanks to the community for its support and feedback.

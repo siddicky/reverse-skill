@@ -1,63 +1,63 @@
-# 专家角色 → Skill 映射（无多 Agent 服务器）
+# Expert Role → Skill Mapping (No Multi-Agent Server)
 
-> 角色代号灵感来自 Z3r0 专家队；**实现方式**是 reverse-skill 路由与交接协议，不是进程编排。
+> The role code is inspired by the Z3r0 expert team; the **implementation method** is the reverse-skill routing and handover protocol, not process orchestration.
 
-## 角色表
+## character sheet
 
-| Code | 名称（可本地化） | 职责 | PRIMARY / 工具 skill |
+| Code | Name (localizable) | Responsibilities | PRIMARY / Tools skill |
 |------|------------------|------|----------------------|
-| **lead** | Lead / 总指挥 | 拆任务、定 scope、阶段门控、汇总报告 | `attack-chain/` 或当前 PRIMARY hub；结束 → `docs-generator/` |
-| **cie** | 情报收集 | 资产发现、暴露面、关系 | `pentest-tools/`（recon）；浏览器 → `browser-automation/`；云面 → `cloud-k8s/` |
-| **cpe** | 渗透验证 | 扫描、利用验证、影响确认 | `pentest-tools/`；API → `api-security/`；AD → `windows-ad/`；无线 → `wifi-wireless/`；库 → `database-security/`；SSO → `identity-federation/`；OT → `ot-ics/` |
-| **cre** | 逆向分析 | 二进制/固件/移动/前端逻辑 | `ida-reverse/` `ghidra-reverse/` `binary-ninja-reverse/` `radare2/` `apk-reverse/` `mobile-reverse/` `macos-reverse/` `js-reverse/` `browser-extension-reverse/` `dotnet-reverse/` `go-rust-reverse/` `firmware-pentest/` `hardware-security/` `malware-analysis/` `protocol-reverse/` `thick-client/` `reverse-engineering/` |
-| **cae** | 代码审计 | 源码/依赖/供应链 | `code-audit/` + `supply-chain-security/` |
-| **cbe** | 蓝队/取证 | 狩猎、检测、IR 伪影 | `threat-hunting/` `digital-forensics/` |
-| **cce** | 密码学 | 算法/协议/密钥误用 | `reverse-engineering` 模式文档 |
-| **llm** | AI 安全 | Prompt/Agent | `llm-security/` |
-| **doc** | 文档官 | 报告/writeup/图 | `docs-generator/` + `diagram-generator/` |
+| **lead** | Lead/General Commander | Split tasks, set scope, stage gate control, summary report | `attack-chain/` or current PRIMARY hub; end → `docs-generator/` |
+| **cie** | Intelligence collection | Asset discovery, exposure, relationship | `pentest-tools/` (recon); browser → `browser-automation/`; cloud → `cloud-k8s/` |
+| **cpe** | Penetration verification | Scan, exploit verification, impact confirmation | `pentest-tools/`; API → `api-security/`; AD → `windows-ad/`; Wireless → `wifi-wireless/`; Library → `database-security/`; SSO → `identity-federation/`;OT → `ot-ics/` |
+| **cre** | reverse analysis | binary/firmware/mobile/front-end logic | `ida-reverse/` `ghidra-reverse/` `binary-ninja-reverse/` `radare2/` `apk-reverse/` `mobile-reverse/` `macos-reverse/` `js-reverse/` `browser-extension-reverse/` `dotnet-reverse/` `go-rust-reverse/` `firmware-pentest/` `hardware-security/` `malware-analysis/` `protocol-reverse/` `thick-client/` `reverse-engineering/` |
+| **cae** | code audit | source code/dependency/supply chain | `code-audit/` + `supply-chain-security/` |
+| **cbe** | Blue Team/Forensics | Hunting, Detection, IR Artifacts | `threat-hunting/` `digital-forensics/` |
+| **cce** | Cryptography | Algorithm/Protocol/Key Misuse | `reverse-engineering` Schema Documentation |
+| **llm** | AI Security | Prompt/Agent | `llm-security/` |
+| **doc** | Documentation Officer | Report/writeup/Picture | `docs-generator/` + `diagram-generator/` |
 
-## Lead 强制协议
+## Lead mandatory agreement
 
 ```text
-1. 输出 PRIMARY（master-route）+ lead_role=lead
-2. 写 scope.md（ops/scope-contract）
-3. 指定 specialist_roles[] 与 handoff 条件
-4. 每阶段结束：更新 timeline + workitems；决定继续/换角色/出报告
-5. 禁止跳过 scope 直接 cpe 扫生产
+1. Output PRIMARY (master-route) + lead_role=lead
+2. Write scope.md (ops/scope-contract)
+3. Specify specialist_roles[] and handoff conditions
+4. End of each stage: update timeline + workitems; decide to continue/change roles/make a report
+5. It is forbidden to skip scope and directly scan production through cpe.
 ```
 
-## 交接（Handoff）规则
+## Handoff rules
 
-| 从 → 到 | 触发 | 交付物 |
+| triggers the | deliverable | from → to |
 |---------|------|--------|
-| lead → cie | 需要资产面 | scope + 已知域名/IP |
-| cie → cpe | 有存活面/服务 | assets 列表 + 端口/URL |
-| cpe → cre | 需逆向校验/客户端逻辑 | 样本路径 + 可疑点 |
-| cre → cpe | 还原出协议/密钥/校验 | 算法说明 + 复现命令 |
-| any → doc | 阶段或任务完成 | Evidence/Finding/Path 草稿 |
-| any → lead | 阻塞/越权/换路径 | timeline 备注 + blocked 原因 |
+| lead → cie | requires asset surface | scope + known domain name/IP |
+| cie → cpe | has survival surface/service | assets list + port/URL |
+| cpe → cre | requires reverse verification/client logic | sample path + suspicious point |
+| cre → cpe | restore protocol/key/check | algorithm description + reproduction command |
+| any → doc | Stage or task completed | Evidence/Finding/Path Draft |
+| any → lead | blocking/override/change path | timeline remarks + blocked reason |
 
-## 单人 Agent 怎么用（特色）
+## How to use single-player Agent (features)
 
-不必真起 6 个 Agent：
+It is not necessary to actually start 6 Agents:
 
 ```text
-同一会话内：
-  [lead] 规划
-  [cie] 执行侦察 skill
-  [cpe] 切换 pentest-tools
+Within the same session:
+  [lead] planning
+  [cie] execute the reconnaissance skill
+  [cpe] switch to pentest-tools
   …
-输出时用角色前缀标签，方便 timeline 检索：
+Use role prefix tags when outputting to facilitate timeline retrieval:
   [cpe] nuclei high findings → E-003
 ```
 
-## 与 master-route 关系
+## Relationship with master-route
 
-- `master-route` 定 **PRIMARY skill**  
-- `role-map` 定 **谁在当前阶段负责**（可写在 scope.md）  
-- 多阶段任务 PRIMARY 常为 `attack-chain/`，由 lead 再分发  
+- `master-route` determined **PRIMARY skill**  
+- `role-map` determines **who is responsible for the current stage** (can be written in scope.md)  
+- Multi-stage task PRIMARY is usually `attack-chain/` and is redistributed by lead  
 
 ## MUST NOT
 
-- 不要假设存在 Z3r0 会话 API  
-- 不要为角色启动未授权目标的额外扫描  
+- Don't assume the Z3r0 session API exists  
+- Do not initiate additional scans of unauthorized targets for the role  

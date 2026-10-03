@@ -1,374 +1,374 @@
-# 逆向技能路由矩阵
+# reverse skill routing matrix
 
-按目标类型、用户意图和工具链，将任务路由到最合适的技能模块。此矩阵默认强制执行，不是参考建议。
+ routes tasks to the most appropriate skill module by target type, user intent, and tool chain. This matrix is ​​mandatory by default and is not a recommendation.
 
-## CRITICAL: 路由判定执行协议
+## CRITICAL: Routing decision execution protocol
 
-1. `MUST` 先完成路由再执行，不允许“先做再补路由”。
-2. `SHOULD` 先读 `MASTER-ROUTING.md` 或运行 `scripts/master-route.ps1` 定 PRIMARY；本表用于疑难补全。
-3. `MUST` 输出你的路由依据（目标类型/意图/工具链至少命中一项）。
-4. `MUST` 对目标 ACT 前完成 `case-init` / `scope.md`（`ops/scope-contract.md`）：`auth.status=granted` + `network_profile`。
-5. `MUST NOT` 因为“看起来差不多”把任务塞进不匹配 skill。
-6. `MUST` 在路由未命中时联网补充方法论，并提议新增 skill。
-7. `MUST NOT` 只回复“请给具体任务”；应先基于现有输入启动可确定步骤。
-8. 作战契约：`ops/`（证据链 / 角色 / 时间线 / IDENTITY）。
-## 按目标类型
+1. `MUST` completes the routing first and then executes it. "Do it first and then make up the routing" is not allowed.
+2. `SHOULD` Read `MASTER-ROUTING.md` first or run `scripts/master-route.ps1` to determine PRIMARY; this table is used to complete difficult questions.
+3. `MUST` Outputs your routing basis (target type/intent/toolchain hits at least one).
+4. `MUST` completes `case-init` / `scope.md` (`ops/scope-contract.md`) before ACT on target: `auth.status=granted` + `network_profile`.
+5. `MUST NOT` puts tasks into mismatched skills because they "look similar".
+6. `MUST` supplements the methodology of networking when the route misses, and proposes a new skill.
+7. `MUST NOT` only replies "please give specific tasks"; determinable steps should be started based on existing input first.
+8. combat contract: `ops/` (evidence chain/role/timeline/IDENTITY).
+## by target type
 
-| 目标类型 | 推荐入口 | 备选方案 |
+| Target type | Recommended entrance | Alternative solution |
 |---------|---------|---------|
-| APK / Android 应用 | `mobile-reverse/SKILL.md` — Frida/Objection/MobSF 全平台移动逆向 | `apk-reverse/` — 静态分析、jadx 反编译；可选已许可的 JEB Pro 交叉验证 |
-| iOS / IPA 应用 | `mobile-reverse/SKILL.md` — iOS 逆向 + Frida/Objection | `mobile-reverse/references/ios-reverse-guide.md` — iOS 专项 |
-| 二进制 exe/dll/so/elf | `ida-reverse/` — IDA Pro 反编译 | `radare2/` — CLI 分析，或 `reverse-engineering/tools.md` — GDB/Unicorn |
-| JavaScript / Web 前端 | `js-reverse/` — 5 阶段工作流 | anything-analyzer MCP 的浏览器工具，或 jshookmcp 的浏览器/CDP/Hook 能力 |
-| HTTP 抓包 / 浏览器采样 / 请求重放 | anything-analyzer MCP（23816） | Reqable MCP、`js-reverse/`、jshookmcp 或 `competition-web-runtime/` |
-| 固件 / IoT | `firmware-pentest/` — OWASP FSTM 全链路：提取→仿真→fuzz→利用 | `reverse-engineering/platforms.md` — 仅静态 RE / `reverse-engineering/tools.md` — Ghidra headless |
-| Binary Ninja / Binja | `binary-ninja-reverse/` — HLIL/MLIL/LLIL + Python API | 显式启用社区 MCP/本机 HTTP 适配器 |
-| WASM / Python 字节码 / .NET | `reverse-engineering/languages.md` | 按具体语言查对应章节 |
+| APK / Android App | `mobile-reverse/SKILL.md` — Frida/Objection/MobSF full-platform mobile reverse engineer | `apk-reverse/` — static analysis, jadx decompilation; optional licensed JEB Pro cross-validation |
+| iOS / IPA application | `mobile-reverse/SKILL.md` — iOS reverse + Frida/Objection | `mobile-reverse/references/ios-reverse-guide.md` — iOS specific |
+| binary exe/dll/so/elf | `ida-reverse/` — IDA Pro decompilation | `radare2/` — CLI analysis, or `reverse-engineering/tools.md` — GDB/Unicorn |
+| JavaScript/Web front-end | `js-reverse/` — 5-stage workflow | browser tool for anything-analyzer MCP, or browser/CDP/Hook capabilities for jshookmcp |
+| HTTP packet capture/browser sampling/request replay | anything-analyzer MCP (23816) | Reqable MCP, `js-reverse/`, jshookmcp or `competition-web-runtime/` |
+| Firmware / IoT | `firmware-pentest/` — OWASP FSTM Full Link: Extract → Simulate → Fuzz → Exploit | `reverse-engineering/platforms.md` — Static RE only / `reverse-engineering/tools.md` — Ghidra headless |
+| Binary Ninja / Binja | `binary-ninja-reverse/` — HLIL/MLIL/LLIL + Python API | Explicitly enable community MCP/native HTTP adapter |
+| WASM / Python bytecode / .NET | `reverse-engineering/languages.md` | Check the corresponding chapter by specific language |
 | macOS / iOS | `reverse-engineering/platforms.md` — Mach-O/ObjC/Swift | — |
-| 内存转储 / PCAP | `reverse-engineering/platforms.md` | `reverse-engineering/patterns*.md` |
-| 已有 case / 证据交接审查 | `case-review/SKILL.md`: Evidence 图与 fixity 校验 | `docs-generator/`: 最终报告 |
-| 密码学 / 加解密算法 | `reverse-engineering/patterns*.md` — 密码学模式 | `js-reverse/`（如果是前端加密） |
-| 协议逆向 / 自定义协议 | `reverse-engineering/platforms.md` — 网络协议 | `js-reverse/`（如果是 WebSocket/HTTP） |
-| Go / Rust 二进制 | `reverse-engineering/languages-compiled.md` + `go-reverse.md` | `ida-reverse/` 或 `radare2/` |
-| **CTF 竞赛全栈** | `../CTF-Sandbox-Orchestrator/ctf-sandbox-orchestrator/SKILL.md` — 总控入口 | 按证据面路由到 40+ 子技能 |
-| **CTF ZIP / PKZIP 压缩包题** | `../CTF-Sandbox-Orchestrator/competition-zip-archive/SKILL.md` — legacy ZipCrypto + `bkcrack` 明文攻击 | 优先于密码暴力破解 |
-| Web 运行时 / API | `../CTF-Sandbox-Orchestrator/competition-web-runtime/SKILL.md` | — |
-| 云 / 容器 / K8s | `../CTF-Sandbox-Orchestrator/competition-agent-cloud/SKILL.md` | — |
-| Windows / AD / 身份 | `../CTF-Sandbox-Orchestrator/competition-identity-windows/SKILL.md` | — |
-| 取证 / PCAP / 隐写 | `../CTF-Sandbox-Orchestrator/competition-forensic-timeline/SKILL.md` | — |
-| Prompt 注入 / Agent | `../CTF-Sandbox-Orchestrator/competition-prompt-injection/SKILL.md` | — |
-| 移动端 (Android/iOS) | `../CTF-Sandbox-Orchestrator/competition-android-hooking/SKILL.md` | — |
-| 固件 / 恶意样本 | `../CTF-Sandbox-Orchestrator/competition-firmware-layout/SKILL.md` | — |
-| **LLM 应用 / AI Agent** | `llm-security/SKILL.md` — OWASP LLM + ASI Top 10 | `../CTF-Sandbox-Orchestrator/competition-prompt-injection/SKILL.md` — CTF 场景 |
-| **REST / GraphQL / WebSocket API** | `api-security/SKILL.md` — 10 阶段方法论 | `pentest-tools/SKILL.md` — 基础 Web 渗透 |
-| **软件供应链 / SBOM / SCA** | `supply-chain-security/SKILL.md` — 六层治理框架 | `pentest-tools/SKILL.md` — 依赖扫描工具 |
-| **恶意软件 / 病毒样本** | `malware-analysis/SKILL.md` — 六阶段分析 + YARA/Sigma | `reverse-engineering/SKILL.md` — 仅通用逆向 / `ida-reverse/` 深度分析 |
-| **公开来源威胁情报 / OSINT** | `threat-intelligence/SKILL.md` — IOC 补充与活动关联 | 公开 X/Twitter 帖子必须由独立来源核验 |
+| Memory Dump / PCAP | `reverse-engineering/platforms.md` | `reverse-engineering/patterns*.md` |
+| has case/evidence handover review | `case-review/SKILL.md`: Evidence diagram and fixity verification | `docs-generator/`: Final report |
+| cryptography/encryption and decryption algorithm | `reverse-engineering/patterns*.md` — cryptography mode | `js-reverse/` (if front-end encryption) |
+| protocol reverse / custom protocol | `reverse-engineering/platforms.md` — network protocol | `js-reverse/` (if WebSocket/HTTP) |
+| Go / Rust binary | `reverse-engineering/languages-compiled.md` + `go-reverse.md` | `ida-reverse/` or `radare2/` |
+|**CTF competition full stack**| `../CTF-Sandbox-Orchestrator/ctf-sandbox-orchestrator/SKILL.md` — master control entrance | routes to 40+ sub-skills by evidence surface |
+|**CTF ZIP / PKZIP compression package question**| `../CTF-Sandbox-Orchestrator/competition-zip-archive/SKILL.md` — legacy ZipCrypto + `bkcrack` plaintext attack | takes precedence over password brute force cracking |
+| Web Runtime / API | `../CTF-Sandbox-Orchestrator/competition-web-runtime/SKILL.md` | — |
+| Cloud / Container / K8s | `../CTF-Sandbox-Orchestrator/competition-agent-cloud/SKILL.md` | — |
+| Windows / AD / Identity | `../CTF-Sandbox-Orchestrator/competition-identity-windows/SKILL.md` | — |
+| Forensics / PCAP / Steganography | `../CTF-Sandbox-Orchestrator/competition-forensic-timeline/SKILL.md` | — |
+| Prompt Injection / Agent | `../CTF-Sandbox-Orchestrator/competition-prompt-injection/SKILL.md` | — |
+| Mobile (Android/iOS) | `../CTF-Sandbox-Orchestrator/competition-android-hooking/SKILL.md` | — |
+| Firmware / Malicious Sample | `../CTF-Sandbox-Orchestrator/competition-firmware-layout/SKILL.md` | — |
+|**LLM Application / AI Agent**| `llm-security/SKILL.md` — OWASP LLM + ASI Top 10 | `../CTF-Sandbox-Orchestrator/competition-prompt-injection/SKILL.md` — CTF Scenario |
+|**REST / GraphQL / WebSocket API**| `api-security/SKILL.md` — 10-stage methodology | `pentest-tools/SKILL.md` — Basic Web Penetration |
+|**Software supply chain / SBOM / SCA**| `supply-chain-security/SKILL.md` — Six-layer governance framework | `pentest-tools/SKILL.md` — Dependency scanning tool |
+|**Malware/virus samples**| `malware-analysis/SKILL.md` — Six-stage analysis + YARA/Sigma | `reverse-engineering/SKILL.md` — Generic reverse engineering only / `ida-reverse/` In-depth analysis |
+|**Open Source Threat Intelligence / OSINT**| `threat-intelligence/SKILL.md` — IOC Supplement associated with activity | Public X/Twitter posts must be verified by independent sources |
 
-## 按用户意图
+## according to user intention
 
-| 用户说 | 可以参考 |
+| users said | can refer to |
 |--------|---------|
-| "反编译/IDA 看一下" | `ida-reverse/SKILL.md` — IDA MCP 工作流 |
-| "还原源码/还原为汇编/逆向还原" | `reverse-engineering/SKILL.md` — 通用逆向 + `ida-reverse/` 或 capstone 静态反汇编 |
-| "Frida hook 一下/动态注入" | `reverse-engineering/tools-dynamic.md` — Frida 章节 |
-| "radare2 / r2 分析" | `radare2/SKILL.md` — CLI 工作流 |
-| "找前端签名/加密参数" | `js-reverse/SKILL.md` — Observe→Capture→Rebuild |
-| "jshookmcp / JS hook / CDP 调试" | `js-reverse/SKILL.md` — 仍走同一条 JS/Web 逆向链路；调用前先确认该 MCP server 已下载、已注册到客户端、已启用 |
-| "Reqable / Reqable MCP / 抓包重放" | `pentest-tools/SKILL.md` — 授权范围内的本地抓包与 API 工作流 |
-| "JEB / JEB Pro" | `apk-reverse/SKILL.md` — 已许可的 Android / ARM 交叉验证；先确认本机安装 |
-| "APK 解包/重打包/改 smali" | `apk-reverse/SKILL.md` — decode→rebuild-sign-install |
-| "过反调试/反检测" | `reverse-engineering/anti-analysis.md` |
-| "这是什么混淆/VM" | `reverse-engineering/patterns*.md` — 按模式查 |
-| "Go/Rust/Swift 逆向" | `reverse-engineering/languages-compiled.md` + `reverse-engineering/go-reverse.md`（Go 专项） |
-| "内核驱动/Rootkit/LKM" | `reverse-engineering/kernel-driver-reverse.md` — 内核驱动逆向 |
-| "C++ vtable/虚函数/类恢复" | `reverse-engineering/kernel-driver-reverse.md` — C/C++ 模式识别 |
-| "IOCTL/DeviceIoControl" | `reverse-engineering/kernel-driver-reverse.md` — Windows 驱动分析 |
-| "Python 字节码/pyc" | `reverse-engineering/languages.md` — Python 章节 |
-| "符号执行/angr" | `reverse-engineering/tools-dynamic.md` — angr 章节 |
-| "模拟执行/Unicorn" | `reverse-engineering/tools.md` — Unicorn 章节 |
-| "补环境/Node 复现" | `js-reverse/references/env-patching.md` |
-| "CTF 题/竞赛逆向" | `reverse-engineering/patterns-ctf*.md` |
-| "CTF ZIP/PKZIP/bkcrack/压缩包明文攻击" | `../CTF-Sandbox-Orchestrator/competition-zip-archive/SKILL.md` |
-| "写报告/写文档/出报告" | `docs-generator/` — 技术文档编写 |
-| "审查 case / 证据链 / 可追溯性" | `case-review/SKILL.md`: 只读 Evidence 图审查 |
-| "写 writeup" | `docs-generator/` — CTF writeup 模板 |
-| "打开网页/浏览器自动化/填表" | `browser-automation/SKILL.md` — Playwright 浏览器操作 |
-| "爬取页面/截图/自动化登录" | `browser-automation/SKILL.md` — 浏览器自动化 |
-| "Playwright / headless" | `browser-automation/SKILL.md` — 浏览器自动化 |
-| "操作桌面应用/Windows 自动化" | `browser-automation/SKILL.md` — OpenReverse 桌面自动化 |
-| "UIA/CUA/桌面 GUI 操作" | `browser-automation/SKILL.md` — OpenReverse（UIA/CUA 模式） |
-| "OpenReverse" | `browser-automation/SKILL.md` — 桌面交互 + 网络观察 |
-| "符号迁移/跨版本对比" | `binary-diff/SKILL.md` — LLM 批量符号迁移 |
-| "缺 PDB/旧版符号推导新版" | `binary-diff/SKILL.md` — 跨版本符号迁移 |
-| "bindiff/函数偏移迁移" | `binary-diff/SKILL.md` — 二进制差分 |
-| "N-day/补丁差分/CVE 还原/1day 武器化" | `patch-diff-exploit/SKILL.md` — 补丁→PoC→打补丁前主机 |
+| "Decompile/IDA take a look" | `ida-reverse/SKILL.md` — IDA MCP workflow |
+| "Restore source code/Restore to assembly/Reverse restore" | `reverse-engineering/SKILL.md` — Universal reverse + `ida-reverse/` or capstone static disassembly |
+| "Frida hook/dynamic injection" | `reverse-engineering/tools-dynamic.md` — Frida chapter |
+| "radare2/r2 analysis" | `radare2/SKILL.md` — CLI workflow |
+| "Find front-end signature/encryption parameters" | `js-reverse/SKILL.md` — Observe→Capture→Rebuild |
+| "jshookmcp / JS hook / CDP debugging" | `js-reverse/SKILL.md` — Still taking the same JS/Web reverse link; before calling, confirm that the MCP server has been downloaded, registered to the client, and enabled |
+| "Reqable / Reqable MCP / Packet Capture Replay" | `pentest-tools/SKILL.md` — Local packet capture and API workflow within the authorization scope |
+| "JEB / JEB Pro" | `apk-reverse/SKILL.md` — Permitted Android / ARM cross-validation; first confirm native installation |
+| "APK unpack/repackage/modify smali" | `apk-reverse/SKILL.md` — decode→rebuild-sign-install |
+| "Over anti-debugging/anti-detection" | `reverse-engineering/anti-analysis.md` |
+| "What kind of confusion/VM is this" | `reverse-engineering/patterns*.md` — Check by mode |
+| "Go/Rust/Swift reverse" | `reverse-engineering/languages-compiled.md` + `reverse-engineering/go-reverse.md` (Go specialization) |
+| "Kernel driver/Rootkit/LKM" | `reverse-engineering/kernel-driver-reverse.md` — Kernel driver reverse engineering |
+| "C++ vtable/virtual function/class recovery" | `reverse-engineering/kernel-driver-reverse.md` — C/C++ pattern recognition |
+| "IOCTL/DeviceIoControl" | `reverse-engineering/kernel-driver-reverse.md` — Windows driver analysis |
+| "Python bytecode/pyc" | `reverse-engineering/languages.md` — Python chapter |
+| "Symbolic execution/angr" | `reverse-engineering/tools-dynamic.md` — angr chapter |
+| "Simulation Execution/Unicorn" | `reverse-engineering/tools.md` — Unicorn Chapter |
+| "Complement environment/Node recurrence" | `js-reverse/references/env-patching.md` |
+| "CTF question/competition reverse" | `reverse-engineering/patterns-ctf*.md` |
+| "CTF ZIP/PKZIP/bkcrack/compressed package plain text attack" | `../CTF-Sandbox-Orchestrator/competition-zip-archive/SKILL.md` |
+| "Write reports/write documents/issue reports" | `docs-generator/` — Technical document writing |
+| "Review case/Evidence chain/Traceability" | `case-review/SKILL.md`: Read-only Evidence graph review |
+| "writeup" | `docs-generator/` — CTF writeup template |
+| "Open web page/browser automation/fill form" | `browser-automation/SKILL.md` — Playwright browser operation |
+| "Crawling pages/screenshots/automated login" | `browser-automation/SKILL.md` — Browser automation |
+| "Playwright / headless" | `browser-automation/SKILL.md` — Browser Automation |
+| "Operation Desktop Application/Windows Automation" | `browser-automation/SKILL.md` — OpenReverse Desktop Automation |
+| "UIA/CUA/Desktop GUI operation" | `browser-automation/SKILL.md` — OpenReverse (UIA/CUA mode) |
+| "OpenReverse" | `browser-automation/SKILL.md` — Desktop interaction + network observation |
+| "Symbol migration/cross-version comparison" | `binary-diff/SKILL.md` — LLM batch symbol migration |
+| "Missing PDB/old version symbol derivation new version" | `binary-diff/SKILL.md` — Cross-version symbol migration |
+| "bindiff/function offset migration" | `binary-diff/SKILL.md` — Binary difference |
+| "N-day/Patch differential/CVE recovery/1day weaponization" | `patch-diff-exploit/SKILL.md` — Patch→PoC→Pre-patch host |
 | "Patch Tuesday/MSRC/Microsoft Update Catalog" | `patch-diff-exploit/references/patch-tuesday-workflow.md` |
-| "ghidriff/Diaphora/DeepDiff（攻击侧）" | `patch-diff-exploit/references/diff-tools-comparison.md` |
-| "pwn/栈溢出/ROP/ret2libc/写 exploit" | `pwn-chain/SKILL.md` — RE→exploit 完整流水线 |
-| "堆利用/tcache/fastbin/unsorted bin" | `pwn-chain/references/heap-pwn.md` |
-| "kernel pwn/内核提权/modprobe_path/commit_creds" | `pwn-chain/references/kernel-pwn.md` |
+| "ghidriff/Diaphora/DeepDiff (attack side)" | `patch-diff-exploit/references/diff-tools-comparison.md` |
+| "pwn/stack overflow/ROP/ret2libc/write exploit" | `pwn-chain/SKILL.md` — RE→exploit complete pipeline |
+| "Heap utilization/tcache/fastbin/unsorted bin" | `pwn-chain/references/heap-pwn.md` |
+| "kernel pwn/kernel privilege escalation/modprobe_path/commit_creds" | `pwn-chain/references/kernel-pwn.md` |
 | "pwntools/GEF/pwndbg/one_gadget/libc-database" | `pwn-chain/SKILL.md` |
-| "固件渗透/路由器固件/IoT 漏洞利用" | `firmware-pentest/SKILL.md` — 从提取打到实机 |
+| "Firmware Penetration/Router Firmware/IoT Vulnerability Exploitation" | `firmware-pentest/SKILL.md` — From extraction to real machine |
 | "binwalk/unblob/SquashFS/UBI/JFFS2" | `firmware-pentest/references/extraction-methodology.md` |
-| "EMBA/自动化固件审计/cve-bin-tool" | `firmware-pentest/references/emba-automated-analysis.md` |
-| "Firmadyne/FAT/QEMU 全系统仿真/AFL++ fuzz" | `firmware-pentest/references/emulation-and-fuzz.md` |
-| "EDR 绕过/AV bypass/免杀/红队投递" | `edr-bypass-re/SKILL.md` — 逆向防御方→针对性绕过 |
+| "EMBA/automated firmware audit/cve-bin-tool" | `firmware-pentest/references/emba-automated-analysis.md` |
+| "Firmadyne/FAT/QEMU full system simulation/AFL++ fuzz" | `firmware-pentest/references/emulation-and-fuzz.md` |
+| "EDR bypass/AV bypass/anti-kill/red team delivery" | `edr-bypass-re/SKILL.md` — reverse defender → targeted bypass |
 | "direct syscall/indirect syscall/Hell's Gate/SysWhispers" | `edr-bypass-re/references/unhook-techniques.md` |
 | "ETW patch/AMSI patch/telemetry blinding" | `edr-bypass-re/references/telemetry-blinding.md` |
-| "ntdll hook/pe-sieve/EDR hook 表" | `edr-bypass-re/references/hook-survey.md` |
-| "端口扫描/Nmap" | `pentest-tools/SKILL.md` — 信息收集 |
-| "漏洞扫描/Nuclei" | `pentest-tools/SKILL.md` — 漏洞检测 |
-| "SQL 注入/SQLMap" | `pentest-tools/SKILL.md` — Web 渗透 |
-| "目录爆破/FFUF/Gobuster" | `pentest-tools/SKILL.md` — Web 渗透 |
-| "密码破解/Hashcat" | `pentest-tools/SKILL.md` — 密码破解 |
-| "渗透测试/主动扫描" | `pentest-tools/SKILL.md` — 渗透工具链 |
-| "SRC 挖洞/Bug Bounty/众测" | `pentest-tools/src-hunter/SKILL.md` — 19 类 playbook + H1 案例 |
-| "WAF 绕过/bypass" | `pentest-tools/src-hunter/references/payloader/` — 263 绕过步骤 |
-| "画图/流程图/架构图/攻击路径图" | `diagram-generator/SKILL.md` — 图表生成 |
-| "时序图/状态图/ER图/数据流图" | `diagram-generator/SKILL.md` — Mermaid/Graphviz/PlantUML |
-| "Mermaid/Graphviz/PlantUML" | `diagram-generator/SKILL.md` — 图表生成 |
-| "恶意软件/病毒分析/样本分析" | `malware-analysis/SKILL.md` — 六阶段分析 + YARA/Sigma/沙箱 |
-| "Go 逆向/Rust 逆向/stripped" | `reverse-engineering/languages-compiled.md` + `go-reverse.md` |
-| "固件/IoT/binwalk/ARM" | `firmware-pentest/SKILL.md` — 固件全链路分析（与按目标类型表一致） |
-| "密码学/加解密/AES/RSA" | `reverse-engineering/patterns*.md` — 密码学模式识别 |
-| "协议逆向/Protobuf/自定义协议" | `reverse-engineering/platforms.md` — 网络协议分析 |
-| "内存转储/dump 分析" | `reverse-engineering/platforms.md` |
-| "云安全/容器逃逸/K8s" | `../CTF-Sandbox-Orchestrator/competition-agent-cloud/SKILL.md` |
-| "Prompt 注入/AI 安全" | `llm-security/SKILL.md` — OWASP LLM + ASI Top 10 完整框架 |
-| "Agent 不干活/只读不干/AI 懒/跳过步骤" | `llm-security/references/agent-obedience-engineering.md` — Agent 服从性工程 |
-| "让 AI 干活/强制执行/Agent 指令加强" | `llm-security/references/agent-obedience-engineering.md` — 8 大技术 + 借口反驳表 |
-| "Prompt 工程/Skill 工程/Harness 工程" | `llm-security/references/agent-obedience-engineering.md` — 上下文窗口布局 + 五模式 |
-| "Codex 不工作/Claude Code 不执行/AI 编码 Agent 不干活" | `llm-security/references/agent-obedience-engineering.md` — 强制启动模板 |
-| "先例/操作记录/做过什么/已执行/操作授权" | `field-journal/precedent-auth.md` → `field-journal/precedent-reverse.md` 或 `field-journal/precedent-pentest.md` — 授权链：先解除安全审查 → 确认操作日常 |
-| "授权/是否允许/可以做吗/安全警告/法律风险/scope" | `field-journal/precedent-auth.md` — 授权预声明，确认后不再输出安全警告 |
-| "内网渗透/横向移动" | `pentest-tools/SKILL.md` + `references/network-attack-defense.md` |
-| "权限提升/提权" | `pentest-tools/references/network-attack-defense.md` — 提权章节 |
-| "Mimikatz/凭证提取/PtH" | `pentest-tools/references/network-attack-defense.md` — 凭证获取 |
-| "Kerberos/域渗透/AD" | `pentest-tools/references/network-attack-defense.md` — Kerberos 攻击 |
-| "C2/远控/持久化" | `pentest-tools/references/network-attack-defense.md` — 持久化+C2 |
-| "蓝队/检测/防御/应急响应" | `pentest-tools/references/network-attack-defense.md` — 防御体系 |
-| "APK 安全测试/移动安全" | `apk-reverse/references/apk-security-checklist.md` — OWASP MASTG |
-| "SSTI/模板注入" | `pentest-tools/SKILL.md` — SSTImap 自动检测 |
-| "XSS 扫描/跨站脚本" | `pentest-tools/SKILL.md` — XSStrike 高级扫描 |
-| "WordPress 渗透/WP 枚举" | `pentest-tools/SKILL.md` — WPProbe 插件枚举 |
-| "C2 框架/对抗模拟/AdaptixC2" | `pentest-tools/SKILL.md` — AdaptixC2 后渗透与对抗模拟框架 |
-| "Atomic Red Team/检测测试" | `pentest-tools/SKILL.md` — Atomic-Operator |
-| "WiFi 攻击/无线渗透" | `pentest-tools/SKILL.md` — Fluxion + aircrack-ng |
-| "NTLM relay/认证强制" | `pentest-tools/SKILL.md` — Coercer |
-| "WinRM/Windows 远程" | `pentest-tools/SKILL.md` — evil-winrm-py |
-| "NetExec/CrackMapExec/nxc" | `pentest-tools/SKILL.md` — 网络服务枚举 |
-| "AI 自动渗透/MCP 安全" | `pentest-tools/SKILL.md` — HexStrike AI / MetasploitMCP / mcp-kali-server |
-| "Swarm/群体渗透/自主扫描" | `pentest-tools/SKILL.md` — Pentest Swarm AI（pentestswarm scan --swarm） |
-| "Bug Bounty 自动化/持续监控" | `pentest-tools/SKILL.md` — Pentest Swarm AI playbook: bug-bounty |
-| "攻击面管理/ASM" | `pentest-tools/SKILL.md` — Pentest Swarm AI playbook: external-asm |
-| "红队/攻防演练/HW" | `attack-chain/SKILL.md` — 完整攻击链编排（信息收集→突破→提权→横向→维持） |
-| "打点/初始突破/边界突破" | `attack-chain/SKILL.md` — 边界突破阶段 |
-| "近源渗透/BadUSB/WiFi钓鱼" | `attack-chain/SKILL.md` — 近源渗透章节 |
-| "投递免杀/实战绕过EDR/Shellcode加载器" | `attack-chain/SKILL.md` — 攻击链中的 EDR/AV 绕过（实战投递阶段） |
-| "钓鱼/社工/邮件钓鱼" | `attack-chain/SKILL.md` — 钓鱼攻击章节 |
-| "供应链攻击" | `attack-chain/SKILL.md` — 供应链攻击章节 |
-| "痕迹清理/反取证" | `attack-chain/SKILL.md` — 痕迹清理章节 |
-| "完整渗透测试/全流程" | `attack-chain/SKILL.md` — 全链路规划 |
-| "从外网打到域控/内网" | `attack-chain/SKILL.md` — 跨阶段路径编排 |
-| "攻击面评估/攻击路径规划" | `attack-chain/SKILL.md` — 路径规划决策树 |
-| "拿到 shell 下一步/后渗透" | `attack-chain/SKILL.md` — 从当前据点规划后续 |
-| "内网渗透全流程" | `attack-chain/SKILL.md` — 横向移动 + 提权 + 域攻击 |
-| "msfconsole 卡死/孤儿进程/MSF 调用规范" | `pentest-tools/references/msf-protocol.md` — MSF 三种正确模式 + 6 大错误 |
-| "脱敏/占位符/分享 payload/写 writeup 前脱敏" | `field-journal/anonymization.md` — 脱敏占位符规范 |
-| "Hydra/在线爆破/SSH 爆破" | `pentest-tools/SKILL.md` — 在线密码爆破 |
-| "Nikto/Web 服务器扫描" | `pentest-tools/SKILL.md` — Web 漏洞扫描 |
-| "Metasploit/msfconsole/exploit" | `pentest-tools/SKILL.md` — 利用框架 |
-| "Wireshark/抓包分析/PCAP" | `digital-forensics/` 或 `protocol-reverse/` |
-| "协议逆向/Protobuf/自定义协议" | `protocol-reverse/SKILL.md` |
-| "Ghidra/无 IDA" | `ghidra-reverse/SKILL.md` |
+| "ntdll hook/pe-sieve/EDR hook table" | `edr-bypass-re/references/hook-survey.md` |
+| "Port Scan/Nmap" | `pentest-tools/SKILL.md` — Information Collection |
+| "Vulnerability Scan/Nuclei" | `pentest-tools/SKILL.md` — Vulnerability Detection |
+| "SQL Injection/SQLMap" | `pentest-tools/SKILL.md` — Web Penetration |
+| "Directory Explosion/FFUF/Gobuster" | `pentest-tools/SKILL.md` — Web Penetration |
+| "Password Cracking/Hashcat" | `pentest-tools/SKILL.md` — Password Cracking |
+| "Penetration Testing/Active Scanning" | `pentest-tools/SKILL.md` — Penetration Toolchain |
+| "SRC Burrowing/Bug Bounty/Public Test" | `pentest-tools/src-hunter/SKILL.md` — 19 categories playbook + H1 case |
+| "WAF bypass/bypass" | `pentest-tools/src-hunter/references/payloader/` — 263 Bypass steps |
+| "Drawing/flow chart/architecture diagram/attack path diagram" | `diagram-generator/SKILL.md` — Chart generation |
+| "Sequence diagram/state diagram/ER diagram/data flow diagram" | `diagram-generator/SKILL.md` — Mermaid/Graphviz/PlantUML |
+| "Mermaid/Graphviz/PlantUML" | `diagram-generator/SKILL.md` — Chart generation |
+| "Malware/Virus Analysis/Sample Analysis" | `malware-analysis/SKILL.md` — Six-stage analysis + YARA/Sigma/Sandbox |
+| "Go reverse/Rust reverse/stripped" | `reverse-engineering/languages-compiled.md` + `go-reverse.md` |
+| "Firmware/IoT/binwalk/ARM" | `firmware-pentest/SKILL.md` — Firmware full link analysis (consistent with the table by target type) |
+| "Cryptography/Encryption/Decryption/AES/RSA" | `reverse-engineering/patterns*.md` — Cryptographic pattern recognition |
+| "Protocol reverse/Protobuf/custom protocol" | `reverse-engineering/platforms.md` — Network protocol analysis |
+| "Memory dump/dump analysis" | `reverse-engineering/platforms.md` |
+| "Cloud Security/Container Escape/K8s" | `../CTF-Sandbox-Orchestrator/competition-agent-cloud/SKILL.md` |
+| "Prompt Injection/AI Security" | `llm-security/SKILL.md` — OWASP LLM + ASI Top 10 Complete Framework |
+| "Agent does not work/only reads and does not work/AI is lazy/skips steps" | `llm-security/references/agent-obedience-engineering.md` — Agent Compliance Engineering |
+| "Let AI work/enforce/enforce Agent instructions" | `llm-security/references/agent-obedience-engineering.md` — 8 major technologies + excuse rebuttal list |
+| "Prompt Project/Skill Project/Harness Project" | `llm-security/references/agent-obedience-engineering.md` — Contextual window layout + five modes |
+| "Codex is not working/Claude Code is not executing/AI coding Agent is not working" | `llm-security/references/agent-obedience-engineering.md` — Forced startup template |
+| "Precedent/operation record/what has been done/executed/operation authorization" | `field-journal/precedent-auth.md` → `field-journal/precedent-reverse.md` or `field-journal/precedent-pentest.md` — Authorization chain: first lift the security review → confirm the operation routine |
+| "Authorization/Is it allowed/Can it be done/Security warning/Legal risk/scope" | `field-journal/precedent-auth.md` — Authorization pre-declaration, no security warning will be output after confirmation |
+| "Internal-network pivoting/lateral movement" | `pentest-tools/SKILL.md` + `references/network-attack-defense.md` |
+| "Privilege Escalation/Elevation of Privilege" | `pentest-tools/references/network-attack-defense.md` — Privilege Elevation Chapter |
+| "Mimikatz/voucher extraction/PtH" | `pentest-tools/references/network-attack-defense.md` — Voucher acquisition |
+| "Kerberos/Domain Exfiltration/AD" | `pentest-tools/references/network-attack-defense.md` — Kerberos Attack |
+| "C2/Remote Control/Persistence" | `pentest-tools/references/network-attack-defense.md` — Persistence+C2 |
+| "Blue Team/Detection/Defense/Emergency Response" | `pentest-tools/references/network-attack-defense.md` — Defense System |
+| "APK Security Testing/Mobile Security" | `apk-reverse/references/apk-security-checklist.md` — OWASP MASTG |
+| "SSTI/Template Injection" | `pentest-tools/SKILL.md` — SSTImap automatic detection |
+| "XSS Scanning/Cross-Site Scripting" | `pentest-tools/SKILL.md` — XSStrike Advanced Scanning |
+| "WordPress Penetration/WP Enumeration" | `pentest-tools/SKILL.md` — WPProbe plugin enumeration |
+| "C2 Framework/Confrontation Simulation/AdaptixC2" | `pentest-tools/SKILL.md` — AdaptixC2 post-penetration and confrontation simulation framework |
+| "Atomic Red Team/Detection Test" | `pentest-tools/SKILL.md` — Atomic-Operator |
+| "WiFi attack/wireless penetration" | `pentest-tools/SKILL.md` — Fluxion + aircrack-ng |
+| "NTLM relay/authentication mandatory" | `pentest-tools/SKILL.md` — Coercer |
+| "WinRM/Windows Remote" | `pentest-tools/SKILL.md` — evil-winrm-py |
+| "NetExec/CrackMapExec/nxc" | `pentest-tools/SKILL.md` — Network service enumeration |
+| "AI automatic penetration/MCP security" | `pentest-tools/SKILL.md` — HexStrike AI / MetasploitMCP / mcp-kali-server |
+| "Swarm/Swarm Penetration/Autonomous Scan" | `pentest-tools/SKILL.md` — Pentest Swarm AI (pentestswarm scan --swarm) |
+| "Bug Bounty Automation/Continuous Monitoring" | `pentest-tools/SKILL.md` — Pentest Swarm AI playbook: bug-bounty |
+| "Attack Surface Management/ASM" | `pentest-tools/SKILL.md` — Pentest Swarm AI playbook: external-asm |
+| "Red Team/Offensive and Defense Exercise/HW" | `attack-chain/SKILL.md` — Complete attack chain orchestration (information collection → breakthrough → privilege escalation → horizontal → maintenance) |
+| "RBI/Initial Breakthrough/Border Breakthrough" | `attack-chain/SKILL.md` — Boundary Breakthrough Phase |
+| "Near-source penetration/BadUSB/WiFi fishing" | `attack-chain/SKILL.md` — Near-source penetration chapter |
+| "Delivery evasion/actual bypass EDR/Shellcode loader" | `attack-chain/SKILL.md` — EDR/AV bypass in the attack chain (actual delivery stage) |
+| "Phishing/Social Engineering/Email Phishing" | `attack-chain/SKILL.md` — Phishing Attack Chapter |
+| "Supply Chain Attack" | `attack-chain/SKILL.md` — Supply Chain Attack Chapter |
+| "Trace Cleanup/Anti-Forensics" | `attack-chain/SKILL.md` — Trace Cleanup Chapter |
+| "Complete Penetration Test/Full Process" | `attack-chain/SKILL.md` — Full Link Planning |
+| "From the external network to the domain control/intranet" | `attack-chain/SKILL.md` — Cross-stage path orchestration |
+| "Attack surface assessment/attack path planning" | `attack-chain/SKILL.md` — Path planning decision tree |
+| "Get shell for next step/post-infiltration" | `attack-chain/SKILL.md` — Plan follow-up from current base |
+| "The whole process of Internal-network pivoting" | `attack-chain/SKILL.md` — Lateral movement + privilege escalation + domain attack |
+| "msfconsole stuck/orphan process/MSF calling specification" | `pentest-tools/references/msf-protocol.md` — MSF three correct modes + 6 big mistakes |
+| "redaction/placeholder/share payload/redaction before writing writeup" | `field-journal/anonymization.md` — redaction placeholder specification |
+| "Hydra/Online Explosion/SSH Explosion" | `pentest-tools/SKILL.md` — Online Password Explosion |
+| "Nikto/Web Server Scan" | `pentest-tools/SKILL.md` — Web Vulnerability Scan |
+| "Metasploit/msfconsole/exploit" | `pentest-tools/SKILL.md` — Exploitation framework |
+| "Wireshark/packet capture analysis/PCAP" | `digital-forensics/` or `protocol-reverse/` |
+| "Protocol reverse/Protobuf/custom protocol" | `protocol-reverse/SKILL.md` |
+| "Ghidra/No IDA" | `ghidra-reverse/SKILL.md` |
 | "Binary Ninja/Binja/HLIL/MLIL/Binary Ninja MCP" | `binary-ninja-reverse/SKILL.md` |
-| "K8s/容器逃逸/云安全" | `cloud-k8s/SKILL.md` |
-| "域渗透/BloodHound/Certipy/Kerberoast" | `windows-ad/SKILL.md` |
-| "取证/Volatility/内存转储" | `digital-forensics/SKILL.md` |
-| "代码审计/SAST/Semgrep" | `code-audit/SKILL.md` |
-| "开源情报/威胁情报/公开 X IOC 补充" | `threat-intelligence/SKILL.md` — 公开帖子仅作为待核验线索 |
-| "威胁狩猎/蓝队/检测工程" | `threat-hunting/SKILL.md` |
-| "游戏逆向/IL2CPP/Unity" | `reverse-engineering/SKILL.md` + seed-014 |
-| "WiFi/无线渗透/aircrack" | `wifi-wireless/SKILL.md` |
-| "浏览器扩展/Chrome 扩展/crx" | `browser-extension-reverse/SKILL.md` |
-| "工控/OT/ICS/SCADA/PLC" | `ot-ics/SKILL.md` |
-| "macOS逆向/Mach-O" | `macos-reverse/SKILL.md` |
-| "厚客户端/桌面客户端" | `thick-client/SKILL.md` |
-| "Go逆向/Rust逆向" | `go-rust-reverse/SKILL.md` |
-| "UART/JTAG/硬件调试" | `hardware-security/SKILL.md` |
-| "数据库安全/Redis/Mongo" | `database-security/SKILL.md` |
-| "钓鱼邮件/SPF/DKIM/DMARC" | `email-security/SKILL.md` |
-| "SAML/OIDC/SSO联邦" | `identity-federation/SKILL.md` |
-| "SDR/射频/HackRF" | `radio-sdr/SKILL.md` |
-| "BurpSuite/Web 代理/拦截" | `pentest-tools/SKILL.md` — Web 代理 |
-| "Responder/LLMNR 投毒/NBT-NS" | `pentest-tools/SKILL.md` — 内网投毒 |
-| "BloodHound/AD 路径/攻击图" | `pentest-tools/SKILL.md` — AD 攻击路径可视化 |
-| "Certipy/AD CS/证书攻击" | `pentest-tools/SKILL.md` — AD 证书服务攻击 |
-| "wfuzz/参数模糊/Web Fuzz" | `pentest-tools/SKILL.md` — Web 模糊测试 |
-| "GDB/GEF/调试/断点" | `reverse-engineering/tools.md` — 动态调试 |
-| "objdump/反汇编/ELF 分析" | `reverse-engineering/SKILL.md` — 静态分析 |
-| "strings/字符串提取" | `reverse-engineering/SKILL.md` — 快速侦察 |
-| "ProxyCat/代理池/IP 轮换" | `pentest-tools/SKILL.md` — 代理管理 |
-| "LLM 安全/AI 安全测试/Prompt 注入测试" | `llm-security/SKILL.md` — OWASP LLM + ASI Top 10 完整框架 |
-| "LLM 越狱/jailbreak/系统提示词提取" | `llm-security/references/prompt-injection-methodology.md` — 五级递进注入 |
-| "Agent 安全/工具滥用/记忆投毒/目标劫持" | `llm-security/references/agent-security-testing.md` — 七阶段 Agent 测试 |
-| "garak/PyRIT/AI 红队" | `llm-security/SKILL.md` — LLM 安全工具链 |
-| "API 安全测试/接口渗透" | `api-security/SKILL.md` — 10 阶段 API 测试方法论 |
-| "GraphQL 安全/内省攻击/批查询绕过" | `api-security/references/rest-graphql-testing.md` — GraphQL 专项 |
-| "JWT 攻击/OAuth 绕过/alg:none" | `api-security/references/jwt-oauth-testing.md` — JWT + OAuth 测试 |
-| "BOLA/IDOR/BFLA/对象级授权绕过" | `api-security/SKILL.md` — Phase 3 授权测试 |
-| "供应链安全/SBOM/SCA/依赖扫描" | `supply-chain-security/SKILL.md` — 六层供应链治理 |
-| "CI/CD 安全/管道审计/构建完整性" | `supply-chain-security/references/cicd-pipeline-security.md` — 管道安全 |
-| "容器安全/镜像扫描/Trivy/Cosign" | `supply-chain-security/SKILL.md` — 容器安全章节 |
-| "gitleaks/密钥扫描/凭证泄漏" | `supply-chain-security/SKILL.md` — CI/CD 管道安全 |
-| "iOS 逆向/IPA/Objective-C/Swift/Mach-O" | `mobile-reverse/SKILL.md` — iOS 逆向 + Frida/Objection |
-| "Frida/Objection/动态插桩/SSL Unpinning" | `mobile-reverse/references/frida-objection-deep.md` — Frida 深度用法 |
-| "Root 检测绕过/越狱检测绕过/反调试移动端" | `mobile-reverse/references/anti-detection-bypass.md` — 多层绕过 |
-| "移动安全测试/MSTG/OWASP Mobile" | `mobile-reverse/SKILL.md` — OWASP MASTG 方法论 |
-| "YARA 规则/Sigma 规则/行为检测规则" | `malware-analysis/references/yara-sigma-rules.md` — 规则编写方法论 |
-| "沙箱分析/CAPE/Joe Sandbox/恶意软件沙箱" | `malware-analysis/references/sandbox-orchestration.md` — 沙箱编排 |
-| "反分析/反沙箱/反调试/虚拟机检测" | `malware-analysis/references/anti-analysis-techniques.md` — 94 种技术 |
-| "IOC 提取/威胁情报/恶意软件分析" | `malware-analysis/SKILL.md` — 六阶段分析流程 |
-| "AI 反编译/LLM 逆向/神经反编译" | `reverse-engineering/references/ai-assisted-re.md` — AI 辅助逆向 |
+| "K8s/container escape/cloud security" | `cloud-k8s/SKILL.md` |
+| "Domain Penetration/BloodHound/Certipy/Kerberoast" | `windows-ad/SKILL.md` |
+| "Forensic/Volatility/Memory Dump" | `digital-forensics/SKILL.md` |
+| "Code Audit/SAST/Semgrep" | `code-audit/SKILL.md` |
+| "Open-source intelligence/threat intelligence/public X IOC enrichment" | `threat-intelligence/SKILL.md` — Public posts are unverified leads only |
+| "Threat Hunting/Blue Team/Detection Engineering" | `threat-hunting/SKILL.md` |
+| "Game Reverse/IL2CPP/Unity" | `reverse-engineering/SKILL.md` + seed-014 |
+| "WiFi/wireless penetration/aircrack" | `wifi-wireless/SKILL.md` |
+| "Browser extension/Chrome extension/crx" | `browser-extension-reverse/SKILL.md` |
+| "Industrial Control/OT/ICS/SCADA/PLC" | `ot-ics/SKILL.md` |
+| "macOS reverse/Mach-O" | `macos-reverse/SKILL.md` |
+| "Thick Client/Desktop Client" | `thick-client/SKILL.md` |
+| "Go reverse/Rust reverse" | `go-rust-reverse/SKILL.md` |
+| "UART/JTAG/hardware debugging" | `hardware-security/SKILL.md` |
+| "Database Security/Redis/Mongo" | `database-security/SKILL.md` |
+| "Phishing Email/SPF/DKIM/DMARC" | `email-security/SKILL.md` |
+| "SAML/OIDC/SSO Federation" | `identity-federation/SKILL.md` |
+| "SDR/RF/HackRF" | `radio-sdr/SKILL.md` |
+| "BurpSuite/Web Proxy/Interception" | `pentest-tools/SKILL.md` — Web Proxy |
+| "Responder/LLMNR poisoning/NBT-NS" | `pentest-tools/SKILL.md` — Intranet poisoning |
+| "BloodHound/AD path/attack graph" | `pentest-tools/SKILL.md` — AD attack path visualization |
+| "Certipy/AD CS/Certificate Attack" | `pentest-tools/SKILL.md` — AD Certificate Services Attack |
+| "wfuzz/parameter fuzz/Web Fuzz" | `pentest-tools/SKILL.md` — Web fuzz testing |
+| "GDB/GEF/Debug/Breakpoints" | `reverse-engineering/tools.md` — Dynamic Debugging |
+| "objdump/disassembly/ELF analysis" | `reverse-engineering/SKILL.md` — static analysis |
+| "strings/string extraction" | `reverse-engineering/SKILL.md` — Quick Scout |
+| "ProxyCat/Proxy Pool/IP Rotation" | `pentest-tools/SKILL.md` — Proxy Management |
+| "LLM security/AI security testing/Prompt injection testing" | `llm-security/SKILL.md` — OWASP LLM + ASI Top 10 complete framework |
+| "LLM jailbreak/jailbreak/system prompt word extraction" | `llm-security/references/prompt-injection-methodology.md` — Five-level progressive injection |
+| "Agent Security/Tool Abuse/Memory Poisoning/Target Hijacking" | `llm-security/references/agent-security-testing.md` — Seven-stage Agent Test |
+| "garak/PyRIT/AI Red Team" | `llm-security/SKILL.md` — LLM Security Toolchain |
+| "API Security Testing/Interface Penetration" | `api-security/SKILL.md` — 10-Phase API Testing Methodology |
+| "GraphQL Security/Introspection Attacks/Batch Query Bypass" | `api-security/references/rest-graphql-testing.md` — GraphQL Specialized |
+| "JWT attack/OAuth bypass/alg:none" | `api-security/references/jwt-oauth-testing.md` — JWT + OAuth test |
+| "BOLA/IDOR/BFLA/Object Level Authorization Bypass" | `api-security/SKILL.md` — Phase 3 Authorization Test |
+| "Supply Chain Security/SBOM/SCA/Dependency Scan" | `supply-chain-security/SKILL.md` — Six-layer supply chain governance |
+| "CI/CD Security/Pipeline Audit/Build Integrity" | `supply-chain-security/references/cicd-pipeline-security.md` — Pipeline Security |
+| "Container Security/Image Scan/Trivy/Cosign" | `supply-chain-security/SKILL.md` — Container Security Chapter |
+| "gitleaks/key scans/credential leaks" | `supply-chain-security/SKILL.md` — CI/CD Pipeline Security |
+| "iOS Reverse/IPA/Objective-C/Swift/Mach-O" | `mobile-reverse/SKILL.md` — iOS Reverse + Frida/Objection |
+| "Frida/Objection/Dynamic Instrumentation/SSL Unpinning" | `mobile-reverse/references/frida-objection-deep.md` — Frida in-depth usage |
+| "Root detection bypass/jailbreak detection bypass/anti-debugging mobile terminal" | `mobile-reverse/references/anti-detection-bypass.md` — Multi-layer bypass |
+| "Mobile Security Testing/MSTG/OWASP Mobile" | `mobile-reverse/SKILL.md` — OWASP MASTG Methodology |
+| "YARA rules/Sigma rules/behavior detection rules" | `malware-analysis/references/yara-sigma-rules.md` — Rule writing methodology |
+| "Sandbox Analysis/CAPE/Joe Sandbox/Malware Sandbox" | `malware-analysis/references/sandbox-orchestration.md` — Sandbox Orchestration |
+| "Anti-analysis/anti-sandbox/anti-debugging/virtual machine detection" | `malware-analysis/references/anti-analysis-techniques.md` — 94 techniques |
+| "IOC extraction/threat intelligence/malware analysis" | `malware-analysis/SKILL.md` — Six-stage analysis process |
+| "AI decompilation/LLM reverse/neural decompilation" | `reverse-engineering/references/ai-assisted-re.md` — AI assisted reverse |
 
-| 工具 | 相关模块 |
+| Tools | Related modules |
 |------|---------|
-| IDA Pro (idapro_*) | `ida-reverse/` — MCP HTTP 服务器 + 72 工具 |
+| IDA Pro (idapro_*) | `ida-reverse/` — MCP HTTP Server + 72 Tools |
 | radare2 (r2/rabin2/rasm2) | `radare2/` — CLI + recon.ps1 |
 | jadx / apktool | `apk-reverse/` — decode.ps1 / manifest-summary.ps1 |
 | Frida | `reverse-engineering/tools-dynamic.md` |
-| GDB / rr（通用调试） | `reverse-engineering/tools.md` |
-| Ghidra (headless) | `reverse-engineering/tools.md` + Ghidra MCP（免费 IDA 替代，可通过 bootstrap 自动注册） |
-| Binary Ninja / binary-ninja-mcp | `binary-ninja-reverse/` — 商业 GUI/API + 显式启用的社区 MCP 回环桥 |
-| Python 3 标准库 | `case-review/`: 只读 case Evidence 图审查 |
+| GDB/rr (generic debugging) | `reverse-engineering/tools.md` |
+| Ghidra (headless) | `reverse-engineering/tools.md` + Ghidra MCP (free IDA replacement, auto-registration via bootstrap) |
+| Binary Ninja / binary-ninja-mcp | `binary-ninja-reverse/` — Commercial GUI/API + explicitly enabled community MCP loopback bridge |
+| Python 3 standard library | `case-review/`: read-only case Evidence graph review |
 | angr / Qiling / Unicorn | `reverse-engineering/tools-dynamic.md` |
 | BinDiff / Diaphora | `reverse-engineering/tools-advanced.md` |
-| anything-analyzer MCP | 端口 23816 的 MCP 服务器（浏览器+HTTP 捕获+AI 分析） |
-| jshookmcp | `js-reverse/` 的补强 MCP 面，适合浏览器/CDP/Hook/Network/SourceMap/AST 场景；需要先下载并在 MCP 客户端里启用 |
-| agent-browser / Playwright | `browser-automation/` — 浏览器自动化（打开、点击、填表、爬取、截图） |
-| OpenReverse (UIA/CUA) | `browser-automation/` — Windows 桌面应用自动化 + 网络观察（mitmproxy） |
-| LLM 符号迁移 / BinDiff 替代 | `binary-diff/` — 跨版本符号批量迁移（DeepSeek/GPT） |
-| BinDiff / Diaphora / ghidriff / DeepDiff（攻击侧） | `patch-diff-exploit/` — 从补丁定位漏洞点→武器化 |
-| binwalk v3 / unblob / EMBA / Firmadyne / FAT | `firmware-pentest/` — 固件提取/自动化审计/仿真 |
-| pwntools / GEF / pwndbg / ROPgadget / Ropper / one_gadget / libc-database | `pwn-chain/` — RE→可用 exploit |
-| SysWhispers3 / Hell's Gate / pe-sieve / API Monitor | `edr-bypass-re/` — EDR 绕过研究与实现 |
-| Nmap / Masscan | `pentest-tools/` — 端口扫描、服务识别 |
-| Nuclei / ZAP / Nikto | `pentest-tools/` — 漏洞扫描 |
-| SQLMap / FFUF / Gobuster | `pentest-tools/` — Web 渗透（注入/爆破） |
-| SSTImap | `pentest-tools/` — SSTI 自动检测与利用（Kali 2026.1: `apt install sstimap`） |
-| XSStrike | `pentest-tools/` — 高级 XSS 扫描（Kali 2026.1: `apt install xsstrike`） |
-| WPProbe | `pentest-tools/` — WordPress 插件枚举（Kali 2026.1: `apt install wpprobe`） |
-| Hashcat / John / Hydra | `pentest-tools/` — 密码破解 |
-| Metasploit / Impacket | `pentest-tools/` — 利用框架 |
-| MetasploitMCP | `pentest-tools/` — Metasploit MCP 接口（Kali 2026.1: `apt install metasploitmcp`） |
-| mcp-kali-server | `pentest-tools/` — Kali 官方 MCP，AI 直接调用终端工具（`apt install mcp-kali-server`） |
-| HexStrike AI | `pentest-tools/` — 150+ 安全工具 MCP 自动化（Kali 2025.4: `apt install hexstrike-ai`） |
-| Pentest Swarm AI | `pentest-tools/` — 群体智能自主渗透框架，stigmergic blackboard 协调多 agent（`go install` 或 Docker） |
-| AdaptixC2 | `pentest-tools/` — 后渗透与对抗模拟框架（Kali 2026.1: `apt install adaptixc2`） |
-| Atomic-Operator | `pentest-tools/` — Atomic Red Team 测试执行（Kali 2026.1） |
-| Coercer | `pentest-tools/` — Windows 认证强制/NTLM relay（`apt install coercer`） |
-| NetExec (nxc) | `pentest-tools/` — 网络服务枚举与利用，CrackMapExec 继任（Kali 预装） |
-| evil-winrm-py | `pentest-tools/` — Python WinRM 远程执行（Kali 2025.4） |
-| Fluxion / aircrack-ng | `pentest-tools/` — WiFi 安全审计与破解（Kali 预装 aircrack-ng，2026.1 新增 fluxion） |
-| Responder | `pentest-tools/` — LLMNR/NBT-NS/MDNS 投毒（Kali 预装） |
-| BloodHound | `pentest-tools/` — AD 攻击路径可视化（`apt install bloodhound`） |
-| Certipy | `pentest-tools/` — AD 证书服务攻击（`apt install certipy-ad`） |
-| CrackMapExec / NetExec | `pentest-tools/` — 网络服务枚举（nxc 为 CME 继任，Kali 预装） |
-| wfuzz | `pentest-tools/` — Web 参数模糊测试（Kali 预装） |
-| Wireshark / tshark | `pentest-tools/` — 网络协议分析与 PCAP 解析（Kali 预装） |
-| BurpSuite | `pentest-tools/` — Web 代理、拦截、漏洞扫描（Kali 预装 Community 版） |
-| BurpSuite MCP | `pentest-tools/` — 63 工具 AI 全控制（代理历史/Intruder/Repeater/Scanner/Collaborator），参见 `references/burpsuite-mcp-guide.md` |
-| ProxyCat | `pentest-tools/` — 代理池管理与 IP 轮换 |
-| objdump / strings / file | `reverse-engineering/` — 基础静态分析（Kali 预装） |
-| Cobalt Strike / Sliver / Havoc / Mythic | `pentest-tools/` — C2 框架工具（与 AdaptixC2 同模块） |
-| Rubber Ducky / WiFi Pineapple / Proxmark3 | `attack-chain/` — 近源渗透硬件 |
-| pentestMCP (Docker) | `pentest-tools/` — 20+ 工具一键 MCP |
-| Mermaid / Graphviz / PlantUML | `diagram-generator/` — 图表生成（流程图/时序图/架构图/攻击路径） |
-| garak / PyRIT / promptfoo | `llm-security/` — LLM 安全测试（100+ 注入探针/多轮编排） |
-| Vespasian / Entropy / api.sh | `api-security/` — API 发现与攻击场景生成 |
-| jwt_tool | `api-security/` — JWT 全面测试（alg:none/密钥混淆/kid 注入） |
-| FireTail / Escape DAST | `api-security/` — GraphQL 专项 + 业务逻辑安全 |
-| OSV-Scanner / Trivy / Syft | `supply-chain-security/` — SBOM 生成 + SCA 扫描 |
-| OWASP Dependency-Track | `supply-chain-security/` — 企业级持续 SCA 监控 |
-| Gitleaks / truffleHog | `supply-chain-security/` — 密钥/凭证扫描 |
-| Cosign / SLSA | `supply-chain-security/` — 构建签名与溯源 |
-| Frida / Objection | `mobile-reverse/` — 动态插桩 + Frida Gadget 注入 |
-| JADX / apktool / MobSF | `mobile-reverse/` — Android 静态分析 |
-| class-dump / jtool2 / Hopper | `mobile-reverse/` — iOS 静态分析 |
-| CAPE Sandbox / ASD Azul | `malware-analysis/` — 沙箱自动化编排 |
-| YARA / FLOSS | `malware-analysis/` — 模式匹配 + 字符串去混淆 |
-| Sigma / Sigma CLI | `malware-analysis/` — SIEM 行为检测规则 |
-| pe-sieve / Detect It Easy | `malware-analysis/` — 进程扫描 + 壳检测 |
-| LLM4Decompile / Glaurung | `reverse-engineering/` — AI 辅助反编译 |
+| anything-analyzer MCP | MCP server on port 23816 (browser + HTTP capture + AI analysis) |
+| jshookmcp | The enhanced MCP side of `js-reverse/`, suitable for browser/CDP/Hook/Network/SourceMap/AST scenarios; you need to download and enable | in the MCP client first
+| agent-browser / Playwright | `browser-automation/` — Browser automation (open, click, form fill, crawl, screenshot) |
+| OpenReverse (UIA/CUA) | `browser-automation/` — Windows desktop application automation + network observation (mitmproxy) |
+| LLM symbol migration / BinDiff replacement | `binary-diff/` — Cross-version symbol batch migration (DeepSeek/GPT) |
+| BinDiff / Diaphora / ghidriff / DeepDiff (attack side) | `patch-diff-exploit/` — Locate vulnerability points from patch → weaponize |
+| binwalk v3 / unblob / EMBA / Firmadyne / FAT | `firmware-pentest/` — Firmware extraction/automated auditing/emulation |
+| pwntools/GEF/pwndbg/ROPgadget/Ropper/one_gadget/libc-database | `pwn-chain/` — RE→available exploit |
+| SysWhispers3 / Hell's Gate / pe-sieve / API Monitor | `edr-bypass-re/` — EDR bypass research and implementation |
+| Nmap / Masscan | `pentest-tools/` — Port scanning, service identification |
+| Nuclei / ZAP / Nikto | `pentest-tools/` — Vulnerability Scan |
+| SQLMap / FFUF / Gobuster | `pentest-tools/` — Web Penetration (Injection/Explosion) |
+| SSTImap | `pentest-tools/` — SSTI automatic detection and utilization (Kali 2026.1: `apt install sstimap`) |
+| XSStrike | `pentest-tools/` — Advanced XSS scanner (Kali 2026.1: `apt install xsstrike`) |
+| WPProbe | `pentest-tools/` — WordPress plugin enumeration (Kali 2026.1: `apt install wpprobe`) |
+| Hashcat / John / Hydra | `pentest-tools/` — Password Cracker |
+| Metasploit / Impacket | `pentest-tools/` — Exploitation framework |
+| MetasploitMCP | `pentest-tools/` — Metasploit MCP interface (Kali 2026.1: `apt install metasploitmcp`) |
+| mcp-kali-server | `pentest-tools/` — Kali official MCP, AI directly calls the terminal tool (`apt install mcp-kali-server`) |
+| HexStrike AI | `pentest-tools/` — 150+ Security Tools MCP Automation (Kali 2025.4: `apt install hexstrike-ai`) |
+| Pentest Swarm AI | `pentest-tools/` — Swarm intelligence autonomous penetration framework, stigmergic blackboard coordinates multiple agents (`go install` or Docker) |
+| AdaptixC2 | `pentest-tools/` — Post-infiltration and confrontation simulation framework (Kali 2026.1: `apt install adaptixc2`) |
+| Atomic-Operator | `pentest-tools/` — Atomic Red Team test execution (Kali 2026.1) |
+| Coercer | `pentest-tools/` — Windows Authentication Enforcement/NTLM relay (`apt install coercer`) |
+| NetExec (nxc) | `pentest-tools/` — Network service enumeration and utilization, CrackMapExec successor (Kali pre-installed) |
+| evil-winrm-py | `pentest-tools/` — Python WinRM remote execution (Kali 2025.4) |
+| Fluxion / aircrack-ng | `pentest-tools/` — WiFi security audit and crack (Kali pre-installed aircrack-ng, new fluxion in 2026.1) |
+| Responder | `pentest-tools/` — LLMNR/NBT-NS/MDNS poisoning (Kali pre-installed) |
+| BloodHound | `pentest-tools/` — AD attack path visualization (`apt install bloodhound`) |
+| Certipy | `pentest-tools/` — AD Certificate Services Attack (`apt install certipy-ad`) |
+| CrackMapExec / NetExec | `pentest-tools/` — Network service enumeration (nxc is CME successor, Kali comes pre-installed) |
+| wfuzz | `pentest-tools/` — Web parameter fuzz testing (Kali pre-installed) |
+| Wireshark / tshark | `pentest-tools/` — Network protocol analysis and PCAP parsing (Kali pre-installed) |
+| BurpSuite | `pentest-tools/` — Web proxy, interception, vulnerability scanning (Kali pre-installed Community version) |
+| BurpSuite MCP | `pentest-tools/` — 63 Tools AI Full Control (Agent History/Intruder/Repeater/Scanner/Collaborator), see `references/burpsuite-mcp-guide.md` |
+| ProxyCat | `pentest-tools/` — Proxy pool management and IP rotation |
+| objdump / strings / file | `reverse-engineering/` — Basic static analysis (Kali pre-installed) |
+| Cobalt Strike / Sliver / Havoc / Mythic | `pentest-tools/` — C2 framework tool (same module as AdaptixC2) |
+| Rubber Ducky / WiFi Pineapple / Proxmark3 | `attack-chain/` — Near-source penetration hardware |
+| pentestMCP (Docker) | `pentest-tools/` — 20+ tools one-click MCP |
+| Mermaid / Graphviz / PlantUML | `diagram-generator/` — Diagram generation (flow chart/sequence diagram/architecture diagram/attack path) |
+| garak / PyRIT / promptfoo | `llm-security/` — LLM security testing (100+ injection probes/multiple rounds of orchestration) |
+| Vespasian / Entropy / api.sh | `api-security/` — API discovery and attack scenario generation |
+| jwt_tool | `api-security/` — JWT comprehensive testing (alg:none/key obfuscation/kid injection) |
+| FireTail / Escape DAST | `api-security/` — GraphQL Specialization + Business Logic Security |
+| OSV-Scanner / Trivy / Syft | `supply-chain-security/` — SBOM generation + SCA scanning |
+| OWASP Dependency-Track | `supply-chain-security/` — Enterprise-grade continuous SCA monitoring |
+| Gitleaks / truffleHog | `supply-chain-security/` — Key/credential scanning |
+| Cosign / SLSA | `supply-chain-security/` — Build signature and traceability |
+| Frida / Objection | `mobile-reverse/` — Dynamic instrumentation + Frida Gadget injection |
+| JADX / apktool / MobSF | `mobile-reverse/` — Android static analysis |
+| class-dump / jtool2 / Hopper | `mobile-reverse/` — iOS static analysis |
+| CAPE Sandbox / ASD Azul | `malware-analysis/` — Sandbox automation orchestration |
+| YARA / FLOSS | `malware-analysis/` — pattern matching + string deobfuscation |
+| Sigma / Sigma CLI | `malware-analysis/` — SIEM Behavior Detection Rules |
+| pe-sieve / Detect It Easy | `malware-analysis/` — Process Scan + Shell Detection |
+| LLM4Decompile / Glaurung | `reverse-engineering/` — AI-assisted decompilation |
 
-需要确认本机工具是否可用、路径在哪里、哪个脚本会调用它时，统一查看 `tool-index.md`，不要临时猜路径。
+When  needs to confirm whether the native tool is available, where the path is, and which script will call it, check `tool-index.md` together and do not guess the path temporarily.
 
 ---
 
-## 路由未命中时的处理
+## Processing when routing misses
 
-如果当前任务在上面所有表格中都找不到匹配项，**不要硬塞进现有 skill**，按以下流程处理：
+ If the current task cannot find a match in any of the above tables,**do not shoehorn it into the existing skill**. Follow the following process:
 
-1. 先确认是否属于现有 skill 的边缘场景（可以扩展现有 skill 覆盖）
-2. 如果确实是全新类型，主动向用户提议新增 skill：
-   - 说明建议的 skill 名称和覆盖场景
-   - 说明需要的工具链
-   - 说明与现有 skill 的关系
-3. 用户确认后，按 `CONTRIBUTING.md` 流程执行新增
-4. 新增完成后更新本路由矩阵
+1. First confirm whether it belongs to the edge scene of the existing skill (the coverage of the existing skill can be expanded)
+2. If is indeed a new type, we will proactively propose to the user a new skill:
+   - Describes suggested skill names and coverage scenarios
+   - describes the required tool chain
+   - Describes the relationship with existing skills
+3. After the user confirms, follow the `CONTRIBUTING.md` process to execute the new
+4. After is added, update this routing matrix
 
-**AI 不需要等用户发现缺失。路由失败本身就是新增 skill 的信号。**
+**AI does not need to wait for the user to discover that it is missing. Routing failure itself is a signal to add a new skill.**
 
-## 路径交叉（跨模块场景）
+## path crossing (cross-module scenario)
 
-有些任务会跨多个模块，以下是常见路径交叉：
+ Some tasks span multiple modules. The following are common path intersections:
 
 ```
-APK 逆向路径：
-  apk-reverse/scripts/decode.ps1 → Java 层分析
-  ↓ 如果核心在 .so
-  ida-reverse/ 或 radare2/ → so 分析
-  ↓ 如果需动态验证
+APK reverse path:
+apk-reverse/scripts/decode.ps1 → Java layer analysis
+↓ If the core is in .so
+ida-reverse/ or radare2/ → so analysis
+↓ If dynamic verification is required
   apk-reverse/scripts/frida-run.ps1 → Frida Hook
 
-前端 JS 逆向路径：
-  js-reverse/Observe → 定位目标请求
-  ↓ 需要更强的浏览器/CDP/Hook/Network 面
-  jshookmcp → 做页面运行时采样、断点、拦截、SourceMap/AST 辅助
-  ↓ 确认入口函数后
-  js-reverse/Rebuild → Node 本地复现
-  ↓ 需要补环境
+Front-end JS reverse path:
+js-reverse/Observe → Target request
+↓ Needs stronger browser/CDP/Hook/Network interface
+jshookmcp → Do page runtime sampling, breakpoints, interception, SourceMap/AST assistance
+↓ After confirming the entry function
+js-reverse/Rebuild → Node local reproduction
+↓ Need to make up for the environment
   js-reverse/references/env-patching.md
 
-二进制逆向路径：
-  radare2/scripts/recon.ps1 → 快速侦察
-  ↓ 深度分析
-  ida-reverse/ → IDA 反编译
-  ↓ 动态验证
+Binary reverse path:
+radare2/scripts/recon.ps1 → Rapid reconnaissance
+↓ In-depth analysis
+ida-reverse/ → IDA decompilation
+↓ Dynamic verification
   reverse-engineering/tools-dynamic.md → Frida/GDB
 
-CTF 竞赛路径（通过 CTF-Sandbox-Orchestrator）：
-  ctf-sandbox-orchestrator/SKILL.md → 建立沙盒模型
-  ↓ 按主导证据面路由
-  competition-web-runtime/ 或 competition-reverse-pwn/ 或 competition-identity-windows/
-  ↓ 走不通时回总控
-  ctf-sandbox-orchestrator → 重新路由
+CTF competition path (via CTF-Sandbox-Orchestrator):
+ctf-sandbox-orchestrator/SKILL.md → Create sandbox model
+↓ Routing by dominant evidence plane
+competition-web-runtime/ or competition-reverse-pwn/ or competition-identity-windows/
+↓ If there is no way, return to the main control
+ctf-sandbox-orchestrator → reroute
 
-Cookie HMAC 密钥复用 → 后台认证绕过：
+Cookie HMAC key reuse → background authentication bypass:
   competition-web-runtime/references/cookie-hmac-key-reuse-auth-bypass.md
-  ↓ 适用场景
-  URL 含 access token、签名 Cookie、后台 admin_session 共用同一密钥
+↓ Applicable scenarios
+URL contains access token, signed cookie, and background admin_session share the same key
 
-固件渗透路径：
-  firmware-pentest/references/extraction-methodology.md → 提取文件系统
-  ↓ 拿到二进制
-  firmware-pentest/references/emba-automated-analysis.md → EMBA 自动审计找已知 CVE
-  ↓ 已知 CVE 不够 / 想找 0-day
-  firmware-pentest/references/emulation-and-fuzz.md → Firmadyne 仿真 + AFL++ fuzz
-  ↓ 找到 crash
-  pwn-chain/references/stack-pwn.md 或 heap-pwn.md → 写 exploit
-  ↓ 打实机
-  attack-chain/SKILL.md → 整合进攻击链
+Firmware penetration path:
+firmware-pentest/references/extraction-methodology.md → Extract file system
+↓ Get binary
+firmware-pentest/references/emba-automated-analysis.md → EMBA automatic audit to find known CVEs
+↓ Not enough known CVEs / looking for 0-day
+firmware-pentest/references/emulation-and-fuzz.md → Firmadyne emulation + AFL++ fuzz
+↓ Found crash
+pwn-chain/references/stack-pwn.md or heap-pwn.md → write exploit
+↓ Compacting machine
+attack-chain/SKILL.md → integrated into attack chain
 
-N-day 武器化路径：
-  patch-diff-exploit/references/patch-tuesday-workflow.md → 取补丁前后二进制
-  ↓ 对齐符号
-  patch-diff-exploit/references/diff-tools-comparison.md → BinDiff/ghidriff/Diaphora 选型
-  ↓ 定位变更
-  patch-diff-exploit/references/root-cause-and-poc.md → LLM 辅助根因 + 写 PoC
-  ↓ 武器化
-  pwn-chain/SKILL.md（构造稳定 exploit）+ pentest-tools/references/msf-protocol.md（Metasploit 模块化）
+N-day weaponization path:
+patch-diff-exploit/references/patch-tuesday-workflow.md → Get the binary before and after the patch
+↓ Alignment symbols
+patch-diff-exploit/references/diff-tools-comparison.md → BinDiff/ghidriff/Diaphora selection
+↓ Positioning changes
+patch-diff-exploit/references/root-cause-and-poc.md → LLM auxiliary root cause + write PoC
+↓ Weaponization
+pwn-chain/SKILL.md (constructing a stable exploit) + pentest-tools/references/msf-protocol.md (Metasploit modularization)
 
-红队投递路径：
-  attack-chain/SKILL.md → 选阶段
-  ↓ 需要绕 EDR
-  edr-bypass-re/references/hook-survey.md → 识别目标 EDR 的 hook
-  ↓ 选绕过技术
-  edr-bypass-re/references/unhook-techniques.md → 直接 syscall / Hell's Gate
+Red team delivery path:
+attack-chain/SKILL.md → Select stage
+↓ Need to bypass EDR
+edr-bypass-re/references/hook-survey.md → Hook that identifies target EDR
+↓ Choose bypass technology
+edr-bypass-re/references/unhook-techniques.md → direct syscall / Hell's Gate
   edr-bypass-re/references/telemetry-blinding.md → ETW patch / AMSI patch
-  ↓ 本地验证
-  pe-sieve / API Monitor → 确认 unhook 干净
-  ↓ 投递
-  回到 attack-chain 后渗透阶段
+↓ Local verification
+pe-sieve/API Monitor → Confirm unhook is clean
+↓ Delivery
+Back to the attack-chain post-infiltration phase
 ```

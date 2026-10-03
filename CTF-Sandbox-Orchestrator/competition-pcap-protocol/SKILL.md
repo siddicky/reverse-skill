@@ -9,7 +9,7 @@ Use this skill only as a downstream specialization after `$ctf-sandbox-orchestra
 
 Use this skill when the decisive evidence sits inside packet order, protocol framing, or stream reconstruction rather than a single IOC or host log.
 
-Reply in Simplified Chinese unless the user explicitly requests English.
+Reply in English unless the user explicitly requests another language.
 
 ## Quick Start
 

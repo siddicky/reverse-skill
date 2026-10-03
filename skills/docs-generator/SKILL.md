@@ -3,87 +3,87 @@ name: docs-generator
 description: |
   Creates task-oriented technical documentation with progressive disclosure. Use when writing READMEs, API docs, architecture docs, or markdown documentation.
   Also use this skill at the END of any completed reverse engineering, penetration testing, CTF, or security analysis task to generate a formal report in the user's project directory.
-  Trigger keywords: 写报告, 写文档, 出报告, writeup, 技术文档, report, documentation.
+  Trigger keywords: write report, write document, issue report, writeup, technical document, report, documentation.
 ---
 
 # Technical Documentation
 
-## ACTION REQUIRED（读完后立刻执行）
+## ACTION REQUIRED (execute immediately after reading)
 
-1. `NOW`：确认当前任务是否命中本 skill 的适用范围
-2. `NOW`：读取 `../tool-index.md`，校验工具可用性和实际路径
-3. `NEXT`：缺工具时调用 bootstrap，不要猜路径
-4. `ACT`：进入"工作流"第一步并执行，不要停在确认状态
+1. `NOW`: Confirm whether the current task hits the applicable scope of this skill
+2. `NOW`: Read `../tool-index.md`, verify tool availability and actual path
+3. `NEXT`: Call bootstrap when tools are missing, do not guess the path
+4. `ACT`: Enter the first step of "workflow" and execute it, do not stop in the confirmation state
 
-For writing style, tone, and voice guidance, use `Skill(ce:writer)` with **The Engineer** persona.
+For writing style, tone, and voice guidance, use `Skill(ce:writer)` with**The Engineer**persona.
 
-## 安全/逆向任务文档输出
+## Security/reverse task document output
 
-当逆向/渗透/CTF/安全分析任务完成后，本 skill 负责在**用户项目目录**生成正式技术文档。
+After the reverse/penetration/CTF/security analysis tasks are completed, this skill is responsible for generating formal technical documents in the**user project directory**.
 
-### 触发时机
+### trigger timing
 
-1. 逆向任务完成，已产出核心结论（算法还原、签名破解、绕过方案等）
-2. 渗透测试完成，已发现并验证漏洞
-3. CTF 题目解出，已拿到 flag
-4. 用户明确要求"写一份报告/文档/writeup"
+1. The reverse task has been completed, and core conclusions have been produced (algorithm restoration, signature cracking, bypass solutions, etc.)
+2. penetration test completed, vulnerability  discovered and verified
+3. CTF problem solved, got flag
+4. user explicitly requested "write a report/document/writeup"
 
-### 模板选择
+### template select
 
-| 任务类型 | 使用模板 |
+| Task type | Using template |
 |---------|---------|
-| APK/二进制/so 逆向 | `references/security-report-templates.md` → 逆向工程报告 |
-| 渗透测试/漏洞挖掘 | `references/security-report-templates.md` → 渗透测试报告 |
-| CTF 解题 | `references/security-report-templates.md` → CTF Writeup |
-| JS/Web 签名逆向 | `references/security-report-templates.md` → 签名逆向报告 |
-| 恶意软件 / APT / 病毒分析报告 | `references/security-report-templates.md` + **`references/vendor-report-rules.md`** |
-| 通用技术文档 | `references/templates.md` → README / API 文档 |
+| APK/binary/so Reverse | `references/security-report-templates.md` → Reverse Engineering Report |
+| Penetration testing/vulnerability mining | `references/security-report-templates.md` → Penetration testing report |
+| CTF Problem Solving | `references/security-report-templates.md` → CTF Writeup |
+| JS/Web Signature Reverse | `references/security-report-templates.md` → Signature Reverse Report |
+| Malware / APT / Virus Analysis Report | `references/security-report-templates.md` +**`references/vendor-report-rules.md`**|
+| General technical documentation | `references/templates.md` → README / API documentation |
 
-### 厂商报告结构（Issue #65）
+### Vendor Reporting Structure (Issue #65)
 
-安全类正式报告 **MUST** 读取 `references/vendor-report-rules.md`（只取结构，不抄厂商原文）。仅在任务证据或用户明确要求时选择厂商 flavor；普通逆向和其他任务使用 `flavor = null`。
+ Security Class Official Report**MUST**Read `references/vendor-report-rules.md` (only get the structure, do not copy the original text of the manufacturer). Select the vendor flavor only if the task evidences it or if the user explicitly requests it; use `flavor = null` for general reverse engineering and other tasks.
 
-| Flavor / Overlay | 何时用 | 主参考骨架 |
+| Flavor / Overlay | When to use | Main reference skeleton |
 |------------------|--------|------------|
-| `malware` | 明确恶意样本、木马、白加黑、钓鱼投毒 | 火绒式：概述→流程→样本分析→应急处置→IOC |
-| `apt` | APT/战役/团伙/多阶段感染链/行业定向 | 卡巴斯基 Securelist 式：摘要→感染链→调查叙事→Interesting findings→技术分析→检测缓解→IOC |
-| `flavor = null` | 普通 APK/ELF/PE/Mach-O 逆向、算法/固件分析、渗透 / CTF / JS 签名 | 原任务模板 + Base 通用元素；不套 malware/APT 专属章节 |
-| thin `vuln` | 用户明确要求漏洞/补丁/CVE 技术分析 | 概述→影响/复现→崩溃与补丁分析→防护建议（叠加在 null 上，非第 3 默认全文 flavor） |
+| `malware` | Clear malicious samples, Trojans, Baijiahei, phishing and poisoning | Tinder style: Overview → Process → Sample Analysis → Emergency Response → IOC |
+| `apt` | APT/campaign/gang/multi-stage infection chain/industry-targeted | Kaspersky Securelist format: Summary→Infection chain→Investigation narrative→Interesting findings→Technical analysis→Detection mitigation→IOC |
+| `flavor = null` | Common APK/ELF/PE/Mach-O reverse engineering, algorithm/firmware analysis, penetration/CTF/JS signature | original task template + Base common elements; does not apply malware/APT exclusive chapter |
+| thin `vuln` | Users explicitly request vulnerability/patch/CVE technical analysis | Overview→Impact/Recurrence→Crash and patch analysis→Protection recommendations (overlaid on null, not the 3rd default full-text flavor) |
 
-原则：**模板在精不在多** —— 仅 2 个厂商全文 flavor；`vuln` 仅为可选 thin overlay，不另建第三套默认全文模板。
-与 §0 Evidence→Finding→Path **同时生效**；冲突时 Evidence 契约优先。
+ principle:**template is more sophisticated than multiple.**- only 2 full-text flavors from manufacturers; `vuln` is only an optional thin overlay and does not create a third set of default full-text templates.
+ and §0 Evidence→Finding→Path**take effect simultaneously with**; in case of conflict, the Evidence contract takes precedence.
 
-### 输出规范
+### output specification
 
-- **输出位置**：用户当前项目目录（不是 skill 包目录）
-- **文件名格式**：`YYYY-MM-DD_[类型]-[目标简称]-report.md`
-- **如果项目有 `docs/` 目录**：优先放在 `docs/` 下
-- **编码**：UTF-8
-- **语言**：跟随用户对话语言（中文对话出中文报告，英文对话出英文报告）
+- **output location**: user’s current project directory (not the skill package directory)
+- **file name format**: `YYYY-MM-DD_[type]-[target abbreviation]-report.md`
+- **If the project has `docs/` directory**: priority is placed under `docs/`
+- **encoding**: UTF-8
+- **Language**: Follow the user's conversation language (Chinese conversation produces a Chinese report, English conversation produces an English report)
 
-### 质量要求
+### Quality requirements
 
-- 所有代码块必须可直接运行或有明确上下文
-- 不要有 placeholder/TODO
-- 关键发现必须有证据支撑
-- 复现步骤必须让第三方能独立重现
-- 敏感信息（真实 token、密码、内部 URL）用占位符替代
-- **MUST** 包含 Evidence → Finding → Path 链（见 `../ops/evidence-finding-path.md` 与模板 §0）
-- **MUST** 读取 `references/vendor-report-rules.md`：选定 `malware` / `apt` 或 `flavor = null`（漏洞任务可叠加 thin `vuln`）；无 flavor 时只输出原任务模板和适用的 Base 元素，不强制 IOC/ATT&CK
-- **SHOULD** 引用 case `scope.md` / `timeline.md`（`../scripts/case-init.ps1`）
+- All code blocks must be directly executable or have an explicit context
+- does not have placeholder/TODO
+- Key findings must be supported by evidence
+- The steps to reproduce must allow a third party to independently reproduce
+- sensitive information (real token, password, internal URL) replaced with placeholders
+- **MUST**contains the Evidence → Finding → Path chain (see `../ops/evidence-finding-path.md` with templates §0)
+- **MUST**reads `references/vendor-report-rules.md`: select `malware` / `apt` or `flavor = null` (vulnerability tasks can be superimposed on thin `vuln`); without flavor, only the original task template and applicable Base elements are output, and IOC/ATT&CK is not forced.
+- **SHOULD**reference case `scope.md` / `timeline.md` (`../scripts/case-init.ps1`)
 
-### 图表集成
+### chart integration
 
-生成报告时，应在适当位置调用 `diagram-generator` skill 生成可视化图表：
+When  generates a report, the `diagram-generator` skill should be called at the appropriate location to generate visual charts:
 
-| 报告类型 | 建议图表 | 图表类型 |
+| Report type | Suggested chart | Chart type |
 |---------|---------|---------|
-| 逆向工程报告 | 函数调用关系图、数据流图 | Mermaid flowchart / sequenceDiagram |
-| 渗透测试报告 | 攻击路径图、网络拓扑图 | Mermaid flowchart / Graphviz |
-| CTF Writeup | 解题思路流程图 | Mermaid flowchart |
-| JS 签名逆向报告 | 请求链路时序图、算法流程图 | Mermaid sequenceDiagram / flowchart |
+| Reverse engineering report | Function call diagram, data flow diagram | Mermaid flowchart / sequenceDiagram |
+| Penetration test report | attack path diagram, network topology diagram | Mermaid flowchart / Graphviz |
+| CTF Writeup | Problem-solving idea flowchart | Mermaid flowchart |
+| JS signature reverse report | Request link sequence diagram, algorithm flow chart | Mermaid sequenceDiagram / flowchart |
 
-图表以 Mermaid 代码块形式嵌入报告 markdown 中，确保可在 GitHub/GitLab 直接渲染。
+ charts are embedded in report markdown in the form of Mermaid code blocks, ensuring that they can be rendered directly in GitHub/GitLab.
 
 ---
 
@@ -122,9 +122,9 @@ Every concept needs a concrete example.
 
 - **Sentence case headings**: "Getting started" not "Getting Started"
 - **Max 3 heading levels**: Deeper means split the doc
-- **Always specify language** in code blocks
-- **Relative paths** for internal links
-- **Tables** for structured data with 3+ attributes
+- **Always specify language**in code blocks
+- **Relative paths**for internal links
+- **Tables**for structured data with 3+ attributes
 
 ## Quality Checklist
 
@@ -154,38 +154,38 @@ For README, API endpoint, and file organization templates, see [references/templ
 
 ---
 
-## 按需自举（On-Demand Bootstrap）
+## On-Demand Bootstrap
 
-本 skill 不依赖外部工具，纯文本生成。无需 bootstrap。
+This skill does not rely on external tools and generates pure text. No bootstrap required.
 
-如果需要渲染图表嵌入报告，会调用 `diagram-generator/` skill。
+ will call the `diagram-generator/` skill if it needs to render a chart embedded report.
 
 ---
 
-## 路由上下文
+## routing context
 
-**上游入口**: 所有安全/逆向 skill 在任务完成后自动调用本 skill
-**触发方式**:
-- 自动：任务完成后作为行为链第 9 步执行
-- 手动：用户说"写报告"、"出文档"、"writeup"
+**upstream entrance**: All security/reverse skills automatically call this skill after the task is completed.
+**trigger mode**:
+- automatically: After the task is completed,  is executed as step 9 of the behavior chain
+- Manual: User says "write report", "output document", "writeup"
 
-**同级关联模块**:
-- `apk-reverse/` — APK 逆向完成后生成逆向报告
-- `ida-reverse/` — 二进制分析完成后生成逆向报告
-- `radare2/` — CLI 分析完成后生成逆向报告
-- `js-reverse/` — JS 签名逆向完成后生成签名报告
-- `reverse-engineering/` — 通用逆向完成后生成逆向报告
-- `field-journal/` — 报告内容同时作为进化日志的数据来源
+**Same level association module**:
+- `apk-reverse/` — Generate reverse engineering report  after APK reverse engineering is completed
+- `ida-reverse/` — generate reverse engineering report  after binary analysis is completed
+- `radare2/` — Generate reverse engineering report  after CLI analysis is completed
+- `js-reverse/` — Generate signature report  after JS signature reverse engineering is completed
+- `reverse-engineering/` — Generate reverse engineering report  after universal reverse engineering is completed
+- `field-journal/` — The report content also serves as the data source of the evolution log
 
-**安全报告模板**: `references/security-report-templates.md`
-**厂商报告规则**: `references/vendor-report-rules.md`（flavor: malware | apt | null；optional overlay: vuln）
-**通用文档模板**: `references/templates.md`
+**Security Report Template**: `references/security-report-templates.md`
+**Vendor reporting rules**: `references/vendor-report-rules.md` (flavor: malware | apt | null; optional overlay: vuln)
+**Universal document template**: `references/templates.md`
 
 
-## 任务完成自检（声称完成前 MUST 通过）
+## task completion self-test (MUST passed before claiming completion)
 
-- [ ] 我是否执行了工作流中的每一步（而不是只阅读）？
-- [ ] 我是否基于 `tool-index` 使用了真实工具路径？
-- [ ] 我是否产出了可复现证据（命令/脚本/截图/报告）？
-- [ ] 报告是否含 Evidence / Finding / Path（ops 契约）？
-- [ ] 是否完成并回写了 RULES 要求的 Checklist 项？
+- [ ] Did I execute every step in the workflow (instead of just reading)?
+- [ ] Am I using real toolpaths based on `tool-index`?
+- [ ] Did I produce reproducible evidence (commands/scripts/screenshots/reports)?
+- [ ] Does the report contain Evidence / Finding / Path (ops contract)?
+- [ ] Have you completed and written back the Checklist items required by RULES?

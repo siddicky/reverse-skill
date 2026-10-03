@@ -9,7 +9,7 @@ Use this skill only as a downstream specialization after `$ctf-sandbox-orchestra
 
 Use this skill when the decisive edge is Linux credential material and where that material is accepted.
 
-Reply in Simplified Chinese unless the user explicitly requests English.
+Reply in English unless the user explicitly requests another language.
 
 ## Quick Start
 
