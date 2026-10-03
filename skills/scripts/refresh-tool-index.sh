@@ -375,7 +375,7 @@ with open(sys.argv[2], 'a', encoding='utf-8') as out:
             f"{opt(r['mcp_http_verified'])} | {yn(r['can_auto_install'])} | "
             f"{r['bootstrap_kind'] or '—'} |\n"
         )
-out.write("\n> ✓ = Yes | ✗ = No | — = Not applicable or not detected. npm-mcp's Ready uses MCP registration status + npx runtime; npx itself does not make an MCP capability available to tools.\n\n")
+    out.write("\n> ✓ = Yes | ✗ = No | — = Not applicable or not detected. npm-mcp's Ready uses MCP registration status + npx runtime; npx itself does not make an MCP capability available to tools.\n\n")
 PY
 else
   CAP_RECORDS_TMP=""

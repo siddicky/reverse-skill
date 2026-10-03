@@ -8,6 +8,7 @@ on:
 
 jobs:
   validate-and-merge:
+    if: startsWith(github.event.pull_request.title, '[field-journal]')
     runs-on: ubuntu-latest
     permissions:
       contents: write

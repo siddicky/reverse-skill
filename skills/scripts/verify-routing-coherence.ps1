@@ -218,12 +218,12 @@ if ($vendorRulesText -match 'first confirm the scope and preserve evidence' -and
 } else {
     Bad 'malware remediation does not require evidence preservation before destructive actions'
 }
-if ($vendorRulesText -match '(?m)\|\s*4\. JS/Web signature reverse engineering\s*\|[^\r\n]*malware') {
+if ($vendorRulesText -notmatch '(?m)\|\s*4\. JS/Web signature reverse engineering\s*\|\s*`flavor = null`') {
     Bad 'vendor rules route JS signature reports through malware flavor'
 } else {
     Ok 'vendor rules keep JS signature reports flavor-neutral'
 }
-Assert-Fields $vendorRulesPath @('skills/ops/evidence-finding-path.md', 'source_ref', 'source_type', 'securelist.com/updated-mata', 'www.huorong.cn', 'thin overlay', 'vuln')
+Assert-Fields $vendorRulesPath @('skills/ops/evidence-finding-path.md', 'Source Evidence', 'securelist.com/updated-mata', 'www.huorong.cn', 'thin overlay', 'vuln')
 Assert-Fields (Join-Path $skillsRoot 'malware-analysis/SKILL.md') @('IAT repair iron rule', 'E-iat-repair-fail', 'E-exports', 'E-self-check-crash', 'ExitProcess', 'Timebox', 'feasibility', 'E-api-hash', 'E-sig-forge', 'A–T', 'U–AV', 'E-batch-deobf', 'E-vba-pcode')
 Assert-Fields (Join-Path $skillsRoot 'reverse-engineering/anti-analysis.md') @('Agent response recipes A–T', 'E-anti-debug-cpuid', 'E-api-hash', 'SigCheck', 'ollvm-deobfuscation')
 Assert-Fields (Join-Path $skillsRoot 'reverse-engineering/references/nonpe-format-cookbook.md') @('U–AV', 'E-batch-deobf', 'E-ps-decode-layer-N', 'E-vba-pcode', 'E-js-vmp', 'E-driver-irp-handlers', 'E-dll-tls-dllmain', 'E-android-hidden-icon-manifest', 'E-delay-import')
@@ -231,10 +231,10 @@ Assert-Fields (Join-Path $skillsRoot 'js-reverse/SKILL.md') @('E-js-vmp', 'E-js-
 Assert-Fields (Join-Path $skillsRoot 'apk-reverse/SKILL.md') @('E-android-hidden-icon-manifest', 'nonpe-format-cookbook')
 Assert-Fields (Join-Path $skillsRoot 'reverse-engineering/kernel-driver-reverse.md') @('E-driver-irp-handlers', 'E-driver-ioctl', 'E-driver-byovd')
 Assert-Fields (Join-Path $skillsRoot 'docs-generator/references/security-report-templates.md') @('thin `vuln`', '1c. Vulnerability technical analysis report')
-if ($vendorRulesText -match '(?i)vuln.*default full-text flavor' -and $vendorRulesText -notmatch '(?i)vuln is \*\*not\*\* the 3rd default full-text flavor') {
+if ($vendorRulesText -match '(?i)vuln.*default full-text flavor' -and $vendorRulesText -notmatch '(?i)`vuln` is \*\*not\*\* the 3rd default full-text flavor') {
     # presence of explicit "not third default" language is OK; flag only if it claims vuln IS a third default full flavor
 }
-if ($vendorRulesText -match 'only 2 full-text flavors from manufacturers' -and $vendorRulesText -match 'vuln is \*\*not\*\* the 3rd default full-text flavor') {
+if ($vendorRulesText -match 'only 2 full-text flavors from manufacturers' -and $vendorRulesText -match '`vuln` is \*\*not\*\* the 3rd default full-text flavor') {
     Ok 'vendor rules keep vuln as thin overlay not third default flavor'
 } else {
     Bad 'vendor rules missing vuln thin-overlay constraint'
