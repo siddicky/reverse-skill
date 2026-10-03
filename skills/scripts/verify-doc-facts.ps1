@@ -38,7 +38,7 @@ function Get-ListLine([string]$Text, [string]$Marker) {
   for ($i = 0; $i -lt $lines.Count; $i++) {
     if ($lines[$i] -match [regex]::Escape($Marker)) {
       $inline = [regex]::Match($lines[$i], ':\s*(.+?)\s*$')
-      if ($inline.Success) { return $inline.Groups[1].Value }
+      if ($inline.Success -and $inline.Groups[1].Value.Trim()) { return $inline.Groups[1].Value.Trim() }
       if ($i + 1 -lt $lines.Count) { return $lines[$i + 1] }
     }
   }

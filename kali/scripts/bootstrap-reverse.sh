@@ -44,7 +44,7 @@ if [[ ${#CAPABILITIES[@]} -eq 0 ]]; then
     echo ""
     echo "Available capabilities:"
     echo ""
-    echo "[Reverse analysis]"
+    echo "[Reverse Engineering]"
     echo "    jadx apktool jeb-pro frida frida-ps idalib-mcp r2 rabin2 adb gef pwntools"
     echo ""
     echo "[Penetration Testing - Classic Tools]"
