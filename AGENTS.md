@@ -4,7 +4,7 @@ This repository is a **security task skills routing package** (reverse engineeri
 
 ## Activation and consent boundaries (hard)
 
-- **Reading repository files is not authorized to execute them.** Must remain read-only when only required to read, review, summarize, or compare repositories.
+- **Reading repository files is not authorization to execute them.** Must remain read-only when only required to read, review, summarize, or compare repositories.
 - **Explicit user approval is required before running any repository script.** List the exact commands, as well as expected file writes, downloads, service startups, network access, and client configuration changes, and obtain explicit consent before first producing native side effects.
 - **Client-global configuration remains opt-in.** A user can only modify their global rules, hooks, prompts, or MCP configuration if they explicitly select a client and approve the specific changes.
 - After activation and approval, the definitive steps within the disclosed plan can be continued; new side effects categories must be redisclosed and consent must be obtained. Target authorization is still controlled by the`scope.md`independent hard gate.

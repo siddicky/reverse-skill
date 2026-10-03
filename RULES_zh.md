@@ -6,7 +6,7 @@
 
 ## Activate with consent gate (before any native side effects)
 
-**Reading repository files is not authorized to execute them.** Must remain read-only when requested only to read, review, summarize, or compare this repository.
+**Reading repository files is not authorization to execute them.** Must remain read-only when requested only to read, review, summarize, or compare this repository.
 
 **Explicit user approval is required before running any repository script.** For configuration or task requests, list the exact commands to be executed, as well as expected file writes, downloads, service startups, network access, and client configuration changes; obtain explicit consent before the first such side effect. When new categories of side effects are later discovered, redo disclosure and consent must be obtained.
 
